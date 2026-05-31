@@ -258,9 +258,7 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
     <button class="nb" id="nb-journal" onclick="go('journal')">
       <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Журнал
     </button>
-    <button class="nb" id="nb-summary" onclick="go('summary')">
-      <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Итоги
-    </button>
+    
     <button class="nb" id="nb-deposits" onclick="go('deposits')">
       <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>Вклады
     </button>
@@ -705,12 +703,13 @@ async function renderDash(){
   const dRows2=active2.map(b=>{
     const a=agg2[b.id];const bal=bals2[b.id]||{start:0,end:0};const bt=btots2[b.id]||{income:0,expense:0};
     const sumInc=a.income+a.income_i+a.tr_in;const sumExp=a.tr_out+a.expense_i+a.expense;
-    const diff=(bal.end||0)-(bal.start||0);
+    const autoEnd=(bal.start||0)+sumInc-sumExp;
+const diff=autoEnd-(bal.start||0);
     totStart2+=bal.start||0;totEnd2+=bal.end||0;totSumInc2+=sumInc;totSumExp2+=sumExp;
     return{b,sumInc,sumExp,bal,bt,diff};
   });
 
-  document.getElementById('dash-summary-detail').innerHTML=`<div class="panel" style="margin-bottom:14px"><div class="panel-h">Итоги с проверкой · ${curMonth}</div><div class="tbl-wrap"><table class="st"><thead><tr><th>Банк</th><th class="bh">Доход по банку</th><th class="bh">Расход по банку</th><th class="gh">∑ Доход</th><th class="gh">Проверка</th><th class="rh">∑ Расход</th><th class="rh">Проверка</th><th class="bh">Остаток на начало</th><th class="bh">Остаток на конец</th><th class="bh">Разница</th></tr></thead><tbody>${dRows2.map(({b,sumInc,sumExp,bal,bt,diff})=>`<tr><td><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td><td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','income',this)">${bt.income?fmtF(bt.income):''}</td><td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','expense',this)">${bt.expense?fmtF(bt.expense):''}</td><td class="pos">${fmtF(sumInc)}</td><td class="${Math.abs((bt.income||0)-sumInc)<1?'check-ok':'check-fail'}">${Math.abs((bt.income||0)-sumInc)<1?'✅':'⚠️ '+fmtF(Math.abs((bt.income||0)-sumInc))}</td><td class="${sumExp?'neg':''}">${fmtF(sumExp)}</td><td class="${Math.abs((bt.expense||0)-sumExp)<1?'check-ok':'check-fail'}">${Math.abs((bt.expense||0)-sumExp)<1?'✅':'⚠️ '+fmtF(Math.abs((bt.expense||0)-sumExp))}</td><td class="ed" contenteditable="true" onblur="saveBalance('${b.id}','start',this)">${bal.start?fmtF(bal.start):''}</td><td class="ed" contenteditable="true" onblur="saveBalance('${b.id}','end',this)">${bal.end?fmtF(bal.end):''}</td><td class="${diff>0?'pos':diff<0?'neg':'neu'}">${diff?(diff>0?'+':'')+fmtF(diff):'—'}</td></tr>`).join('')}<tr class="${trOk2?'check-row':'check-row fail'}"><td colspan="10" style="text-align:left;font-size:13px;font-weight:700">${trOk2?'✅ Переводы сходятся: '+fmtF(tots2.tr_in):'⚠️ Переводы не сходятся! Приход из др.Б: '+fmtF(tots2.tr_in)+' ≠ Списание в др.Б: '+fmtF(tots2.tr_out)+' · Разница: '+fmtF(Math.abs(trDiff2))}</td></tr></tbody><tfoot><tr><td>Итог</td><td></td><td></td><td class="pos">${fmtF(totSumInc2)}</td><td></td><td class="neg">${fmtF(totSumExp2)}</td><td></td><td>${totStart2?fmtF(totStart2):'—'}</td><td>${totEnd2?fmtF(totEnd2):'—'}</td><td class="${totEnd2-totStart2>0?'pos':totEnd2-totStart2<0?'neg':'neu'}">${totEnd2-totStart2?(totEnd2-totStart2>0?'+':'')+fmtF(totEnd2-totStart2):'—'}</td></tr></tfoot></table></div></div>`;
+  document.getElementById('dash-summary-detail').innerHTML=`<div class="panel" style="margin-bottom:14px"><div class="panel-h">Итоги с проверкой · ${curMonth}</div><div class="tbl-wrap"><table class="st"><thead><tr><th>Банк</th><th class="bh">Доход по банку</th><th class="bh">Расход по банку</th><th class="gh">∑ Доход</th><th class="gh">Проверка</th><th class="rh">∑ Расход</th><th class="rh">Проверка</th><th class="bh">Остаток на начало</th><th class="bh">Остаток на конец</th><th class="bh">Разница</th></tr></thead><tbody>${dRows2.map(({b,sumInc,sumExp,bal,bt,diff})=>`<tr><td><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td><td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','income',this)">${bt.income?fmtF(bt.income):''}</td><td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','expense',this)">${bt.expense?fmtF(bt.expense):''}</td><td class="pos">${fmtF(sumInc)}</td><td class="${Math.abs((bt.income||0)-sumInc)<1?'check-ok':'check-fail'}">${Math.abs((bt.income||0)-sumInc)<1?'✅':'⚠️ '+fmtF(Math.abs((bt.income||0)-sumInc))}</td><td class="${sumExp?'neg':''}">${fmtF(sumExp)}</td><td class="${Math.abs((bt.expense||0)-sumExp)<1?'check-ok':'check-fail'}">${Math.abs((bt.expense||0)-sumExp)<1?'✅':'⚠️ '+fmtF(Math.abs((bt.expense||0)-sumExp))}</td><td class="ed" contenteditable="true" onblur="saveBalance('${b.id}','start',this)">${bal.start?fmtF(bal.start):''}</td><td class="ed" contenteditable="true" onblur="saveBalance('${b.id}','end',this)">${autoEnd?fmtF(autoEnd):''}</td><td class="${diff>0?'pos':diff<0?'neg':'neu'}">${diff?(diff>0?'+':'')+fmtF(diff):'—'}</td></tr>`).join('')}<tr class="${trOk2?'check-row':'check-row fail'}"><td colspan="10" style="text-align:left;font-size:13px;font-weight:700">${trOk2?'✅ Переводы сходятся: '+fmtF(tots2.tr_in):'⚠️ Переводы не сходятся! Приход из др.Б: '+fmtF(tots2.tr_in)+' ≠ Списание в др.Б: '+fmtF(tots2.tr_out)+' · Разница: '+fmtF(Math.abs(trDiff2))}</td></tr></tbody><tfoot><tr><td>Итог</td><td></td><td></td><td class="pos">${fmtF(totSumInc2)}</td><td></td><td class="neg">${fmtF(totSumExp2)}</td><td></td><td>${totStart2?fmtF(totStart2):'—'}</td><td>${totEnd2?fmtF(totEnd2):'—'}</td><td class="${totEnd2-totStart2>0?'pos':totEnd2-totStart2<0?'neg':'neu'}">${totEnd2-totStart2?(totEnd2-totStart2>0?'+':'')+fmtF(totEnd2-totStart2):'—'}</td></tr></tfoot></table></div></div>`;
 }
 
 function goToBank(bankId){document.getElementById('jf-bank').value=bankId;go('journal');}
@@ -820,7 +819,8 @@ async function renderSummary(){
   let totStart=0,totEnd=0,totSumInc=0,totSumExp=0;
   const dRows=active.map(b=>{const a=agg[b.id];const bal=bals[b.id]||{start:0,end:0};
     const sumInc=a.income+a.income_i+a.tr_in;const sumExp=a.tr_out+a.expense_i+a.expense;
-    const diff=(bal.end||0)-(bal.start||0);
+    const autoEnd=(bal.start||0)+sumInc-sumExp;
+const diff=autoEnd-(bal.start||0);
     totStart+=bal.start||0;totEnd+=bal.end||0;totSumInc+=sumInc;totSumExp+=sumExp;
     return{b,sumInc,sumExp,bal,diff};
   });
@@ -849,8 +849,16 @@ async function saveBalance(bankId,field,el){
   try{
     await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET ${field==='start'?'balance_start':'balance_end'}=EXCLUDED.${field==='start'?'balance_start':'balance_end'}`,
       field==='start'?[bankId,curMonth,val,0]:[bankId,curMonth,0,val]);
+    if(field==='end'){
+      const nextMonth=MONTHS[MONTHS.indexOf(curMonth)+1];
+      if(nextMonth){
+        await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=EXCLUDED.balance_start`,
+          [bankId,nextMonth,val,0]);
+      }
+    }
     toast('✓ Остаток сохранён');
   }catch(e){toast('Ошибка сохранения');}
+}
 }
 
 async function renderAnalytics(){
