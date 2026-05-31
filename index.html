@@ -72,10 +72,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .alert-banner svg{width:18px;height:18px;flex-shrink:0;stroke:#d97706;fill:none;stroke-width:2;}
 
 /* TOTAL CARD */
-.total-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 22px;margin-bottom:14px;box-shadow:var(--shadow);}
+.total-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:18px;box-shadow:var(--shadow);}
 .total-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
 .total-label{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;}
-.total-value{font-family:'Manrope',sans-serif;font-size:32px;font-weight:800;color:var(--text);letter-spacing:-1px;line-height:1;}
+.total-value{font-family:'Manrope',sans-serif;font-size:42px;font-weight:800;color:var(--text);letter-spacing:-1px;line-height:1;}
 .total-breakdown{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px;}
 .tb-item{background:var(--surface2);border-radius:var(--radius-sm);padding:14px 16px;border:1px solid var(--border);}
 .tb-lbl{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
@@ -83,12 +83,12 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 
 /* CLEAN CARDS */
 .clean-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px;}
-.clean-card{border-radius:var(--radius);padding:14px 18px;border:1px solid;box-shadow:var(--shadow);}
+.clean-card{border-radius:var(--radius);padding:20px 22px;border:1px solid;box-shadow:var(--shadow);}
 .clean-card.main{background:var(--green-bg);border-color:var(--green-b);}
 .clean-card.inc{background:#f0fdf4;border-color:#bbf7d0;}
 .clean-card.exp{background:var(--red-bg);border-color:var(--red-b);}
 .cc-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
-.cc-val{font-family:'Manrope',sans-serif;font-size:22px;font-weight:800;margin-top:6px;line-height:1;}
+.cc-val{font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;margin-top:8px;line-height:1;}
 .cc-sub{font-size:12px;margin-top:6px;opacity:.75;}
 
 /* DASH GRID */
@@ -281,26 +281,35 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
   <div class="ph"><h1>Дашборд</h1><p id="dash-sub">Общая картина финансов</p></div>
   <div id="dep-alerts"></div>
   <div class="mbar" id="mt-dash"></div>
-  <div style="display:grid;grid-template-columns:280px 1fr 1fr 1fr;gap:14px;margin-bottom:18px">
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)">
-      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Всего моих денег</div>
-      <div id="dash-total-money" style="font-family:Manrope,sans-serif;font-size:30px;font-weight:800;color:var(--text);letter-spacing:-1px;margin-bottom:12px">—</div>
-      <div id="dash-breakdown"></div>
+  <!-- TOTAL MONEY -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 22px;margin-bottom:12px;box-shadow:var(--shadow)">
+    <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Всего моих денег</div>
+    <div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap">
+      <div id="dash-total-money" style="font-family:Manrope,sans-serif;font-size:34px;font-weight:800;color:var(--text);letter-spacing:-1px;flex-shrink:0">—</div>
+      <div id="dash-breakdown" style="display:flex;gap:24px;flex-wrap:wrap;align-items:center"></div>
     </div>
-    <div class="clean-card main">
-      <div class="cc-lbl" style="color:var(--green)">Чистый доход</div>
-      <div class="cc-val" id="dash-clean" style="color:var(--green)">—</div>
-      <div class="cc-sub" style="color:var(--green)">Приход − Расход</div>
+  </div>
+  <!-- METRICS ROW -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+    <div style="background:var(--green-bg);border:1px solid var(--green-b);border-radius:var(--radius);padding:14px 16px">
+      <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.06em">Чистый доход</div>
+      <div id="dash-clean" style="font-family:Manrope,sans-serif;font-size:22px;font-weight:800;color:var(--green);margin-top:5px">—</div>
+      <div style="font-size:11px;color:var(--green);margin-top:3px;opacity:.75">Приход − Расход</div>
     </div>
-    <div class="clean-card inc">
-      <div class="cc-lbl" style="color:var(--green)">Приход вне систем</div>
-      <div class="cc-val" id="dash-income" style="color:var(--green)">—</div>
-      <div class="cc-sub" style="color:var(--green)">Реальные поступления</div>
+    <div style="background:var(--green-bg);border:1px solid var(--green-b);border-radius:var(--radius);padding:14px 16px">
+      <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.06em">Приход вне систем</div>
+      <div id="dash-income" style="font-family:Manrope,sans-serif;font-size:22px;font-weight:800;color:var(--green);margin-top:5px">—</div>
+      <div style="font-size:11px;color:var(--green);margin-top:3px;opacity:.75">Реальные поступления</div>
     </div>
-    <div class="clean-card exp">
-      <div class="cc-lbl" style="color:var(--red)">Расход вне систем</div>
-      <div class="cc-val" id="dash-expense" style="color:var(--red)">—</div>
-      <div class="cc-sub" style="color:var(--red)">Реальные траты</div>
+    <div style="background:var(--red-bg);border:1px solid var(--red-b);border-radius:var(--radius);padding:14px 16px">
+      <div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.06em">Расход вне систем</div>
+      <div id="dash-expense" style="font-family:Manrope,sans-serif;font-size:22px;font-weight:800;color:var(--red);margin-top:5px">—</div>
+      <div style="font-size:11px;color:var(--red);margin-top:3px;opacity:.75">Реальные траты</div>
+    </div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px">
+      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Внутри (переводы)</div>
+      <div id="dash-internal" style="font-family:Manrope,sans-serif;font-size:22px;font-weight:800;color:var(--text2);margin-top:5px">—</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:3px">Между своими счетами</div>
     </div>
   </div>
   <div class="dash-grid">
@@ -620,13 +629,14 @@ async function renderDash(){
 
   const agg={};banks.forEach(b=>agg[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
   recs.forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
-  let totalInc=0,totalExp=0;
-  banks.forEach(b=>{totalInc+=agg[b.id].income;totalExp+=agg[b.id].expense;});
+  let totalInc=0,totalExp=0,totalInternal=0;
+  banks.forEach(b=>{totalInc+=agg[b.id].income;totalExp+=agg[b.id].expense;totalInternal+=agg[b.id].tr_in+agg[b.id].income_i;});
   const clean=totalInc-totalExp;
   document.getElementById('dash-clean').textContent=(clean>=0?'+':'')+fmtF(clean);
   document.getElementById('dash-clean').style.color=clean>=0?'var(--green)':'var(--red)';
   document.getElementById('dash-income').textContent=fmtF(totalInc);
   document.getElementById('dash-expense').textContent=fmtF(totalExp);
+  const intEl=document.getElementById('dash-internal');if(intEl)intEl.textContent=fmtF(totalInternal);
 
   let totalDebit=0,totalSavings=0,totalDeposit=0,totalCash=0;
   banks.forEach(b=>{const bal=bals[b.id];const end=bal?bal.end:0;
@@ -638,10 +648,13 @@ async function renderDash(){
   const totalMoney=totalDebit+totalSavings+totalDeposit+totalCash;
   document.getElementById('dash-total-money').textContent=fmtF(totalMoney);
   document.getElementById('dash-breakdown').innerHTML=`
-  <div style="font-size:13px;color:var(--text2);margin-bottom:4px">💳 Карты: <b style="color:var(--accent)">${fmtF(totalDebit)}</b></div>
-  <div style="font-size:13px;color:var(--text2);margin-bottom:4px">📈 Накопит.: <b style="color:var(--teal)">${fmtF(totalSavings)}</b></div>
-  <div style="font-size:13px;color:var(--text2);margin-bottom:4px">🏦 Вклады: <b style="color:var(--purple)">${fmtF(totalDeposit)}</b></div>
-  <div style="font-size:13px;color:var(--text2)">💵 Наличные: <b style="color:var(--amber)">${fmtF(totalCash)}</b></div>`;
+    <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase">Карты</span><span style="font-size:15px;font-weight:700;color:var(--accent);font-family:Manrope,sans-serif">${fmtF(totalDebit)}</span></div>
+    <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
+    <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase">Накопит.</span><span style="font-size:15px;font-weight:700;color:var(--teal);font-family:Manrope,sans-serif">${fmtF(totalSavings)}</span></div>
+    <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
+    <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase">Вклады</span><span style="font-size:15px;font-weight:700;color:var(--purple);font-family:Manrope,sans-serif">${fmtF(totalDeposit)}</span></div>
+    <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
+    <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase">Наличные</span><span style="font-size:15px;font-weight:700;color:var(--amber);font-family:Manrope,sans-serif">${fmtF(totalCash)}</span></div>`;
 
   const activeBanks=banks.filter(b=>Object.values(agg[b.id]).some(v=>v>0)||(bals[b.id]&&bals[b.id].end));
   document.getElementById('dash-banks').innerHTML=activeBanks.length
