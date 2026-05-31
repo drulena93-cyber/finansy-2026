@@ -312,25 +312,8 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
       <div style="font-size:11px;color:var(--text3);margin-top:3px">Между своими счетами</div>
     </div>
   </div>
-  <div class="dash-grid">
-    <div class="panel">
-      <div class="panel-h">По счетам <span style="font-size:12px;color:var(--text3);font-weight:400">· клик → журнал</span></div>
-      <div class="panel-b" id="dash-banks"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-h">Расходы по категориям</div>
-      <div class="panel-b" id="dash-cats"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-h">Вклады</div>
-      <div class="panel-b" id="dash-deps"></div>
-    </div>
-  </div>
-  <div class="panel">
-    <div class="panel-h">Последние операции</div>
-    <div class="panel-b" id="dash-recent"></div>
-  </div>
-</div>
+  <div id="dash-summary-top"></div>
+  <div id="dash-summary-detail"></div>
 
 <!-- JOURNAL -->
 <div id="view-journal" class="view">
@@ -440,6 +423,20 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
     <div class="panel-b">
       <div class="an-chart" id="an-chart"></div>
       <div style="display:flex;gap:6px;margin-top:6px" id="an-labels"></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1.1fr 1fr 0.9fr;gap:16px;margin-bottom:18px">
+    <div class="panel">
+      <div class="panel-h">По счетам · <span id="an-month-lbl"></span></div>
+      <div class="panel-b" id="an-banks"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h">Расходы по категориям</div>
+      <div class="panel-b" id="an-cats"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h">Вклады</div>
+      <div class="panel-b" id="an-deps"></div>
     </div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
@@ -716,23 +713,27 @@ async function renderDash(){
         <div class="dep-amount">${fmt(parseFloat(d.amount))}</div>
       </div>`;}).join('')
     :'<div class="empty">Вкладов нет</div>';
-
-  const allRecs=await loadAllRecords();
-  const recent=[...allRecs].sort((a,b)=>b.id-a.id).slice(0,6);
-  document.getElementById('dash-recent').innerHTML=recent.length
-    ?recent.map(r=>{const b=bank(r.bank_id);const sign=TYPE_SIGN[r.type]||0;
-      return `<div class="rec-row">
-        <div class="bdot" style="background:${b.color}"></div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.description||TYPE_LABELS[r.type]}</div>
-          <div style="font-size:12px;color:var(--text3)">${b.name} · ${r.month}${r.category?' · '+r.category:''}</div>
-        </div>
-        <div style="font-size:15px;font-weight:700;color:${sign>=0?'var(--green)':'var(--red)'};white-space:nowrap;font-family:Manrope,sans-serif">${sign>=0?'+':'-'}${fmt(parseFloat(r.amount))}</div>
-      </div>`;}).join('')
-    :'<div class="empty">Нет записей</div>';
 }
+function goToBank(bankId){document.getElementById('jf-bank').value=bankId;go('journal');// Render summary tables on dashboard
+const bals2=await loadBalances(curMonth);
+const btots2=await loadBankTotals(curMonth);
+const agg2={};banks.forEach(b=>agg2[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
+recs.forEach(r=>{if(agg2[r.bank_id])agg2[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
+const active2=banks.filter(b=>Object.values(agg2[b.id]).some(v=>v>0)||(bals2[b.id]&&(bals2[b.id].start||bals2[b.id].end)));
+const tots2={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
+active2.forEach(b=>Object.keys(tots2).forEach(k=>tots2[k]+=agg2[b.id][k]||0));
 
-function goToBank(bankId){document.getElementById('jf-bank').value=bankId;go('journal');}
+document.getElementById('dash-summary-top').innerHTML=`<div class="panel" style="margin-bottom:14px"><div class="panel-h">Сводка по банкам · ${curMonth}</div><div class="tbl-wrap"><table class="st"><thead><tr><th>Банк</th><th class="gh">Приход вне систем</th><th class="gh">Приход внутри</th><th class="gh">Приход+из другого Б</th><th class="rh">Списание в другой Б</th><th class="rh">Списание внутри</th><th class="rh">Расход вне систем</th></tr></thead><tbody>${active2.map(b=>{const a=agg2[b.id];return`<tr><td><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td><td class="${a.income?'pos':''}">${a.income?fmt(a.income):'—'}</td><td>${a.income_i?fmt(a.income_i):'—'}</td><td>${a.tr_in?fmt(a.tr_in):'—'}</td><td>${a.tr_out?fmt(a.tr_out):'—'}</td><td>${a.expense_i?fmt(a.expense_i):'—'}</td><td class="${a.expense?'neg':''}">${a.expense?fmt(a.expense):'—'}</td></tr>`;}).join('')}</tbody><tfoot><tr><td>Итог</td><td class="pos">${fmtF(tots2.income)}</td><td>${fmtF(tots2.income_i)}</td><td>${fmtF(tots2.tr_in)}</td><td>${fmtF(tots2.tr_out)}</td><td>${fmtF(tots2.expense_i)}</td><td class="neg">${fmtF(tots2.expense)}</td></tr></tfoot></table></div></div>`;
+
+const trDiff2=tots2.tr_in-tots2.tr_out;const trOk2=Math.abs(trDiff2)<0.01;
+let totStart2=0,totEnd2=0,totSumInc2=0,totSumExp2=0;
+const dRows2=active2.map(b=>{const a=agg2[b.id];const bal=bals2[b.id]||{start:0,end:0};const bt=btots2[b.id]||{income:0,expense:0};
+const sumInc=a.income+a.income_i+a.tr_in;const sumExp=a.tr_out+a.expense_i+a.expense;
+const diff=(bal.end||0)-(bal.start||0);
+totStart2+=bal.start||0;totEnd2+=bal.end||0;totSumInc2+=sumInc;totSumExp2+=sumExp;
+return{b,sumInc,sumExp,bal,bt,diff};});
+
+document.getElementById('dash-summary-detail').innerHTML=`<div class="panel" style="margin-bottom:14px"><div class="panel-h">Итоги с проверкой · ${curMonth}</div><div class="tbl-wrap"><table class="st"><thead><tr><th>Банк</th><th class="bh">Доход по банку</th><th class="bh">Расход по банку</th><th class="gh">∑ Доход</th><th class="gh">Проверка</th><th class="rh">∑ Расход</th><th class="rh">Проверка</th><th class="bh">Остаток на начало</th><th class="bh">Остаток на конец</th><th class="bh">Разница</th></tr></thead><tbody>${dRows2.map(({b,sumInc,sumExp,bal,bt,diff})=>`<tr><td><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td><td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','income',this)">${bt.income?fmtF(bt.income):''}</td><td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','expense',this)">${bt.expense?fmtF(bt.expense):''}</td><td class="pos">${fmtF(sumInc)}</td><td class="${Math.abs((bt.income||0)-sumInc)<1?'check-ok':'check-fail'}">${Math.abs((bt.income||0)-sumInc)<1?'✅':'⚠️ '+fmtF(Math.abs((bt.income||0)-sumInc))}</td><td class="${sumExp?'neg':''}">${fmtF(sumExp)}</td><td class="${Math.abs((bt.expense||0)-sumExp)<1?'check-ok':'check-fail'}">${Math.abs((bt.expense||0)-sumExp)<1?'✅':'⚠️ '+fmtF(Math.abs((bt.expense||0)-sumExp))}</td><td class="ed" contenteditable="true" onblur="saveBalance('${b.id}','start',this)">${bal.start?fmtF(bal.start):''}</td><td class="ed" contenteditable="true" onblur="saveBalance('${b.id}','end',this)">${bal.end?fmtF(bal.end):''}</td><td class="${diff>0?'pos':diff<0?'neg':'neu'}">${diff?(diff>0?'+':'')+fmtF(diff):'—'}</td></tr>`).join('')}<tr class="${trOk2?'check-row':'check-row fail'}"><td colspan="10" style="text-align:left;font-size:13px;font-weight:700">${trOk2?'✅ Переводы сходятся: '+fmtF(tots2.tr_in):'⚠️ Переводы не сходятся! Приход из др.Б: '+fmtF(tots2.tr_in)+' ≠ Списание в др.Б: '+fmtF(tots2.tr_out)+' · Разница: '+fmtF(Math.abs(trDiff2))}</td></tr></tbody><tfoot><tr><td>Итог</td><td></td><td></td><td class="pos">${fmtF(totSumInc2)}</td><td></td><td class="neg">${fmtF(totSumExp2)}</td><td></td><td>${totStart2?fmtF(totStart2):'—'}</td><td>${totEnd2?fmtF(totEnd2):'—'}</td><td class="${totEnd2-totStart2>0?'pos':totEnd2-totStart2<0?'neg':'neu'}">${totEnd2-totStart2?(totEnd2-totStart2>0?'+':'')+fmtF(totEnd2-totStart2):'—'}</td></tr></tfoot></table></div></div>`;}
 
 function setSortJrn(col){
   const sortMap={date:'date_desc',bank:'bank',cat:'cat',amount:'amount_desc'};
@@ -883,6 +884,18 @@ async function saveBalance(bankId,field,el){
 }
 
 async function renderAnalytics(){
+  document.getElementById('an-month-lbl').textContent=curMonth;
+const recsA=await loadRecordsMonth(curMonth);
+const balsA=await loadBalances(curMonth);
+const aggA={};banks.forEach(b=>aggA[b.id]={income:0,expense:0});
+recsA.forEach(r=>{if(aggA[r.bank_id]){if(r.type==='income')aggA[r.bank_id].income+=parseFloat(r.amount)||0;if(r.type==='expense')aggA[r.bank_id].expense+=parseFloat(r.amount)||0;}});
+const activeBanksA=banks.filter(b=>Object.values(aggA[b.id]).some(v=>v>0)||(balsA[b.id]&&balsA[b.id].end));
+document.getElementById('an-banks').innerHTML=activeBanksA.length?activeBanksA.map(b=>{const bal=balsA[b.id];const net=aggA[b.id].income-aggA[b.id].expense;return`<div class="brow" onclick="goToBank('${b.id}')"><div class="bdot" style="background:${b.color}"></div><div style="flex:1"><div class="bname">${b.name}</div>${bal&&bal.end?`<div style="font-size:12px;color:var(--text3)">остаток: ${fmt(bal.end)}</div>`:''}</div><div class="${net>=0?'binc':'bexp'}">${net>=0?'+':'-'}${fmt(net)}</div></div>`;}).join(''):'<div class="empty">Нет данных</div>';
+const catExpA={};recsA.filter(r=>r.type==='expense').forEach(r=>{const c=r.category||'Прочее';catExpA[c]=(catExpA[c]||0)+parseFloat(r.amount);});
+const sortedCatsA=Object.entries(catExpA).sort((a,b)=>b[1]-a[1]);const maxCatA=sortedCatsA[0]?sortedCatsA[0][1]:1;
+document.getElementById('an-cats').innerHTML=sortedCatsA.length?sortedCatsA.slice(0,7).map(([c,v])=>`<div class="cat-row"><div class="cat-name">${c}</div><div class="cat-track"><div class="cat-fill" style="width:${Math.round(v/maxCatA*100)}%;background:var(--red)"></div></div><div class="cat-val" style="color:var(--red)">-${fmt(v)}</div></div>`).join(''):'<div class="empty">Нет расходов</div>';
+const depsA=await loadDeposits();const todayA=new Date();todayA.setHours(0,0,0,0);
+document.getElementById('an-deps').innerHTML=depsA.length?depsA.slice(0,5).map(d=>{const dc=new Date(d.date_close);const diff=Math.floor((dc-todayA)/(1000*60*60*24));const cls=diff<0?'exp':diff<=14?'warn':'ok';const lbl=diff<0?'Истёк':diff<=14?diff+' дн.':dc.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'});return`<div class="dep-row"><div style="display:flex;align-items:center;justify-content:space-between"><div class="dep-name">${d.name}</div><span class="dep-badge ${cls}">${lbl}</span></div><div class="dep-meta">${d.bank_name} · ${d.rate}% годовых</div><div class="dep-amount">${fmt(parseFloat(d.amount))}</div></div>`;}).join(''):'<div class="empty">Вкладов нет</div>';
   const all=await loadAllRecords();
   const byM={};MONTHS.forEach(m=>byM[m]={inc:0,exp:0});
   all.forEach(r=>{if(byM[r.month]){if(r.type==='income')byM[r.month].inc+=parseFloat(r.amount)||0;if(r.type==='expense')byM[r.month].exp+=parseFloat(r.amount)||0;}});
