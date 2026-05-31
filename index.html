@@ -619,6 +619,17 @@ async function loadBalances(month){
   try{const rows=await q('SELECT * FROM balances WHERE month=$1',[month]);const out={};rows.forEach(r=>out[r.bank_id]={start:parseFloat(r.balance_start)||0,end:parseFloat(r.balance_end)||0});return out;}
   catch(e){return{};}
 }
+async function loadBankTotals(month){
+  try{const rows=await q('SELECT * FROM bank_totals WHERE month=$1',[month]);const out={};rows.forEach(r=>out[r.bank_id]={income:parseFloat(r.income_bank)||0,expense:parseFloat(r.expense_bank)||0});return out;}
+  catch(e){return{};}
+}
+async function saveBankTotal(bankId,field,val){
+  try{
+    await q(`INSERT INTO bank_totals(bank_id,month,income_bank,expense_bank) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET ${field==='income'?'income_bank':'expense_bank'}=EXCLUDED.${field==='income'?'income_bank':'expense_bank'}`,
+      field==='income'?[bankId,curMonth,val,0]:[bankId,curMonth,0,val]);
+    toast('✓ Сохранено');
+  }catch(e){toast('Ошибка');}
+}
 async function loadDeposits(){try{return await q('SELECT * FROM deposits WHERE is_active=true ORDER BY date_close');}catch(e){return[];}}
 
 function fillBankSelects(){
@@ -809,6 +820,7 @@ async function renderSummary(){
   document.getElementById('sum-m-lbl').textContent=curMonth;
   const recs=await loadRecordsMonth(curMonth);
   const bals=await loadBalances(curMonth);
+  const btots=await loadBankTotals(curMonth);
   const agg={};banks.forEach(b=>agg[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
   recs.forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
   const active=banks.filter(b=>Object.values(agg[b.id]).some(v=>v>0)||(bals[b.id]&&(bals[b.id].start||bals[b.id].end)));
@@ -833,11 +845,16 @@ async function renderSummary(){
     return{b,sumInc,sumExp,bal,diff};
   });
   document.getElementById('sum-detail').innerHTML=`
-    <thead><tr><th>Банк</th><th class="gh">∑ Доход</th><th class="rh">∑ Расход</th><th class="bh">Остаток начало</th><th class="bh">Остаток конец</th><th class="bh">Разница</th></tr></thead>
+    <thead><tr><th>Банк</th><th class="bh">Доход по банку</th><th class="bh">Расход по банку</th><th class="gh">∑ Доход</th><th class="gh">Проверка</th><th class="rh">∑ Расход</th><th class="rh">Проверка</th>
     <tbody>
       ${dRows.map(({b,sumInc,sumExp,bal,diff})=>`<tr>
         <td><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td>
-        <td class="pos">${fmtF(sumInc)}</td><td class="${sumExp?'neg':''}">${fmtF(sumExp)}</td>
+        <td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','income',this)">${btots[b.id]?btots[b.id].income||'':''}</td>
+        <td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','expense',this)">${btots[b.id]?btots[b.id].expense||'':''}</td>
+        <td class="pos">${fmtF(sumInc)}</td>
+        <td class="${Math.abs((btots[b.id]?.income||0)-sumInc)<1?'check-ok':'check-fail'}">${Math.abs((btots[b.id]?.income||0)-sumInc)<1?'✅':'⚠️ '+fmtF(Math.abs((btots[b.id]?.income||0)-sumInc))}</td>
+        <td class="${sumExp?'neg':''}">${fmtF(sumExp)}</td>
+        <td class="${Math.abs((btots[b.id]?.expense||0)-sumExp)<1?'check-ok':'check-fail'}">${Math.abs((btots[b.id]?.expense||0)-sumExp)<1?'✅':'⚠️ '+fmtF(Math.abs((btots[b.id]?.expense||0)-sumExp))}</td>
         <td class="ed" contenteditable="true" onblur="saveBalance('${b.id}','start',this)">${bal.start||''}</td>
         <td class="ed" contenteditable="true" onblur="saveBalance('${b.id}','end',this)">${bal.end||''}</td>
         <td class="${diff>0?'pos':diff<0?'neg':'neu'}">${diff?fmtF(diff):'—'}</td>
@@ -859,6 +876,12 @@ async function saveBalance(bankId,field,el){
       field==='start'?[bankId,curMonth,val,0]:[bankId,curMonth,0,val]);
     toast('✓ Остаток сохранён');
   }catch(e){toast('Ошибка сохранения');}
+  async function saveBankTotalEl(bankId,field,el){
+  const val=parseFloat(el.textContent.replace(/\s|₽|⚠️/g,'').replace(',','.'))||0;
+  el.textContent=val||'';
+  await saveBankTotal(bankId,field,val);
+  renderSummary();
+}
 }
 
 async function renderAnalytics(){
