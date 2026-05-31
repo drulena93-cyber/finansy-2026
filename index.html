@@ -524,7 +524,7 @@ const SUPABASE_URL = 'https://qvfyajmwhdchhukhwbct.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2Znlham13aGRjaGh1a2h3YmN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMjg0MjEsImV4cCI6MjA5NTgwNDQyMX0.fkGU-F5mkDzCb00mtmT0EVritTg0oMCvMRKwQ-vgCwE';
 const API = '/api/db';
 const PWD_KEY = 'fin26_pwd';
-const DEFAULT_PWD = '932900';
+const DEFAULT_PWD = '';
 const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const TYPE_LABELS = {income:'Приход вне систем',income_i:'Приход внутри',tr_in:'Приход+из другого Б',tr_out:'Списание в другой Б',expense_i:'Списание внутри',expense:'Расход вне систем'};
 const TYPE_SIGN = {income:1,income_i:1,tr_in:1,tr_out:-1,expense_i:-1,expense:-1};
@@ -547,16 +547,9 @@ function toast(m) { const t=document.getElementById('toast'); t.textContent=m; t
 
 // AUTH
 function doLogin() {
-  const pwd = document.getElementById('pwd-inp').value;
-  const stored = localStorage.getItem(PWD_KEY)||DEFAULT_PWD;
-  if(pwd===stored) {
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('app').style.display='block';
-    initApp();
-  } else {
-    document.getElementById('login-err').textContent='Неверный пароль';
-    document.getElementById('pwd-inp').value='';
-  }
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  initApp();
 }
 function doLogout() { document.getElementById('login-screen').style.display='flex'; document.getElementById('app').style.display='none'; document.getElementById('pwd-inp').value=''; document.getElementById('login-err').textContent=''; }
 function changePwd() {
