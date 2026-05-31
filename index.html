@@ -5,221 +5,223 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Финансы 2026</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-:root {
-  --bg:#f5f6fa;--surface:#fff;--surface2:#f8f9fc;--border:#e4e7ef;--border2:#d0d5e8;
-  --text:#1a1d2e;--text2:#5a6180;--text3:#9099b5;
-  --accent:#4f6ef7;--accent-l:#eef1fe;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+:root{
+  --bg:#f0f2f8;--surface:#ffffff;--surface2:#f7f8fc;--border:#e2e6f0;--border2:#c8cfe0;
+  --text:#1a1d2e;--text2:#4a5270;--text3:#8890aa;
+  --accent:#4f6ef7;--accent-l:#eef1fe;--accent-d:#3b5bd9;
   --green:#16a34a;--green-bg:#f0fdf4;--green-b:#bbf7d0;
   --red:#dc2626;--red-bg:#fef2f2;--red-b:#fecaca;
-  --amber:#d97706;--amber-bg:#fffbeb;
-  --purple:#7c3aed;--purple-bg:#f5f3ff;
-  --radius:12px;--radius-sm:8px;
+  --amber:#d97706;--amber-bg:#fffbeb;--amber-b:#fcd34d;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;--purple-b:#ddd6fe;
+  --teal:#0d9488;--teal-bg:#f0fdfa;
+  --radius:16px;--radius-sm:10px;--radius-xs:6px;
+  --shadow:0 1px 4px rgba(0,0,0,0.06),0 0 0 1px rgba(0,0,0,0.03);
+  --shadow-md:0 4px 20px rgba(0,0,0,0.08);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;min-height:100vh;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:15px;min-height:100vh;line-height:1.5;}
 
 /* LOGIN */
-#login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000;}
-.login-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px 36px;width:320px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,0.08);}
-.login-logo{font-size:32px;margin-bottom:8px;}
-.login-title{font-size:20px;font-weight:700;color:var(--accent);margin-bottom:4px;}
-.login-sub{font-size:12px;color:var(--text3);margin-bottom:24px;}
-.login-inp{width:100%;height:44px;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:0 16px;font-size:16px;text-align:center;letter-spacing:6px;outline:none;font-family:inherit;transition:border .15s;}
-.login-inp:focus{border-color:var(--accent);}
-.login-err{font-size:12px;color:var(--red);margin-top:8px;min-height:16px;}
-.login-btn{width:100%;height:44px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;margin-top:12px;transition:background .15s;font-family:inherit;}
-.login-btn:hover{background:#3b5bd9;}
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#eef1fe 0%,#f0f2f8 50%,#f0fdf4 100%);display:flex;align-items:center;justify-content:center;z-index:1000;}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:48px 40px;width:360px;text-align:center;box-shadow:var(--shadow-md);}
+.login-logo{font-size:48px;margin-bottom:12px;}
+.login-title{font-family:'Manrope',sans-serif;font-size:24px;font-weight:800;color:var(--accent);margin-bottom:6px;}
+.login-sub{font-size:14px;color:var(--text3);margin-bottom:28px;}
+.login-inp{width:100%;height:52px;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:0 18px;font-size:18px;text-align:center;letter-spacing:8px;outline:none;font-family:inherit;transition:border .15s;background:var(--surface2);}
+.login-inp:focus{border-color:var(--accent);background:#fff;}
+.login-err{font-size:13px;color:var(--red);margin-top:10px;min-height:18px;}
+.login-btn{width:100%;height:52px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-size:16px;font-weight:700;cursor:pointer;margin-top:14px;transition:all .15s;font-family:'Manrope',sans-serif;letter-spacing:.3px;}
+.login-btn:hover{background:var(--accent-d);transform:translateY(-1px);}
 
 /* APP */
 #app{display:none;min-height:100vh;}
 .layout{display:flex;min-height:100vh;}
 
 /* SIDEBAR */
-.sidebar{width:200px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:0;position:fixed;top:0;left:0;bottom:0;z-index:100;}
-.sb-logo{padding:16px 16px 14px;border-bottom:1px solid var(--border);cursor:pointer;}
-.sb-logo-title{font-size:14px;font-weight:700;color:var(--accent);}
-.sb-logo-sub{font-size:10px;color:var(--text3);margin-top:2px;}
-.nav{padding:10px 8px;flex:1;}
-.nav-lbl{font-size:9px;font-weight:600;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;padding:10px 8px 4px;}
-.nb{display:flex;align-items:center;gap:7px;width:100%;padding:7px 9px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;color:var(--text2);background:none;border:none;cursor:pointer;transition:all .12s;text-align:left;margin-bottom:1px;}
-.nb svg{width:14px;height:14px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
+.sb-logo{padding:20px 20px 18px;border-bottom:1px solid var(--border);}
+.sb-logo-title{font-family:'Manrope',sans-serif;font-size:17px;font-weight:800;color:var(--accent);letter-spacing:-.3px;}
+.sb-logo-sub{font-size:12px;color:var(--text3);margin-top:3px;}
+.nav{padding:14px 10px;flex:1;overflow-y:auto;}
+.nav-lbl{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding:12px 10px 5px;}
+.nb{display:flex;align-items:center;gap:9px;width:100%;padding:10px 12px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;color:var(--text2);background:none;border:none;cursor:pointer;transition:all .12s;text-align:left;margin-bottom:2px;}
+.nb svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .nb:hover{background:var(--bg);color:var(--text);}
 .nb.active{background:var(--accent-l);color:var(--accent);font-weight:600;}
-.nb-logout{color:var(--red);margin-top:auto;}
+.nb-logout{color:var(--red)!important;margin-top:8px;}
+.nb-logout:hover{background:var(--red-bg)!important;}
 
-.main{margin-left:200px;padding:24px 28px;flex:1;}
-.ph{margin-bottom:18px;}
-.ph h1{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.3px;}
-.ph p{font-size:12px;color:var(--text2);margin-top:2px;}
+.main{margin-left:220px;padding:28px 32px;flex:1;min-width:0;}
+.ph{margin-bottom:22px;}
+.ph h1{font-family:'Manrope',sans-serif;font-size:24px;font-weight:800;color:var(--text);letter-spacing:-.4px;}
+.ph p{font-size:14px;color:var(--text2);margin-top:4px;}
 
 /* MONTH BAR */
-.mbar{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:5px;}
-.mtab{padding:5px 11px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text2);transition:all .12s;}
+.mbar{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:22px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:6px;}
+.mtab{padding:7px 14px;border-radius:var(--radius-xs);font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text2);transition:all .12s;font-family:inherit;}
 .mtab:hover{background:var(--bg);color:var(--text);}
-.mtab.active{background:var(--accent);color:#fff;}
+.mtab.active{background:var(--accent);color:#fff;font-weight:600;}
 
 /* VIEWS */
 .view{display:none;}
 .view.active{display:block;}
 
 /* ALERT BANNER */
-.alert-banner{background:#fffbeb;border:1px solid #fcd34d;border-radius:var(--radius-sm);padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:12px;color:#92400e;}
-.alert-banner svg{width:16px;height:16px;flex-shrink:0;stroke:#d97706;fill:none;stroke-width:2;}
+.alert-banner{background:var(--amber-bg);border:1px solid var(--amber-b);border-radius:var(--radius-sm);padding:12px 18px;margin-bottom:18px;display:flex;align-items:center;gap:10px;font-size:14px;color:#92400e;font-weight:500;}
+.alert-banner svg{width:18px;height:18px;flex-shrink:0;stroke:#d97706;fill:none;stroke-width:2;}
 
-/* TOTAL MONEY CARD */
-.total-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px;}
-.total-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.total-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;}
-.total-value{font-size:32px;font-weight:700;color:var(--text);letter-spacing:-.5px;}
-.total-breakdown{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
-.tb-item{background:var(--surface2);border-radius:var(--radius-sm);padding:10px 12px;}
-.tb-lbl{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
-.tb-val{font-size:15px;font-weight:700;margin-top:4px;}
+/* TOTAL CARD */
+.total-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:18px;box-shadow:var(--shadow);}
+.total-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
+.total-label{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;}
+.total-value{font-family:'Manrope',sans-serif;font-size:42px;font-weight:800;color:var(--text);letter-spacing:-1px;line-height:1;}
+.total-breakdown{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px;}
+.tb-item{background:var(--surface2);border-radius:var(--radius-sm);padding:14px 16px;border:1px solid var(--border);}
+.tb-lbl{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
+.tb-val{font-family:'Manrope',sans-serif;font-size:18px;font-weight:700;margin-top:6px;}
 
-/* CLEAN INCOME */
-.clean-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;}
-.clean-card{border-radius:var(--radius);padding:14px 16px;border:1px solid;}
+/* CLEAN CARDS */
+.clean-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px;}
+.clean-card{border-radius:var(--radius);padding:20px 22px;border:1px solid;box-shadow:var(--shadow);}
 .clean-card.main{background:var(--green-bg);border-color:var(--green-b);}
 .clean-card.inc{background:#f0fdf4;border-color:#bbf7d0;}
 .clean-card.exp{background:var(--red-bg);border-color:var(--red-b);}
-.clean-card.int{background:#f8f9fc;border-color:var(--border);}
-.cc-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
-.cc-val{font-size:20px;font-weight:700;margin-top:6px;}
-.cc-sub{font-size:10px;margin-top:3px;opacity:.7;}
+.cc-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+.cc-val{font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;margin-top:8px;line-height:1;}
+.cc-sub{font-size:12px;margin-top:6px;opacity:.75;}
 
-/* 3 COL GRID */
-.dash-grid{display:grid;grid-template-columns:1.1fr 1fr 0.9fr;gap:14px;margin-bottom:16px;}
+/* DASH GRID */
+.dash-grid{display:grid;grid-template-columns:1.1fr 1fr 0.9fr;gap:16px;margin-bottom:18px;}
 
 /* PANEL */
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
-.panel-h{padding:11px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--text);display:flex;align-items:center;justify-content:space-between;}
-.panel-b{padding:12px 14px;}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+.panel-h{padding:14px 18px;border-bottom:1px solid var(--border);font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between;font-family:'Manrope',sans-serif;}
+.panel-b{padding:14px 18px;}
 
 /* BANK ROWS */
-.brow{display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:.5px solid var(--border);cursor:pointer;}
+.brow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
 .brow:last-child{border-bottom:none;}
 .brow:hover .bname{color:var(--accent);text-decoration:underline;}
-.bdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.bname{font-size:12px;font-weight:500;flex:1;}
-.binc{font-size:11px;color:var(--green);font-weight:600;}
-.bexp{font-size:11px;color:var(--red);font-weight:600;}
+.bdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.bname{font-size:13px;font-weight:500;flex:1;}
+.binc{font-size:13px;color:var(--green);font-weight:700;}
+.bexp{font-size:13px;color:var(--red);font-weight:700;}
 
 /* CAT BARS */
-.cat-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:.5px solid var(--border);}
+.cat-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);}
 .cat-row:last-child{border-bottom:none;}
-.cat-name{font-size:11px;color:var(--text);width:90px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.cat-track{flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden;}
-.cat-fill{height:6px;border-radius:3px;}
-.cat-val{font-size:11px;font-weight:600;width:65px;text-align:right;flex-shrink:0;}
+.cat-name{font-size:13px;color:var(--text);width:100px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;}
+.cat-track{flex:1;height:8px;background:var(--bg);border-radius:4px;overflow:hidden;}
+.cat-fill{height:8px;border-radius:4px;transition:width .4s ease;}
+.cat-val{font-size:13px;font-weight:700;width:80px;text-align:right;flex-shrink:0;}
 
 /* DEPOSIT ROWS */
-.dep-row{padding:8px 0;border-bottom:.5px solid var(--border);}
+.dep-row{padding:10px 0;border-bottom:1px solid var(--border);}
 .dep-row:last-child{border-bottom:none;}
-.dep-name{font-size:12px;font-weight:600;color:var(--text);}
-.dep-meta{font-size:11px;color:var(--text2);margin-top:2px;}
-.dep-amount{font-size:13px;font-weight:700;color:var(--purple);}
-.dep-badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;}
+.dep-name{font-size:14px;font-weight:700;color:var(--text);}
+.dep-meta{font-size:12px;color:var(--text2);margin-top:3px;}
+.dep-amount{font-family:'Manrope',sans-serif;font-size:16px;font-weight:700;color:var(--purple);margin-top:4px;}
+.dep-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
 .dep-badge.ok{background:var(--green-bg);color:var(--green);border:1px solid var(--green-b);}
-.dep-badge.warn{background:var(--amber-bg);color:var(--amber);border:1px solid #fcd34d;}
+.dep-badge.warn{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-b);}
 .dep-badge.exp{background:var(--red-bg);color:var(--red);border:1px solid var(--red-b);}
 
 /* RECENT */
-.rec-row{display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:.5px solid var(--border);}
+.rec-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
 .rec-row:last-child{border-bottom:none;}
 
 /* JOURNAL */
 .tbl-wrap{overflow-x:auto;}
-table.jt{width:100%;border-collapse:collapse;font-size:11px;min-width:900px;}
-table.jt th{background:var(--surface2);padding:7px 9px;text-align:left;font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap;}
+table.jt{width:100%;border-collapse:collapse;font-size:13px;min-width:1000px;}
+table.jt th{background:var(--surface2);padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--border);white-space:nowrap;}
 table.jt th.gh{background:var(--green-bg);color:var(--green);}
 table.jt th.rh{background:var(--red-bg);color:var(--red);}
-table.jt td{padding:6px 9px;border-bottom:.5px solid var(--border);vertical-align:middle;}
+table.jt td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px;}
 table.jt tr:last-child td{border-bottom:none;}
-table.jt tr:hover td{background:var(--bg);}
-table.jt td.num{text-align:right;font-weight:600;font-variant-numeric:tabular-nums;}
+table.jt tr:hover td{background:var(--surface2);}
+table.jt td.num{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;}
 table.jt td.gc{color:var(--green);}
 table.jt td.rc{color:var(--red);}
 table.jt td.ac{color:var(--accent);}
 table.jt td.pc{color:var(--purple);}
-.del-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;width:20px;height:20px;border-radius:3px;display:flex;align-items:center;justify-content:center;transition:all .1s;padding:0;}
+.del-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;transition:all .1s;padding:0;}
 .del-btn:hover{background:var(--red-bg);color:var(--red);}
-.add-bar{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end;padding:12px 14px;background:var(--surface2);border-top:1px solid var(--border);}
-.fg{display:flex;flex-direction:column;gap:4px;}
-.fg label{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;}
-.inp{height:30px;padding:0 9px;border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:inherit;font-size:11px;color:var(--text);background:var(--surface);outline:none;transition:border .12s;}
+
+/* ADD BAR */
+.add-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;padding:14px 18px;background:var(--surface2);border-top:1px solid var(--border);}
+.fg{display:flex;flex-direction:column;gap:5px;}
+.fg label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;}
+.inp{height:36px;padding:0 12px;border:1.5px solid var(--border2);border-radius:var(--radius-xs);font-family:inherit;font-size:13px;color:var(--text);background:var(--surface);outline:none;transition:border .12s;}
 .inp:focus{border-color:var(--accent);}
 select.inp{cursor:pointer;}
-.inp.w70{width:70px;}.inp.w90{width:90px;}.inp.w110{width:110px;}.inp.w130{width:130px;}.inp.w150{width:150px;}.inp.w80{width:80px;}
-.btn{height:30px;padding:0 14px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .12s;font-family:inherit;white-space:nowrap;}
-.btn-p{background:var(--accent);color:#fff;}.btn-p:hover{background:#3b5bd9;}
-.btn-g{background:var(--surface);color:var(--text2);border:1px solid var(--border);}.btn-g:hover{color:var(--text);}
+.inp.w70{width:70px;}.inp.w90{width:90px;}.inp.w110{width:110px;}.inp.w130{width:130px;}.inp.w150{width:150px;}.inp.w80{width:80px;}.inp.w170{width:170px;}
+.btn{height:36px;padding:0 18px;border-radius:var(--radius-xs);font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .12s;font-family:inherit;white-space:nowrap;}
+.btn-p{background:var(--accent);color:#fff;}.btn-p:hover{background:var(--accent-d);transform:translateY(-1px);}
+.btn-g{background:var(--surface);color:var(--text2);border:1.5px solid var(--border);}.btn-g:hover{color:var(--text);border-color:var(--border2);}
 .btn-d{background:var(--red-bg);color:var(--red);border:1px solid var(--red-b);}
-.btn-sm{height:26px;padding:0 10px;font-size:11px;}
+.btn-d:hover{background:#fee2e2;}
+.btn-sm{height:32px;padding:0 14px;font-size:12px;}
 
 /* TOTALS STRIP */
-.tot-strip{display:flex;gap:16px;padding:8px 14px;background:var(--surface2);border-top:1px solid var(--border);flex-wrap:wrap;}
-.ti{display:flex;flex-direction:column;gap:1px;}
-.ti-l{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;font-weight:600;}
-.ti-v{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;}
+.tot-strip{display:flex;gap:20px;padding:12px 18px;background:var(--surface2);border-top:1px solid var(--border);flex-wrap:wrap;}
+.ti{display:flex;flex-direction:column;gap:2px;}
+.ti-l{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;font-weight:700;}
+.ti-v{font-family:'Manrope',sans-serif;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;}
 
 /* SUMMARY */
-table.st{width:100%;border-collapse:collapse;font-size:11px;}
-table.st th{background:var(--surface2);padding:7px 11px;font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--border);text-align:right;}
+table.st{width:100%;border-collapse:collapse;font-size:13px;}
+table.st th{background:var(--surface2);padding:10px 14px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--border);text-align:right;}
 table.st th:first-child{text-align:left;}
 table.st th.gh{background:var(--green-bg);color:var(--green);}
 table.st th.rh{background:var(--red-bg);color:var(--red);}
 table.st th.bh{background:var(--accent-l);color:var(--accent);}
-table.st td{padding:7px 11px;border-bottom:.5px solid var(--border);text-align:right;font-variant-numeric:tabular-nums;}
-table.st td:first-child{text-align:left;font-weight:500;}
+table.st td{padding:10px 14px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums;font-size:13px;}
+table.st td:first-child{text-align:left;font-weight:600;}
 table.st tr:last-child td{border-bottom:none;font-weight:700;background:var(--surface2);}
-table.st td.pos{color:var(--green);font-weight:600;}
-table.st td.neg{color:var(--red);font-weight:600;}
+table.st td.pos{color:var(--green);font-weight:700;}
+table.st td.neg{color:var(--red);font-weight:700;}
 table.st td.neu{color:var(--text3);}
-table.st td.check-ok{color:var(--green);font-weight:700;}
-table.st td.check-fail{color:var(--red);font-weight:700;background:var(--red-bg);}
 table.st td.ed{background:#fffde7;cursor:text;}
-.bdot-sm{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;}
-.check-row td{background:#f0fdf4;font-weight:700;}
-.check-row.fail td{background:var(--red-bg);}
+table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
+.bdot-sm{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle;}
+.check-row td{background:var(--green-bg);font-weight:700;color:var(--green);}
+.check-row.fail td{background:var(--red-bg);color:var(--red);}
 
 /* ANALYTICS */
-.an-chart{display:flex;align-items:flex-end;gap:5px;height:130px;padding-top:10px;}
-.an-grp{flex:1;display:flex;gap:2px;align-items:flex-end;flex-direction:column;}
-.an-bars{display:flex;gap:2px;align-items:flex-end;width:100%;}
-.an-bar{flex:1;border-radius:3px 3px 0 0;min-height:2px;cursor:pointer;transition:opacity .1s;}
+.an-chart{display:flex;align-items:flex-end;gap:6px;height:160px;padding-top:10px;}
+.an-bar{flex:1;border-radius:4px 4px 0 0;min-height:2px;cursor:pointer;transition:opacity .1s;}
 .an-bar:hover{opacity:.75;}
 .an-bar.inc{background:var(--green);}
 .an-bar.exp{background:var(--red);}
-.an-lbl{font-size:9px;color:var(--text3);text-align:center;margin-top:5px;width:100%;}
+.an-lbl{font-size:11px;color:var(--text3);text-align:center;margin-top:6px;width:100%;}
 
 /* DEPOSITS VIEW */
-.dep-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.dep-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .dep-form-grid .full{grid-column:1/-1;}
-.dep-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;}
-.dep-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.dep-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:12px;box-shadow:var(--shadow);}
+.dep-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 
 /* SETTINGS */
 .set-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-.bank-set-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:.5px solid var(--border);}
+.bank-set-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
 .bank-set-row:last-child{border-bottom:none;}
-.color-sw{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.color-sw{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
 
 /* SCROLLBAR */
-::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
 
 /* EMPTY */
-.empty{text-align:center;padding:28px;color:var(--text3);font-size:12px;}
+.empty{text-align:center;padding:32px;color:var(--text3);font-size:14px;}
 
 /* TOAST */
-#toast{position:fixed;bottom:18px;right:18px;background:var(--text);color:#fff;padding:9px 16px;border-radius:var(--radius-sm);font-size:12px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:999;}
+#toast{position:fixed;bottom:20px;right:20px;background:var(--text);color:#fff;padding:12px 20px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .2s;z-index:999;box-shadow:var(--shadow-md);}
 #toast.show{opacity:1;}
 
-.section-div{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--border);}
-.filters{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
-.loading{text-align:center;padding:20px;color:var(--text3);font-size:12px;}
+.section-div{font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;color:var(--text2);margin:20px 0 10px;padding-bottom:8px;border-bottom:2px solid var(--border);}
+.filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
 </style>
 </head>
 <body>
@@ -229,10 +231,10 @@ table.st td.ed{background:#fffde7;cursor:text;}
   <div class="login-box">
     <div class="login-logo">💳</div>
     <div class="login-title">Финансы 2026</div>
-    <div class="login-sub">Введите пароль для входа</div>
+    <div class="login-sub">Личный финансовый трекер</div>
     <input type="password" class="login-inp" id="pwd-inp" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()">
     <div class="login-err" id="login-err"></div>
-    <button class="login-btn" onclick="doLogin()">Войти</button>
+    <button class="login-btn" onclick="doLogin()">Войти →</button>
   </div>
 </div>
 
@@ -240,41 +242,34 @@ table.st td.ed{background:#fffde7;cursor:text;}
 <div id="app">
 <div class="layout">
 <nav class="sidebar">
-  <div class="sb-logo" onclick="go('dashboard')">
+  <div class="sb-logo">
     <div class="sb-logo-title">💳 Финансы</div>
     <div class="sb-logo-sub">2026 · Личный трекер</div>
   </div>
   <div class="nav">
     <div class="nav-lbl">Обзор</div>
     <button class="nb active" id="nb-dashboard" onclick="go('dashboard')">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Дашборд
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Дашборд
     </button>
     <button class="nb" id="nb-analytics" onclick="go('analytics')">
-      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      Аналитика
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Аналитика
     </button>
     <div class="nav-lbl">Операции</div>
     <button class="nb" id="nb-journal" onclick="go('journal')">
-      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      Журнал
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Журнал
     </button>
     <button class="nb" id="nb-summary" onclick="go('summary')">
-      <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-      Итоги
+      <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Итоги
     </button>
     <button class="nb" id="nb-deposits" onclick="go('deposits')">
-      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
-      Вклады
+      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>Вклады
     </button>
     <div class="nav-lbl">Система</div>
     <button class="nb" id="nb-settings" onclick="go('settings')">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      Настройки
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Настройки
     </button>
-    <button class="nb nb-logout" onclick="doLogout()" style="margin-top:12px;">
-      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Выйти
+    <button class="nb nb-logout" onclick="doLogout()" style="margin-top:auto">
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Выйти
     </button>
   </div>
 </nav>
@@ -288,10 +283,9 @@ table.st td.ed{background:#fffde7;cursor:text;}
   <div class="mbar" id="mt-dash"></div>
   <div class="total-card">
     <div class="total-card-top">
-      <div class="total-label">Всего моих денег</div>
-      <div style="font-size:11px;color:var(--text3)">карты + накопит. + вклады + наличные</div>
+      <div><div class="total-label">Всего моих денег</div><div class="total-value" id="dash-total-money">—</div></div>
+      <div style="font-size:12px;color:var(--text3);text-align:right;line-height:1.8">карты<br>накопит.<br>вклады<br>наличные</div>
     </div>
-    <div class="total-value" id="dash-total-money">Загрузка...</div>
     <div class="total-breakdown" id="dash-breakdown"></div>
   </div>
   <div class="clean-row">
@@ -313,7 +307,7 @@ table.st td.ed{background:#fffde7;cursor:text;}
   </div>
   <div class="dash-grid">
     <div class="panel">
-      <div class="panel-h">По счетам <span style="font-size:10px;color:var(--text3);font-weight:400">· клик → журнал</span></div>
+      <div class="panel-h">По счетам <span style="font-size:12px;color:var(--text3);font-weight:400">· клик → журнал</span></div>
       <div class="panel-b" id="dash-banks"></div>
     </div>
     <div class="panel">
@@ -333,14 +327,14 @@ table.st td.ed{background:#fffde7;cursor:text;}
 
 <!-- JOURNAL -->
 <div id="view-journal" class="view">
-  <div class="ph"><h1>Журнал операций</h1><p>Все операции строка за строкой</p></div>
+  <div class="ph"><h1>Журнал операций</h1><p>Все операции строка за строкой — как в Excel</p></div>
   <div class="mbar" id="mt-journal"></div>
   <div class="panel">
     <div class="panel-h">
       <span>Операции · <span id="jrn-m-lbl"></span></span>
       <div class="filters">
-        <select class="inp w110" id="jf-bank" onchange="renderJournal()"><option value="">Все счета</option></select>
-        <select class="inp w110" id="jf-type" onchange="renderJournal()">
+        <select class="inp w130" id="jf-bank" onchange="renderJournal()"><option value="">Все счета</option></select>
+        <select class="inp w150" id="jf-type" onchange="renderJournal()">
           <option value="">Все типы</option>
           <option value="income">Приход вне систем</option>
           <option value="income_i">Приход внутри</option>
@@ -371,9 +365,9 @@ table.st td.ed{background:#fffde7;cursor:text;}
     <div class="tot-strip" id="jrn-tots"></div>
     <div class="add-bar">
       <div class="fg"><label>Дата</label><input type="date" class="inp w110" id="f-date"></div>
-      <div class="fg"><label>Банк</label><select class="inp w130" id="f-bank"></select></div>
+      <div class="fg"><label>Банк</label><select class="inp w150" id="f-bank"></select></div>
       <div class="fg"><label>Тип</label>
-        <select class="inp w150" id="f-type">
+        <select class="inp w170" id="f-type">
           <option value="income">Приход вне систем</option>
           <option value="income_i">Приход внутри</option>
           <option value="tr_in">Приход+из другого Б</option>
@@ -384,7 +378,7 @@ table.st td.ed{background:#fffde7;cursor:text;}
       </div>
       <div class="fg"><label>Сумма ₽</label><input type="number" class="inp w90" id="f-amount" placeholder="0" min="0"></div>
       <div class="fg"><label>Категория</label>
-        <select class="inp w110" id="f-cat">
+        <select class="inp w130" id="f-cat">
           <option value="">— выбрать —</option>
           <option>Еда</option><option>Транспорт</option><option>Медицина</option>
           <option>Подписка</option><option>Аренда</option><option>Развлечение</option>
@@ -392,8 +386,8 @@ table.st td.ed{background:#fffde7;cursor:text;}
           <option>Кэшбэк</option><option>Перевод</option><option>Прочее</option>
         </select>
       </div>
-      <div class="fg"><label>Описание</label><input type="text" class="inp w150" id="f-desc" placeholder="Пятёрочка, зарплата…"></div>
-      <button class="btn btn-p" onclick="addRecord()" style="margin-top:17px">+ Добавить</button>
+      <div class="fg"><label>Описание</label><input type="text" class="inp w170" id="f-desc" placeholder="Пятёрочка, зарплата…"></div>
+      <button class="btn btn-p" onclick="addRecord()" style="margin-top:20px">+ Добавить</button>
     </div>
   </div>
 </div>
@@ -403,33 +397,31 @@ table.st td.ed{background:#fffde7;cursor:text;}
   <div class="ph"><h1>Итоги по месяцу</h1><p>Сводные таблицы с проверкой переводов и остатками</p></div>
   <div class="mbar" id="mt-summary"></div>
   <div class="section-div">Сводка по банкам · <span id="sum-m-lbl"></span></div>
-  <div class="panel" style="margin-bottom:16px">
-    <div class="tbl-wrap"><table class="st" id="sum-top"></table></div>
-  </div>
+  <div class="panel" style="margin-bottom:18px"><div class="tbl-wrap"><table class="st" id="sum-top"></table></div></div>
   <div class="section-div">Итоги с проверкой переводов и остатками</div>
   <div class="panel">
     <div class="tbl-wrap"><table class="st" id="sum-detail"></table></div>
-    <div style="font-size:10px;color:var(--text3);padding:6px 14px">* Жёлтые ячейки — кликни и введи остаток, сохранится автоматически</div>
+    <div style="font-size:12px;color:var(--text3);padding:8px 18px">* Жёлтые ячейки — кликни и введи остаток, сохранится автоматически</div>
   </div>
 </div>
 
 <!-- ANALYTICS -->
 <div id="view-analytics" class="view">
   <div class="ph"><h1>Аналитика</h1><p>Динамика доходов и расходов за 2026</p></div>
-  <div class="panel" style="margin-bottom:16px">
+  <div class="panel" style="margin-bottom:18px">
     <div class="panel-h">
       <span>Чистый доход по месяцам</span>
-      <div style="display:flex;gap:10px;font-size:10px;color:var(--text2)">
-        <span><span style="display:inline-block;width:8px;height:8px;background:var(--green);border-radius:2px;margin-right:3px"></span>Приход вне систем</span>
-        <span><span style="display:inline-block;width:8px;height:8px;background:var(--red);border-radius:2px;margin-right:3px"></span>Расход вне систем</span>
+      <div style="display:flex;gap:14px;font-size:12px;color:var(--text2)">
+        <span><span style="display:inline-block;width:10px;height:10px;background:var(--green);border-radius:3px;margin-right:5px;vertical-align:middle"></span>Приход вне систем</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:var(--red);border-radius:3px;margin-right:5px;vertical-align:middle"></span>Расход вне систем</span>
       </div>
     </div>
     <div class="panel-b">
       <div class="an-chart" id="an-chart"></div>
-      <div style="display:flex;gap:5px;margin-top:4px" id="an-labels"></div>
+      <div style="display:flex;gap:6px;margin-top:6px" id="an-labels"></div>
     </div>
   </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
     <div class="panel"><div class="panel-h">Топ расходов по счетам (год)</div><div class="panel-b" id="an-exp"></div></div>
     <div class="panel"><div class="panel-h">Топ доходов по счетам (год)</div><div class="panel-b" id="an-inc"></div></div>
   </div>
@@ -438,22 +430,20 @@ table.st td.ed{background:#fffde7;cursor:text;}
 <!-- DEPOSITS -->
 <div id="view-deposits" class="view">
   <div class="ph"><h1>Вклады и накопительные</h1><p>Отслеживание сроков и сумм</p></div>
-  <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:20px">
-    <div>
-      <div class="panel">
-        <div class="panel-h">Добавить вклад</div>
-        <div class="panel-b">
-          <div class="dep-form-grid">
-            <div class="fg full"><label>Название</label><input class="inp" style="width:100%" id="df-name" placeholder="ФинУСЛУГИ ВКЛАД"></div>
-            <div class="fg"><label>Банк</label><input class="inp" style="width:100%" id="df-bank" placeholder="Альфа Банк"></div>
-            <div class="fg"><label>Сумма ₽</label><input type="number" class="inp" style="width:100%" id="df-amount" placeholder="0"></div>
-            <div class="fg"><label>Ставка %</label><input type="number" class="inp" style="width:100%" id="df-rate" placeholder="18.5" step="0.1"></div>
-            <div class="fg"><label>Дата открытия</label><input type="date" class="inp" style="width:100%" id="df-open"></div>
-            <div class="fg"><label>Дата закрытия</label><input type="date" class="inp" style="width:100%" id="df-close"></div>
-            <div class="fg full"><label>Комментарий</label><input class="inp" style="width:100%" id="df-desc" placeholder="Необязательно"></div>
-            <div class="full" style="display:flex;justify-content:flex-end;margin-top:4px">
-              <button class="btn btn-p" onclick="addDeposit()">+ Добавить вклад</button>
-            </div>
+  <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:20px">
+    <div class="panel">
+      <div class="panel-h">Добавить вклад</div>
+      <div class="panel-b">
+        <div class="dep-form-grid">
+          <div class="fg full"><label>Название</label><input class="inp" style="width:100%" id="df-name" placeholder="ФинУСЛУГИ ВКЛАД"></div>
+          <div class="fg"><label>Банк</label><input class="inp" style="width:100%" id="df-bank" placeholder="Альфа Банк"></div>
+          <div class="fg"><label>Сумма ₽</label><input type="number" class="inp" style="width:100%" id="df-amount" placeholder="0"></div>
+          <div class="fg"><label>Ставка %</label><input type="number" class="inp" style="width:100%" id="df-rate" placeholder="18.5" step="0.1"></div>
+          <div class="fg"><label>Дата открытия</label><input type="date" class="inp" style="width:100%" id="df-open"></div>
+          <div class="fg"><label>Дата закрытия</label><input type="date" class="inp" style="width:100%" id="df-close"></div>
+          <div class="fg full"><label>Комментарий</label><input class="inp" style="width:100%" id="df-desc" placeholder="Необязательно"></div>
+          <div class="full" style="display:flex;justify-content:flex-end;margin-top:6px">
+            <button class="btn btn-p" onclick="addDeposit()">+ Добавить вклад</button>
           </div>
         </div>
       </div>
@@ -471,18 +461,15 @@ table.st td.ed{background:#fffde7;cursor:text;}
         <div class="panel-h">Счета и карты</div>
         <div class="panel-b">
           <div id="bank-list"></div>
-          <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
-            <div style="font-size:10px;font-weight:600;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Добавить счёт</div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap">
-              <input class="inp w130" id="nb-name" placeholder="Название">
-              <select class="inp w110" id="nb-type">
-                <option value="debit">Дебетовая</option>
-                <option value="credit">Кредитная</option>
-                <option value="savings">Накопительная</option>
-                <option value="cash">Наличные</option>
-                <option value="deposit">Вклад</option>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+            <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Добавить счёт</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <input class="inp w150" id="nb-name" placeholder="Название счёта">
+              <select class="inp w120" id="nb-type">
+                <option value="debit">Дебетовая</option><option value="credit">Кредитная</option>
+                <option value="savings">Накопительная</option><option value="cash">Наличные</option><option value="deposit">Вклад</option>
               </select>
-              <input type="color" id="nb-color" value="#4f6ef7" style="width:32px;height:30px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;padding:2px">
+              <input type="color" id="nb-color" value="#4f6ef7" style="width:36px;height:36px;border:1.5px solid var(--border);border-radius:var(--radius-xs);cursor:pointer;padding:2px">
               <button class="btn btn-p btn-sm" onclick="addBank()">Добавить</button>
             </div>
           </div>
@@ -493,9 +480,9 @@ table.st td.ed{background:#fffde7;cursor:text;}
       <div class="panel" style="margin-bottom:16px">
         <div class="panel-h">Сменить пароль</div>
         <div class="panel-b">
-          <div style="display:flex;gap:8px;align-items:flex-end">
-            <div class="fg"><label>Новый пароль</label><input type="password" class="inp w130" id="new-pwd" placeholder="Новый пароль"></div>
-            <div class="fg"><label>Повторить</label><input type="password" class="inp w130" id="new-pwd2" placeholder="Повторить"></div>
+          <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+            <div class="fg"><label>Новый пароль</label><input type="password" class="inp w150" id="new-pwd" placeholder="Введите пароль"></div>
+            <div class="fg"><label>Повторить</label><input type="password" class="inp w150" id="new-pwd2" placeholder="Повторите пароль"></div>
             <button class="btn btn-p btn-sm" onclick="changePwd()">Сохранить</button>
           </div>
         </div>
@@ -507,7 +494,7 @@ table.st td.ed{background:#fffde7;cursor:text;}
             <button class="btn btn-g btn-sm" onclick="exportData()">⬇ Экспорт JSON</button>
             <label class="btn btn-g btn-sm" style="cursor:pointer;display:flex;align-items:center">⬆ Импорт JSON<input type="file" accept=".json" style="display:none" onchange="importData(this)"></label>
           </div>
-          <div style="margin-top:8px;font-size:11px;color:var(--text3)" id="data-info"></div>
+          <div style="margin-top:10px;font-size:12px;color:var(--text3)" id="data-info"></div>
         </div>
       </div>
     </div>
@@ -520,80 +507,81 @@ table.st td.ed{background:#fffde7;cursor:text;}
 <div id="toast"></div>
 
 <script>
-const SUPABASE_URL = 'https://qvfyajmwhdchhukhwbct.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2Znlham13aGRjaGh1a2h3YmN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMjg0MjEsImV4cCI6MjA5NTgwNDQyMX0.fkGU-F5mkDzCb00mtmT0EVritTg0oMCvMRKwQ-vgCwE';
-const API = '/api/db';
-const PWD_KEY = 'fin26_pwd';
-const DEFAULT_PWD = '';
-const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-const TYPE_LABELS = {income:'Приход вне систем',income_i:'Приход внутри',tr_in:'Приход+из другого Б',tr_out:'Списание в другой Б',expense_i:'Списание внутри',expense:'Расход вне систем'};
-const TYPE_SIGN = {income:1,income_i:1,tr_in:1,tr_out:-1,expense_i:-1,expense:-1};
-const BTYPE = {debit:'Дебетовая',credit:'Кредитная',savings:'Накопит.',cash:'Наличные',deposit:'Вклад'};
+const API='/api/db';
+const PWD_KEY='fin26_pwd';
+const DEFAULT_PWD='';
+const MONTHS=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const TYPE_LABELS={income:'Приход вне систем',income_i:'Приход внутри',tr_in:'Приход+из другого Б',tr_out:'Списание в другой Б',expense_i:'Списание внутри',expense:'Расход вне систем'};
+const TYPE_SIGN={income:1,income_i:1,tr_in:1,tr_out:-1,expense_i:-1,expense:-1};
+const BTYPE={debit:'Дебетовая',credit:'Кредитная',savings:'Накопит.',cash:'Наличные',deposit:'Вклад'};
 
-let banks=[], records=[], balances={}, deposits=[];
-let curMonth = MONTHS[new Date().getMonth()];
+let banks=[],deposits=[];
+let curMonth=MONTHS[new Date().getMonth()];
 
-async function q(sql, params=[]) {
-  const r = await fetch(API, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:sql,params})});
-  const d = await r.json();
+async function q(sql,params=[]){
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:sql,params})});
+  const d=await r.json();
   if(d.error) throw new Error(d.error);
   return d.rows||[];
 }
 
-function fmt(n) { return Math.abs(n||0).toLocaleString('ru-RU',{minimumFractionDigits:0,maximumFractionDigits:2})+' ₽'; }
-function fmtF(n) { return (n||0).toLocaleString('ru-RU',{minimumFractionDigits:0,maximumFractionDigits:2})+' ₽'; }
-function bank(id) { return banks.find(b=>b.id===id)||{name:id,color:'#888',type:'debit'}; }
-function toast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+function fmt(n){return Math.abs(n||0).toLocaleString('ru-RU',{minimumFractionDigits:0,maximumFractionDigits:2})+' ₽';}
+function fmtF(n){return (n||0).toLocaleString('ru-RU',{minimumFractionDigits:0,maximumFractionDigits:2})+' ₽';}
+function bank(id){return banks.find(b=>b.id===id)||{name:id,color:'#888',type:'debit'};}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
-// AUTH
-function doLogin() {
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('app').style.display='block';
-  initApp();
+function doLogin(){
+  const pwd=document.getElementById('pwd-inp').value;
+  const stored=localStorage.getItem(PWD_KEY)||DEFAULT_PWD;
+  if(!stored||pwd===stored){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='block';
+    initApp();
+  } else {
+    document.getElementById('login-err').textContent='Неверный пароль';
+    document.getElementById('pwd-inp').value='';
+  }
 }
-function doLogout() { document.getElementById('login-screen').style.display='flex'; document.getElementById('app').style.display='none'; document.getElementById('pwd-inp').value=''; document.getElementById('login-err').textContent=''; }
-function changePwd() {
-  const p1=document.getElementById('new-pwd').value, p2=document.getElementById('new-pwd2').value;
+function doLogout(){document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('pwd-inp').value='';document.getElementById('login-err').textContent='';}
+function changePwd(){
+  const p1=document.getElementById('new-pwd').value,p2=document.getElementById('new-pwd2').value;
   if(!p1){toast('Введите пароль');return;}
   if(p1!==p2){toast('Пароли не совпадают');return;}
   localStorage.setItem(PWD_KEY,p1);
-  document.getElementById('new-pwd').value=''; document.getElementById('new-pwd2').value='';
-  toast('✓ Пароль изменён');
+  document.getElementById('new-pwd').value='';document.getElementById('new-pwd2').value='';
+  toast('✓ Пароль сохранён');
 }
 
-// NAVIGATION
-function go(name) {
+function go(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
   document.getElementById('view-'+name).classList.add('active');
-  const nb=document.getElementById('nb-'+name); if(nb) nb.classList.add('active');
-  if(name==='dashboard') renderDash();
-  if(name==='journal') renderJournal();
-  if(name==='summary') renderSummary();
-  if(name==='analytics') renderAnalytics();
-  if(name==='deposits') renderDeposits();
-  if(name==='settings') renderSettings();
+  const nb=document.getElementById('nb-'+name);if(nb)nb.classList.add('active');
+  if(name==='dashboard')renderDash();
+  if(name==='journal')renderJournal();
+  if(name==='summary')renderSummary();
+  if(name==='analytics')renderAnalytics();
+  if(name==='deposits')renderDeposits();
+  if(name==='settings')renderSettings();
 }
 
-// MONTH TABS
-function initTabs() {
+function initTabs(){
   ['mt-dash','mt-journal','mt-summary'].forEach(id=>{
-    const c=document.getElementById(id); if(!c) return;
+    const c=document.getElementById(id);if(!c)return;
     c.innerHTML=MONTHS.map(m=>`<button class="mtab${m===curMonth?' active':''}" onclick="selMonth('${m}')">${m.slice(0,3)}</button>`).join('');
   });
 }
-function selMonth(m) {
+function selMonth(m){
   curMonth=m;
   document.querySelectorAll('.mtab').forEach(t=>t.classList.toggle('active',t.textContent===m.slice(0,3)));
-  const av=document.querySelector('.view.active'); if(!av) return;
+  const av=document.querySelector('.view.active');if(!av)return;
   const id=av.id.replace('view-','');
-  if(id==='dashboard') renderDash();
-  if(id==='journal') renderJournal();
-  if(id==='summary') renderSummary();
+  if(id==='dashboard')renderDash();
+  if(id==='journal')renderJournal();
+  if(id==='summary')renderSummary();
 }
 
-// INIT
-async function initApp() {
+async function initApp(){
   initTabs();
   await loadBanks();
   fillBankSelects();
@@ -602,180 +590,132 @@ async function initApp() {
   renderDash();
 }
 
-async function loadBanks() {
-  try { banks=await q('SELECT * FROM banks ORDER BY sort_order'); }
-  catch(e) { console.error(e); }
+async function loadBanks(){try{banks=await q('SELECT * FROM banks ORDER BY sort_order');}catch(e){console.error(e);}}
+async function loadRecordsMonth(month){try{return await q('SELECT * FROM records WHERE month=$1 ORDER BY op_date,id',[month]);}catch(e){return[];}}
+async function loadAllRecords(){try{return await q('SELECT * FROM records ORDER BY month,op_date,id');}catch(e){return[];}}
+async function loadBalances(month){
+  try{const rows=await q('SELECT * FROM balances WHERE month=$1',[month]);const out={};rows.forEach(r=>out[r.bank_id]={start:parseFloat(r.balance_start)||0,end:parseFloat(r.balance_end)||0});return out;}
+  catch(e){return{};}
 }
-async function loadRecordsMonth(month) {
-  try { return await q('SELECT * FROM records WHERE month=$1 ORDER BY op_date,id',[month]); }
-  catch(e) { return []; }
-}
-async function loadAllRecords() {
-  try { return await q('SELECT * FROM records ORDER BY month,op_date,id'); }
-  catch(e) { return []; }
-}
-async function loadBalances(month) {
-  try {
-    const rows=await q('SELECT * FROM balances WHERE month=$1',[month]);
-    const out={};
-    rows.forEach(r=>out[r.bank_id]={start:parseFloat(r.balance_start)||0,end:parseFloat(r.balance_end)||0});
-    return out;
-  } catch(e) { return {}; }
-}
-async function loadDeposits() {
-  try { return await q('SELECT * FROM deposits WHERE is_active=true ORDER BY date_close'); }
-  catch(e) { return []; }
-}
+async function loadDeposits(){try{return await q('SELECT * FROM deposits WHERE is_active=true ORDER BY date_close');}catch(e){return[];}}
 
-function fillBankSelects() {
+function fillBankSelects(){
   ['f-bank','jf-bank'].forEach(id=>{
-    const el=document.getElementById(id); if(!el) return;
+    const el=document.getElementById(id);if(!el)return;
     const cur=el.value;
     el.innerHTML=(id==='jf-bank'?'<option value="">Все счета</option>':'')+banks.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
-    if(cur) el.value=cur;
+    if(cur)el.value=cur;
   });
 }
 
-// DASHBOARD
-async function renderDash() {
+async function renderDash(){
   document.getElementById('dash-sub').textContent=curMonth+' 2026';
-  document.getElementById('dash-m-lbl' ) && (document.getElementById('dash-m-lbl').textContent=curMonth);
-
-  const [recs, bals, deps] = await Promise.all([loadRecordsMonth(curMonth), loadBalances(curMonth), loadDeposits()]);
+  const[recs,bals,deps]=await Promise.all([loadRecordsMonth(curMonth),loadBalances(curMonth),loadDeposits()]);
   deposits=deps;
-
-  // Deposit alerts
-  const today=new Date(); today.setHours(0,0,0,0);
-  const alerts=deps.filter(d=>{ const dc=new Date(d.date_close); const diff=Math.floor((dc-today)/(1000*60*60*24)); return diff<=14; });
-  const alertDiv=document.getElementById('dep-alerts');
-  alertDiv.innerHTML=alerts.map(d=>{
-    const dc=new Date(d.date_close); const diff=Math.floor((dc-today)/(1000*60*60*24));
+  const today=new Date();today.setHours(0,0,0,0);
+  const alerts=deps.filter(d=>{const dc=new Date(d.date_close);const diff=Math.floor((dc-today)/(1000*60*60*24));return diff<=14;});
+  document.getElementById('dep-alerts').innerHTML=alerts.map(d=>{
+    const dc=new Date(d.date_close);const diff=Math.floor((dc-today)/(1000*60*60*24));
     const txt=diff<0?'закончился '+dc.toLocaleDateString('ru-RU'):`заканчивается ${dc.toLocaleDateString('ru-RU')} (через ${diff} дн.)`;
-    return `<div class="alert-banner"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Вклад <strong style="margin:0 3px">${d.name}</strong> ${txt} — не забудь закрыть или продлить!</div>`;
+    return `<div class="alert-banner"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Вклад <strong style="margin:0 4px">${d.name}</strong> ${txt}</div>`;
   }).join('');
 
-  // Aggregates
-  const agg={};
-  banks.forEach(b=>agg[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
-  recs.forEach(r=>{ if(agg[r.bank_id]) agg[r.bank_id][r.type]+=parseFloat(r.amount)||0; });
-
+  const agg={};banks.forEach(b=>agg[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
+  recs.forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
   let totalInc=0,totalExp=0;
-  banks.forEach(b=>{ totalInc+=agg[b.id].income; totalExp+=agg[b.id].expense; });
+  banks.forEach(b=>{totalInc+=agg[b.id].income;totalExp+=agg[b.id].expense;});
   const clean=totalInc-totalExp;
-
   document.getElementById('dash-clean').textContent=(clean>=0?'+':'')+fmtF(clean);
   document.getElementById('dash-clean').style.color=clean>=0?'var(--green)':'var(--red)';
   document.getElementById('dash-income').textContent=fmtF(totalInc);
   document.getElementById('dash-expense').textContent=fmtF(totalExp);
 
-  // Total money
   let totalDebit=0,totalSavings=0,totalDeposit=0,totalCash=0;
-  banks.forEach(b=>{
-    const bal=bals[b.id]; const end=bal?bal.end:0;
-    if(b.type==='debit'||b.type==='credit') totalDebit+=end;
-    else if(b.type==='savings') totalSavings+=end;
-    else if(b.type==='cash') totalCash+=end;
+  banks.forEach(b=>{const bal=bals[b.id];const end=bal?bal.end:0;
+    if(b.type==='debit'||b.type==='credit')totalDebit+=end;
+    else if(b.type==='savings')totalSavings+=end;
+    else if(b.type==='cash')totalCash+=end;
   });
   deps.forEach(d=>totalDeposit+=parseFloat(d.amount)||0);
   const totalMoney=totalDebit+totalSavings+totalDeposit+totalCash;
   document.getElementById('dash-total-money').textContent=fmtF(totalMoney);
   document.getElementById('dash-breakdown').innerHTML=`
     <div class="tb-item"><div class="tb-lbl">Карты</div><div class="tb-val" style="color:var(--accent)">${fmtF(totalDebit)}</div></div>
-    <div class="tb-item"><div class="tb-lbl">Накопительные</div><div class="tb-val" style="color:var(--teal,#0d9488)">${fmtF(totalSavings)}</div></div>
+    <div class="tb-item"><div class="tb-lbl">Накопительные</div><div class="tb-val" style="color:var(--teal)">${fmtF(totalSavings)}</div></div>
     <div class="tb-item"><div class="tb-lbl">Вклады</div><div class="tb-val" style="color:var(--purple)">${fmtF(totalDeposit)}</div></div>
-    <div class="tb-item"><div class="tb-lbl">Наличные</div><div class="tb-val" style="color:var(--amber)">${fmtF(totalCash)}</div></div>
-  `;
+    <div class="tb-item"><div class="tb-lbl">Наличные</div><div class="tb-val" style="color:var(--amber)">${fmtF(totalCash)}</div></div>`;
 
-  // Banks
   const activeBanks=banks.filter(b=>Object.values(agg[b.id]).some(v=>v>0)||(bals[b.id]&&bals[b.id].end));
   document.getElementById('dash-banks').innerHTML=activeBanks.length
-    ? activeBanks.map(b=>{
-        const a=agg[b.id]; const bal=bals[b.id];
-        const net=a.income-a.expense;
-        return `<div class="brow" onclick="goToBank('${b.id}')">
-          <div class="bdot" style="background:${b.color}"></div>
-          <div style="flex:1"><div class="bname">${b.name}</div>${bal&&bal.end?`<div style="font-size:10px;color:var(--text3)">остаток: ${fmt(bal.end)}</div>`:''}</div>
-          <div style="text-align:right"><div class="${net>=0?'binc':'bexp'}">${net>=0?'+':'-'}${fmt(net)}</div></div>
-        </div>`;
-      }).join('')
-    : '<div class="empty">Нет данных. Добавь операции в журнале.</div>';
+    ?activeBanks.map(b=>{const a=agg[b.id];const bal=bals[b.id];const net=a.income-a.expense;
+      return `<div class="brow" onclick="goToBank('${b.id}')">
+        <div class="bdot" style="background:${b.color}"></div>
+        <div style="flex:1"><div class="bname">${b.name}</div>${bal&&bal.end?`<div style="font-size:12px;color:var(--text3)">остаток: ${fmt(bal.end)}</div>`:''}</div>
+        <div class="${net>=0?'binc':'bexp'}">${net>=0?'+':'-'}${fmt(net)}</div>
+      </div>`;}).join('')
+    :'<div class="empty">Нет данных. Добавь операции в журнале.</div>';
 
-  // Categories
   const catExp={};
-  recs.filter(r=>r.type==='expense').forEach(r=>{ const c=r.category||'Прочее'; catExp[c]=(catExp[c]||0)+parseFloat(r.amount); });
+  recs.filter(r=>r.type==='expense').forEach(r=>{const c=r.category||'Прочее';catExp[c]=(catExp[c]||0)+parseFloat(r.amount);});
   const sortedCats=Object.entries(catExp).sort((a,b)=>b[1]-a[1]);
   const maxCat=sortedCats[0]?sortedCats[0][1]:1;
   document.getElementById('dash-cats').innerHTML=sortedCats.length
-    ? sortedCats.slice(0,7).map(([c,v])=>`<div class="cat-row">
+    ?sortedCats.slice(0,7).map(([c,v])=>`<div class="cat-row">
         <div class="cat-name">${c}</div>
         <div class="cat-track"><div class="cat-fill" style="width:${Math.round(v/maxCat*100)}%;background:var(--red)"></div></div>
         <div class="cat-val" style="color:var(--red)">-${fmt(v)}</div>
       </div>`).join('')
-    : '<div class="empty">Нет расходов с категориями</div>';
+    :'<div class="empty">Нет расходов с категориями</div>';
 
-  // Deposits on dash
   document.getElementById('dash-deps').innerHTML=deps.length
-    ? deps.slice(0,5).map(d=>{
-        const dc=new Date(d.date_close); const diff=Math.floor((dc-today)/(1000*60*60*24));
-        const cls=diff<0?'exp':diff<=14?'warn':'ok';
-        const lbl=diff<0?'Истёк':diff<=14?diff+' дн.':dc.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'});
-        return `<div class="dep-row">
-          <div style="display:flex;align-items:center;justify-content:space-between">
-            <div class="dep-name">${d.name}</div>
-            <div class="dep-badge ${cls}">${lbl}</div>
-          </div>
-          <div class="dep-meta">${d.bank_name} · ${d.rate}% годовых</div>
-          <div class="dep-amount">${fmt(parseFloat(d.amount))}</div>
-        </div>`;
-      }).join('')
-    : '<div class="empty">Вкладов нет</div>';
+    ?deps.slice(0,5).map(d=>{const dc=new Date(d.date_close);const diff=Math.floor((dc-today)/(1000*60*60*24));
+      const cls=diff<0?'exp':diff<=14?'warn':'ok';
+      const lbl=diff<0?'Истёк':diff<=14?diff+' дн.':dc.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'});
+      return `<div class="dep-row">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="dep-name">${d.name}</div><span class="dep-badge ${cls}">${lbl}</span>
+        </div>
+        <div class="dep-meta">${d.bank_name} · ${d.rate}% годовых</div>
+        <div class="dep-amount">${fmt(parseFloat(d.amount))}</div>
+      </div>`;}).join('')
+    :'<div class="empty">Вкладов нет</div>';
 
-  // Recent
   const allRecs=await loadAllRecords();
   const recent=[...allRecs].sort((a,b)=>b.id-a.id).slice(0,6);
   document.getElementById('dash-recent').innerHTML=recent.length
-    ? recent.map(r=>{
-        const b=bank(r.bank_id); const sign=TYPE_SIGN[r.type]||0;
-        return `<div class="rec-row">
-          <div class="bdot" style="background:${b.color}"></div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.description||TYPE_LABELS[r.type]}</div>
-            <div style="font-size:10px;color:var(--text3)">${b.name} · ${r.month}${r.category?' · '+r.category:''}</div>
-          </div>
-          <div style="font-size:12px;font-weight:700;color:${sign>=0?'var(--green)':'var(--red)'};white-space:nowrap">${sign>=0?'+':'-'}${fmt(parseFloat(r.amount))}</div>
-        </div>`;
-      }).join('')
-    : '<div class="empty">Нет записей</div>';
+    ?recent.map(r=>{const b=bank(r.bank_id);const sign=TYPE_SIGN[r.type]||0;
+      return `<div class="rec-row">
+        <div class="bdot" style="background:${b.color}"></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.description||TYPE_LABELS[r.type]}</div>
+          <div style="font-size:12px;color:var(--text3)">${b.name} · ${r.month}${r.category?' · '+r.category:''}</div>
+        </div>
+        <div style="font-size:15px;font-weight:700;color:${sign>=0?'var(--green)':'var(--red)'};white-space:nowrap;font-family:Manrope,sans-serif">${sign>=0?'+':'-'}${fmt(parseFloat(r.amount))}</div>
+      </div>`;}).join('')
+    :'<div class="empty">Нет записей</div>';
 }
 
-function goToBank(bankId) {
-  document.getElementById('jf-bank').value=bankId;
-  go('journal');
-}
+function goToBank(bankId){document.getElementById('jf-bank').value=bankId;go('journal');}
 
-// JOURNAL
-async function renderJournal() {
+async function renderJournal(){
   document.getElementById('jrn-m-lbl').textContent=curMonth;
   const fb=document.getElementById('jf-bank').value;
   const ft=document.getElementById('jf-type').value;
   let recs=await loadRecordsMonth(curMonth);
-  if(fb) recs=recs.filter(r=>r.bank_id===fb);
-  if(ft) recs=recs.filter(r=>r.type===ft);
-
+  if(fb)recs=recs.filter(r=>r.bank_id===fb);
+  if(ft)recs=recs.filter(r=>r.type===ft);
   const tbody=document.getElementById('jrn-body');
   const empty=document.getElementById('jrn-empty');
-
-  if(!recs.length){ tbody.innerHTML=''; empty.style.display=''; }
-  else {
+  if(!recs.length){tbody.innerHTML='';empty.style.display='';}
+  else{
     empty.style.display='none';
     tbody.innerHTML=recs.map(r=>{
-      const b=bank(r.bank_id);
-      const amt=parseFloat(r.amount)||0;
+      const b=bank(r.bank_id);const amt=parseFloat(r.amount)||0;
       const cols={income:'',income_i:'',tr_in:'',tr_out:'',expense_i:'',expense:''};
       cols[r.type]=fmt(amt);
       return `<tr>
         <td style="color:var(--text2);white-space:nowrap">${r.op_date||'—'}</td>
-        <td><span style="display:inline-flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:50%;background:${b.color};flex-shrink:0"></span>${b.name}</span></td>
+        <td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${b.color};flex-shrink:0"></span>${b.name}</span></td>
         <td class="num gc">${cols.income}</td>
         <td class="num pc">${cols.income_i}</td>
         <td class="num ac">${cols.tr_in}</td>
@@ -785,11 +725,8 @@ async function renderJournal() {
         <td class="num pc">${cols.expense_i}</td>
         <td class="num rc">${cols.expense}</td>
         <td><button class="del-btn" onclick="delRecord(${r.id})">×</button></td>
-      </tr>`;
-    }).join('');
+      </tr>`;}).join('');
   }
-
-  // Totals
   const tots={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
   recs.forEach(r=>tots[r.type]+=parseFloat(r.amount)||0);
   document.getElementById('jrn-tots').innerHTML=`
@@ -798,11 +735,10 @@ async function renderJournal() {
     <div class="ti"><span class="ti-l">Приход внутри</span><span class="ti-v" style="color:var(--purple)">${fmtF(tots.income_i)}</span></div>
     <div class="ti"><span class="ti-l">Приход из др.Б</span><span class="ti-v" style="color:var(--accent)">${fmtF(tots.tr_in)}</span></div>
     <div class="ti"><span class="ti-l">Списание в др.Б</span><span class="ti-v" style="color:var(--accent)">${fmtF(tots.tr_out)}</span></div>
-    <div class="ti"><span class="ti-l">Расход вне сис.</span><span class="ti-v" style="color:var(--red)">${fmtF(tots.expense)}</span></div>
-  `;
+    <div class="ti"><span class="ti-l">Расход вне сис.</span><span class="ti-v" style="color:var(--red)">${fmtF(tots.expense)}</span></div>`;
 }
 
-async function addRecord() {
+async function addRecord(){
   const bankId=document.getElementById('f-bank').value;
   const type=document.getElementById('f-type').value;
   const amount=parseFloat(document.getElementById('f-amount').value);
@@ -811,147 +747,101 @@ async function addRecord() {
   const date=document.getElementById('f-date').value;
   if(!bankId){toast('Выберите счёт');return;}
   if(!amount||amount<=0){toast('Введите сумму');return;}
-  try {
+  try{
     await q('INSERT INTO records(month,bank_id,type,amount,category,description,op_date) VALUES($1,$2,$3,$4,$5,$6,$7)',[curMonth,bankId,type,amount,cat||null,desc||null,date||null]);
-    document.getElementById('f-amount').value='';
-    document.getElementById('f-desc').value='';
-    renderJournal();
-    toast('✓ Запись добавлена');
-  } catch(e){toast('Ошибка: '+e.message);}
+    document.getElementById('f-amount').value='';document.getElementById('f-desc').value='';
+    renderJournal();toast('✓ Запись добавлена');
+  }catch(e){toast('Ошибка: '+e.message);}
 }
 
-async function delRecord(id) {
-  if(!confirm('Удалить запись?')) return;
-  try { await q('DELETE FROM records WHERE id=$1',[id]); renderJournal(); toast('Удалено'); }
-  catch(e){toast('Ошибка: '+e.message);}
+async function delRecord(id){
+  if(!confirm('Удалить запись?'))return;
+  try{await q('DELETE FROM records WHERE id=$1',[id]);renderJournal();toast('Удалено');}
+  catch(e){toast('Ошибка');}
 }
 
-// SUMMARY
-async function renderSummary() {
+async function renderSummary(){
   document.getElementById('sum-m-lbl').textContent=curMonth;
   const recs=await loadRecordsMonth(curMonth);
   const bals=await loadBalances(curMonth);
-
-  const agg={};
-  banks.forEach(b=>agg[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
-  recs.forEach(r=>{ if(agg[r.bank_id]) agg[r.bank_id][r.type]+=parseFloat(r.amount)||0; });
-
+  const agg={};banks.forEach(b=>agg[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
+  recs.forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
   const active=banks.filter(b=>Object.values(agg[b.id]).some(v=>v>0)||(bals[b.id]&&(bals[b.id].start||bals[b.id].end)));
-
-  // TOP TABLE
   const tots={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
   active.forEach(b=>Object.keys(tots).forEach(k=>tots[k]+=agg[b.id][k]||0));
-
   document.getElementById('sum-top').innerHTML=`
-    <thead><tr>
-      <th>Банк</th>
-      <th class="gh">Приход вне систем</th><th class="gh">Приход внутри</th><th class="gh">Приход+из другого Б</th>
-      <th class="rh">Списание в другой Б</th><th class="rh">Списание внутри</th><th class="rh">Расход вне систем</th>
-    </tr></thead>
+    <thead><tr><th>Банк</th><th class="gh">Приход вне систем</th><th class="gh">Приход внутри</th><th class="gh">Приход+из другого Б</th><th class="rh">Списание в другой Б</th><th class="rh">Списание внутри</th><th class="rh">Расход вне систем</th></tr></thead>
     <tbody>${active.map(b=>{const a=agg[b.id];return `<tr>
       <td><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td>
-      <td class="${a.income?'pos':''}">${a.income?fmt(a.income):'—'}</td>
-      <td>${a.income_i?fmt(a.income_i):'—'}</td>
-      <td>${a.tr_in?fmt(a.tr_in):'—'}</td>
-      <td>${a.tr_out?fmt(a.tr_out):'—'}</td>
-      <td>${a.expense_i?fmt(a.expense_i):'—'}</td>
-      <td class="${a.expense?'neg':''}">${a.expense?fmt(a.expense):'—'}</td>
-    </tr>`;}).join('')}
-    </tbody>
-    <tfoot><tr>
-      <td>Общий итог</td>
-      <td class="pos">${fmtF(tots.income)}</td><td>${fmtF(tots.income_i)}</td><td>${fmtF(tots.tr_in)}</td>
-      <td>${fmtF(tots.tr_out)}</td><td>${fmtF(tots.expense_i)}</td><td class="neg">${fmtF(tots.expense)}</td>
-    </tr></tfoot>`;
+      <td class="${a.income?'pos':''}">${a.income?fmt(a.income):'—'}</td><td>${a.income_i?fmt(a.income_i):'—'}</td>
+      <td>${a.tr_in?fmt(a.tr_in):'—'}</td><td>${a.tr_out?fmt(a.tr_out):'—'}</td>
+      <td>${a.expense_i?fmt(a.expense_i):'—'}</td><td class="${a.expense?'neg':''}">${a.expense?fmt(a.expense):'—'}</td>
+    </tr>`;}).join('')}</tbody>
+    <tfoot><tr><td>Общий итог</td><td class="pos">${fmtF(tots.income)}</td><td>${fmtF(tots.income_i)}</td><td>${fmtF(tots.tr_in)}</td><td>${fmtF(tots.tr_out)}</td><td>${fmtF(tots.expense_i)}</td><td class="neg">${fmtF(tots.expense)}</td></tr></tfoot>`;
 
-  // DETAIL TABLE + CHECK
-  const trInTotal=tots.tr_in, trOutTotal=tots.tr_out;
-  const trDiff=trInTotal-trOutTotal;
-  const trOk=Math.abs(trDiff)<0.01;
-
-  let detailRows=active.map(b=>{
-    const a=agg[b.id];
-    const bal=bals[b.id]||{start:0,end:0};
-    const sumInc=a.income+a.income_i+a.tr_in;
-    const sumExp=a.tr_out+a.expense_i+a.expense;
-    const diff=(bal.end||0)-(bal.start||0);
-    return {b,a,bal,sumInc,sumExp,diff};
-  });
-
+  const trDiff=tots.tr_in-tots.tr_out;const trOk=Math.abs(trDiff)<0.01;
   let totStart=0,totEnd=0,totSumInc=0,totSumExp=0;
-  detailRows.forEach(r=>{totStart+=r.bal.start||0;totEnd+=r.bal.end||0;totSumInc+=r.sumInc;totSumExp+=r.sumExp;});
-
+  const dRows=active.map(b=>{const a=agg[b.id];const bal=bals[b.id]||{start:0,end:0};
+    const sumInc=a.income+a.income_i+a.tr_in;const sumExp=a.tr_out+a.expense_i+a.expense;
+    const diff=(bal.end||0)-(bal.start||0);
+    totStart+=bal.start||0;totEnd+=bal.end||0;totSumInc+=sumInc;totSumExp+=sumExp;
+    return{b,sumInc,sumExp,bal,diff};
+  });
   document.getElementById('sum-detail').innerHTML=`
-    <thead><tr>
-      <th>Банк</th>
-      <th class="gh">∑ Доход</th><th class="rh">∑ Расход</th>
-      <th class="bh">Остаток начало</th><th class="bh">Остаток конец</th><th class="bh">Разница</th>
-    </tr></thead>
+    <thead><tr><th>Банк</th><th class="gh">∑ Доход</th><th class="rh">∑ Расход</th><th class="bh">Остаток начало</th><th class="bh">Остаток конец</th><th class="bh">Разница</th></tr></thead>
     <tbody>
-      ${detailRows.map(({b,sumInc,sumExp,bal,diff})=>`<tr>
+      ${dRows.map(({b,sumInc,sumExp,bal,diff})=>`<tr>
         <td><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td>
-        <td class="pos">${fmtF(sumInc)}</td>
-        <td class="${sumExp?'neg':''}">${fmtF(sumExp)}</td>
+        <td class="pos">${fmtF(sumInc)}</td><td class="${sumExp?'neg':''}">${fmtF(sumExp)}</td>
         <td class="ed" contenteditable="true" onblur="saveBalance('${b.id}','start',this)">${bal.start||''}</td>
         <td class="ed" contenteditable="true" onblur="saveBalance('${b.id}','end',this)">${bal.end||''}</td>
         <td class="${diff>0?'pos':diff<0?'neg':'neu'}">${diff?fmtF(diff):'—'}</td>
       </tr>`).join('')}
       <tr class="${trOk?'check-row':'check-row fail'}">
-        <td colspan="6" style="text-align:left;font-size:11px">
-          ${trOk
-            ? '✅ Переводы сходятся: Приход из др.Б = Списание в др.Б = '+fmtF(trInTotal)
-            : '⚠️ Переводы не сходятся! Приход из др.Б: '+fmtF(trInTotal)+' ≠ Списание в др.Б: '+fmtF(trOutTotal)+' · Разница: '+fmtF(Math.abs(trDiff))}
+        <td colspan="6" style="text-align:left;font-size:13px;font-weight:700">
+          ${trOk?'✅ Переводы сходятся: '+fmtF(tots.tr_in):'⚠️ Переводы не сходятся! Приход из др.Б: '+fmtF(tots.tr_in)+' ≠ Списание в др.Б: '+fmtF(tots.tr_out)+' · Разница: '+fmtF(Math.abs(trDiff))}
         </td>
       </tr>
     </tbody>
-    <tfoot><tr>
-      <td>Итог</td>
-      <td class="pos">${fmtF(totSumInc)}</td><td class="neg">${fmtF(totSumExp)}</td>
-      <td>${totStart?fmtF(totStart):'—'}</td><td>${totEnd?fmtF(totEnd):'—'}</td>
-      <td class="${totEnd-totStart>0?'pos':totEnd-totStart<0?'neg':'neu'}">${totEnd-totStart?fmtF(totEnd-totStart):'—'}</td>
-    </tr></tfoot>`;
+    <tfoot><tr><td>Итог</td><td class="pos">${fmtF(totSumInc)}</td><td class="neg">${fmtF(totSumExp)}</td><td>${totStart?fmtF(totStart):'—'}</td><td>${totEnd?fmtF(totEnd):'—'}</td><td class="${totEnd-totStart>0?'pos':totEnd-totStart<0?'neg':'neu'}">${totEnd-totStart?fmtF(totEnd-totStart):'—'}</td></tr></tfoot>`;
 }
 
-async function saveBalance(bankId,field,el) {
+async function saveBalance(bankId,field,el){
   const val=parseFloat(el.textContent.replace(/\s|₽/g,'').replace(',','.'))||0;
   el.textContent=val||'';
-  try {
-    await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4)
-      ON CONFLICT(bank_id,month) DO UPDATE SET ${field==='start'?'balance_start':'balance_end'}=$${field==='start'?3:4}`,
+  try{
+    await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET ${field==='start'?'balance_start':'balance_end'}=EXCLUDED.${field==='start'?'balance_start':'balance_end'}`,
       field==='start'?[bankId,curMonth,val,0]:[bankId,curMonth,0,val]);
     toast('✓ Остаток сохранён');
-  } catch(e){toast('Ошибка сохранения');}
+  }catch(e){toast('Ошибка сохранения');}
 }
 
-// ANALYTICS
-async function renderAnalytics() {
+async function renderAnalytics(){
   const all=await loadAllRecords();
-  const byM={}; MONTHS.forEach(m=>byM[m]={inc:0,exp:0});
-  all.forEach(r=>{ if(byM[r.month]){ if(r.type==='income') byM[r.month].inc+=parseFloat(r.amount)||0; if(r.type==='expense') byM[r.month].exp+=parseFloat(r.amount)||0; }});
-  const maxV=Math.max(...MONTHS.flatMap(m=>[byM[m].inc,byM[m].exp]),1);
-  const H=130;
+  const byM={};MONTHS.forEach(m=>byM[m]={inc:0,exp:0});
+  all.forEach(r=>{if(byM[r.month]){if(r.type==='income')byM[r.month].inc+=parseFloat(r.amount)||0;if(r.type==='expense')byM[r.month].exp+=parseFloat(r.amount)||0;}});
+  const maxV=Math.max(...MONTHS.flatMap(m=>[byM[m].inc,byM[m].exp]),1);const H=160;
   document.getElementById('an-chart').innerHTML=MONTHS.map(m=>{
     const iH=Math.max((byM[m].inc/maxV)*H,byM[m].inc>0?3:0);
     const eH=Math.max((byM[m].exp/maxV)*H,byM[m].exp>0?3:0);
     return `<div style="flex:1;display:flex;flex-direction:column;align-items:center">
-      <div class="an-bars" style="height:${H}px"><div class="an-bar inc" style="height:${iH}px" title="${m}: +${fmtF(byM[m].inc)}"></div><div class="an-bar exp" style="height:${eH}px" title="${m}: -${fmtF(byM[m].exp)}"></div></div>
+      <div style="display:flex;gap:3px;align-items:flex-end;height:${H}px;width:100%">
+        <div class="an-bar inc" style="height:${iH}px;flex:1" title="${m}: +${fmtF(byM[m].inc)}"></div>
+        <div class="an-bar exp" style="height:${eH}px;flex:1" title="${m}: -${fmtF(byM[m].exp)}"></div>
+      </div>
       <div class="an-lbl">${m.slice(0,3)}</div>
-    </div>`;
-  }).join('');
+    </div>`;}).join('');
 
-  const bInc={},bExp={};
-  banks.forEach(b=>{bInc[b.id]=0;bExp[b.id]=0;});
-  all.forEach(r=>{ if(r.type==='income'&&bInc[r.bank_id]!==undefined) bInc[r.bank_id]+=parseFloat(r.amount)||0; if(r.type==='expense'&&bExp[r.bank_id]!==undefined) bExp[r.bank_id]+=parseFloat(r.amount)||0; });
-  const mI=Math.max(...Object.values(bInc),1), mE=Math.max(...Object.values(bExp),1);
+  const bInc={},bExp={};banks.forEach(b=>{bInc[b.id]=0;bExp[b.id]=0;});
+  all.forEach(r=>{if(r.type==='income'&&bInc[r.bank_id]!==undefined)bInc[r.bank_id]+=parseFloat(r.amount)||0;if(r.type==='expense'&&bExp[r.bank_id]!==undefined)bExp[r.bank_id]+=parseFloat(r.amount)||0;});
+  const mI=Math.max(...Object.values(bInc),1),mE=Math.max(...Object.values(bExp),1);
   const si=banks.filter(b=>bInc[b.id]>0).sort((a,b)=>bInc[b.id]-bInc[a.id]).reverse();
   const se=banks.filter(b=>bExp[b.id]>0).sort((a,b)=>bExp[b.id]-bExp[a.id]).reverse();
-
   document.getElementById('an-inc').innerHTML=si.length?si.slice(0,8).map(b=>`<div class="cat-row">
     <div class="cat-name">${b.name}</div>
     <div class="cat-track"><div class="cat-fill" style="width:${Math.round(bInc[b.id]/mI*100)}%;background:${b.color}"></div></div>
     <div class="cat-val" style="color:var(--green)">${fmt(bInc[b.id])}</div>
   </div>`).join(''):'<div class="empty">Нет данных</div>';
-
   document.getElementById('an-exp').innerHTML=se.length?se.slice(0,8).map(b=>`<div class="cat-row">
     <div class="cat-name">${b.name}</div>
     <div class="cat-track"><div class="cat-fill" style="width:${Math.round(bExp[b.id]/mE*100)}%;background:${b.color}"></div></div>
@@ -959,35 +849,32 @@ async function renderAnalytics() {
   </div>`).join(''):'<div class="empty">Нет данных</div>';
 }
 
-// DEPOSITS
-async function renderDeposits() {
-  const deps=await loadDeposits(); deposits=deps;
-  const today=new Date(); today.setHours(0,0,0,0);
+async function renderDeposits(){
+  const deps=await loadDeposits();deposits=deps;
+  const today=new Date();today.setHours(0,0,0,0);
   document.getElementById('dep-list').innerHTML=deps.length
-    ? deps.map(d=>{
-        const dc=new Date(d.date_close); const diff=Math.floor((dc-today)/(1000*60*60*24));
-        const cls=diff<0?'exp':diff<=14?'warn':'ok';
-        const lbl=diff<0?'Истёк':diff<=14?`⚠️ ${diff} дн.`:`${dc.toLocaleDateString('ru-RU')}`;
-        return `<div class="dep-card">
-          <div class="dep-card-head">
-            <div><div class="dep-name">${d.name}</div><div class="dep-meta">${d.bank_name}</div></div>
-            <div style="display:flex;gap:6px;align-items:center">
-              <span class="dep-badge ${cls}">${lbl}</span>
-              <button class="btn btn-d btn-sm" onclick="closeDeposit(${d.id})">Закрыть</button>
-            </div>
+    ?deps.map(d=>{const dc=new Date(d.date_close);const diff=Math.floor((dc-today)/(1000*60*60*24));
+      const cls=diff<0?'exp':diff<=14?'warn':'ok';
+      const lbl=diff<0?'Истёк':diff<=14?`⚠️ ${diff} дн.`:dc.toLocaleDateString('ru-RU');
+      return `<div class="dep-card">
+        <div class="dep-card-head">
+          <div><div class="dep-name">${d.name}</div><div class="dep-meta">${d.bank_name}</div></div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="dep-badge ${cls}">${lbl}</span>
+            <button class="btn btn-d btn-sm" onclick="closeDeposit(${d.id})">Закрыть</button>
           </div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px">
-            <div><div style="font-size:10px;color:var(--text3)">Сумма</div><div class="dep-amount">${fmt(parseFloat(d.amount))}</div></div>
-            <div><div style="font-size:10px;color:var(--text3)">Ставка</div><div style="font-size:14px;font-weight:700;color:var(--green)">${d.rate}%</div></div>
-            <div><div style="font-size:10px;color:var(--text3)">Открыт</div><div style="font-size:12px;font-weight:500">${new Date(d.date_open).toLocaleDateString('ru-RU')}</div></div>
-          </div>
-          ${d.description?`<div style="font-size:11px;color:var(--text2);margin-top:8px">${d.description}</div>`:''}
-        </div>`;
-      }).join('')
-    : '<div class="empty">Вкладов ещё нет. Добавь первый слева.</div>';
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px">
+          <div><div style="font-size:11px;color:var(--text3);font-weight:600">Сумма</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--purple);margin-top:4px">${fmt(parseFloat(d.amount))}</div></div>
+          <div><div style="font-size:11px;color:var(--text3);font-weight:600">Ставка</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--green);margin-top:4px">${d.rate}%</div></div>
+          <div><div style="font-size:11px;color:var(--text3);font-weight:600">Открыт</div><div style="font-size:14px;font-weight:500;margin-top:4px">${new Date(d.date_open).toLocaleDateString('ru-RU')}</div></div>
+        </div>
+        ${d.description?`<div style="font-size:13px;color:var(--text2);margin-top:10px">${d.description}</div>`:''}
+      </div>`;}).join('')
+    :'<div class="empty">Вкладов ещё нет. Добавь первый слева.</div>';
 }
 
-async function addDeposit() {
+async function addDeposit(){
   const name=document.getElementById('df-name').value.trim();
   const bankName=document.getElementById('df-bank').value.trim();
   const amount=parseFloat(document.getElementById('df-amount').value);
@@ -996,73 +883,79 @@ async function addDeposit() {
   const dateClose=document.getElementById('df-close').value;
   const desc=document.getElementById('df-desc').value.trim();
   if(!name||!amount||!rate||!dateOpen||!dateClose){toast('Заполни все обязательные поля');return;}
-  try {
+  try{
     await q('INSERT INTO deposits(name,bank_name,amount,rate,date_open,date_close,description) VALUES($1,$2,$3,$4,$5,$6,$7)',[name,bankName||'—',amount,rate,dateOpen,dateClose,desc||null]);
-    document.getElementById('df-name').value=''; document.getElementById('df-bank').value='';
-    document.getElementById('df-amount').value=''; document.getElementById('df-rate').value='';
-    document.getElementById('df-close').value=''; document.getElementById('df-desc').value='';
-    renderDeposits(); toast('✓ Вклад добавлен');
-  } catch(e){toast('Ошибка: '+e.message);}
+    document.getElementById('df-name').value='';document.getElementById('df-bank').value='';
+    document.getElementById('df-amount').value='';document.getElementById('df-rate').value='';
+    document.getElementById('df-close').value='';document.getElementById('df-desc').value='';
+    renderDeposits();toast('✓ Вклад добавлен');
+  }catch(e){toast('Ошибка: '+e.message);}
 }
 
-async function closeDeposit(id) {
-  if(!confirm('Отметить вклад как закрытый?')) return;
-  try { await q('UPDATE deposits SET is_active=false WHERE id=$1',[id]); renderDeposits(); toast('Вклад закрыт'); }
+async function closeDeposit(id){
+  if(!confirm('Отметить вклад как закрытый?'))return;
+  try{await q('UPDATE deposits SET is_active=false WHERE id=$1',[id]);renderDeposits();toast('Вклад закрыт');}
   catch(e){toast('Ошибка');}
 }
 
-// SETTINGS
-async function renderSettings() {
-  document.getElementById('bank-list').innerHTML=banks.map((b,i)=>`
+async function renderSettings(){
+  document.getElementById('bank-list').innerHTML=banks.map(b=>`
     <div class="bank-set-row">
       <span class="color-sw" style="background:${b.color}"></span>
-      <div style="flex:1"><div style="font-size:12px;font-weight:500">${b.name}</div><div style="font-size:10px;color:var(--text3)">${BTYPE[b.type]||b.type}</div></div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:600">${b.name}</div><div style="font-size:12px;color:var(--text3)">${BTYPE[b.type]||b.type}</div></div>
       <button class="btn btn-d btn-sm" onclick="removeBank('${b.id}')">✕</button>
     </div>`).join('');
-  document.getElementById('data-info').textContent=`Данные хранятся в Supabase · Supabase URL: ${SUPABASE_URL.slice(8,20)}...`;
+  document.getElementById('data-info').textContent=`Данные хранятся в Supabase (облако) · Записей загружено из базы`;
 }
 
-async function addBank() {
+async function addBank(){
   const name=document.getElementById('nb-name').value.trim();
   if(!name){toast('Введите название');return;}
   const id='b'+Date.now();
-  const type=document.getElementById('nb-type').value;
-  const color=document.getElementById('nb-color').value;
-  try {
-    await q('INSERT INTO banks(id,name,type,color,sort_order) VALUES($1,$2,$3,$4,$5)',[id,name,type,color,banks.length+1]);
-    await loadBanks(); fillBankSelects(); renderSettings(); document.getElementById('nb-name').value='';
+  try{
+    await q('INSERT INTO banks(id,name,type,color,sort_order) VALUES($1,$2,$3,$4,$5)',[id,name,document.getElementById('nb-type').value,document.getElementById('nb-color').value,banks.length+1]);
+    await loadBanks();fillBankSelects();renderSettings();document.getElementById('nb-name').value='';
     toast('✓ Счёт добавлен');
-  } catch(e){toast('Ошибка: '+e.message);}
+  }catch(e){toast('Ошибка: '+e.message);}
 }
 
-async function removeBank(id) {
-  if(!confirm(`Удалить этот счёт?`)) return;
-  try { await q('DELETE FROM banks WHERE id=$1',[id]); await loadBanks(); fillBankSelects(); renderSettings(); toast('Удалено'); }
+async function removeBank(id){
+  if(!confirm('Удалить этот счёт?'))return;
+  try{await q('DELETE FROM banks WHERE id=$1',[id]);await loadBanks();fillBankSelects();renderSettings();toast('Удалено');}
   catch(e){toast('Ошибка');}
 }
 
-async function exportData() {
-  const [recs,deps]=await Promise.all([loadAllRecords(),loadDeposits()]);
+async function exportData(){
+  const[recs,deps]=await Promise.all([loadAllRecords(),loadDeposits()]);
   const d={banks,records:recs,deposits:deps,exported:new Date().toISOString()};
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));
-  a.download='finansy_2026_backup.json'; a.click();
-  toast('✓ Экспорт выполнен');
+  a.download='finansy_2026_backup.json';a.click();toast('✓ Экспорт выполнен');
 }
 
-async function importData(input) {
+async function importData(input){
   const fr=new FileReader();
   fr.onload=async e=>{
-    try {
+    try{
       const d=JSON.parse(e.target.result);
-      if(d.records) for(const r of d.records) {
+      if(d.records)for(const r of d.records){
         await q('INSERT INTO records(month,bank_id,type,amount,category,description,op_date) VALUES($1,$2,$3,$4,$5,$6,$7)',[r.month,r.bank_id,r.type,r.amount,r.category||null,r.description||null,r.op_date||null]);
       }
-      toast('✓ Импорт выполнен'); renderDash();
-    } catch(e){toast('Ошибка файла');}
+      toast('✓ Импорт выполнен');renderDash();
+    }catch(e){toast('Ошибка файла');}
   };
-  fr.readAsText(input.files[0]); input.value='';
+  fr.readAsText(input.files[0]);input.value='';
 }
+
+// Auto-login if no password set
+window.onload=()=>{
+  const stored=localStorage.getItem(PWD_KEY);
+  if(!stored){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='block';
+    initApp();
+  }
+};
 </script>
 </body>
 </html>
