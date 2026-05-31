@@ -336,40 +336,9 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
 <div id="view-journal" class="view">
   <div class="ph"><h1>Журнал операций</h1><p>Все операции строка за строкой — как в Excel</p></div>
   <div class="mbar" id="mt-journal"></div>
-  <div class="panel">
-    <div class="panel-h">
-      <span>Операции · <span id="jrn-m-lbl"></span></span>
-      <div class="filters">
-        <select class="inp w130" id="jf-bank" onchange="renderJournal()"><option value="">Все счета</option></select>
-        <select class="inp w150" id="jf-type" onchange="renderJournal()">
-          <option value="">Все типы</option>
-          <option value="income">Приход вне систем</option>
-          <option value="income_i">Приход внутри</option>
-          <option value="tr_in">Приход из др.Б</option>
-          <option value="tr_out">Списание в др.Б</option>
-          <option value="expense_i">Списание внутри</option>
-          <option value="expense">Расход вне систем</option>
-        </select>
-      </div>
-    </div>
-    <div class="tbl-wrap">
-      <table class="jt">
-        <thead><tr>
-          <th>Дата</th><th>Банк и счёт</th>
-          <th class="gh">Приход вне систем</th>
-          <th class="gh">Приход внутри</th>
-          <th class="gh">Приход+из другого Б</th>
-          <th>Категория</th><th>Описание</th>
-          <th class="rh">Списание в другой Б</th>
-          <th class="rh">Списание внутри</th>
-          <th class="rh">Расход вне систем</th>
-          <th></th>
-        </tr></thead>
-        <tbody id="jrn-body"></tbody>
-      </table>
-    </div>
-    <div id="jrn-empty" class="empty" style="display:none">Нет операций за этот месяц. Добавь первую ниже ↓</div>
-    <div class="tot-strip" id="jrn-tots"></div>
+  <!-- ADD FORM TOP -->
+  <div class="panel" style="margin-bottom:14px">
+    <div class="panel-h">+ Новая операция</div>
     <div class="add-bar">
       <div class="fg"><label>Дата</label><input type="date" class="inp w110" id="f-date"></div>
       <div class="fg"><label>Банк</label><select class="inp w150" id="f-bank"></select></div>
@@ -396,6 +365,51 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
       <div class="fg"><label>Описание</label><input type="text" class="inp w170" id="f-desc" placeholder="Пятёрочка, зарплата…"></div>
       <button class="btn btn-p" onclick="addRecord()" style="margin-top:20px">+ Добавить</button>
     </div>
+  </div>
+  <!-- TABLE -->
+  <div class="panel">
+    <div class="panel-h">
+      <span>Операции · <span id="jrn-m-lbl"></span></span>
+      <div class="filters">
+        <select class="inp w130" id="jf-bank" onchange="renderJournal()"><option value="">Все счета</option></select>
+        <select class="inp w150" id="jf-type" onchange="renderJournal()">
+          <option value="">Все типы</option>
+          <option value="income">Приход вне систем</option>
+          <option value="income_i">Приход внутри</option>
+          <option value="tr_in">Приход из др.Б</option>
+          <option value="tr_out">Списание в др.Б</option>
+          <option value="expense_i">Списание внутри</option>
+          <option value="expense">Расход вне систем</option>
+        </select>
+        <select class="inp w130" id="jf-sort" onchange="renderJournal()">
+          <option value="date_desc">Дата ↓ (новые)</option>
+          <option value="date_asc">Дата ↑ (старые)</option>
+          <option value="bank">По банку</option>
+          <option value="amount_desc">Сумма ↓</option>
+          <option value="amount_asc">Сумма ↑</option>
+        </select>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="jt">
+        <thead><tr>
+          <th style="cursor:pointer" onclick="setSortJrn('date')">Дата <span id="sort-date">↓</span></th>
+          <th style="cursor:pointer" onclick="setSortJrn('bank')">Банк и счёт</th>
+          <th class="gh">Приход вне систем</th>
+          <th class="gh">Приход внутри</th>
+          <th class="gh">Приход+из другого Б</th>
+          <th style="cursor:pointer" onclick="setSortJrn('cat')">Категория</th>
+          <th>Описание</th>
+          <th class="rh">Списание в другой Б</th>
+          <th class="rh">Списание внутри</th>
+          <th class="rh">Расход вне систем</th>
+          <th></th>
+        </tr></thead>
+        <tbody id="jrn-body"></tbody>
+      </table>
+    </div>
+    <div id="jrn-empty" class="empty" style="display:none">Нет операций за этот месяц.</div>
+    <div class="tot-strip" id="jrn-tots"></div>
   </div>
 </div>
 
@@ -524,6 +538,7 @@ const BTYPE={debit:'Дебетовая',credit:'Кредитная',savings:'Н�
 
 let banks=[],deposits=[];
 let curMonth=MONTHS[new Date().getMonth()];
+let jrnSort='date_desc';
 
 async function q(sql,params=[]){
   const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:sql,params})});
@@ -708,13 +723,32 @@ async function renderDash(){
 
 function goToBank(bankId){document.getElementById('jf-bank').value=bankId;go('journal');}
 
+function setSortJrn(col){
+  const sortMap={date:'date_desc',bank:'bank',cat:'cat',amount:'amount_desc'};
+  const sel=document.getElementById('jf-sort');
+  if(sel){sel.value=sortMap[col]||'date_desc';jrnSort=sel.value;}
+  renderJournal();
+}
+
 async function renderJournal(){
   document.getElementById('jrn-m-lbl').textContent=curMonth;
   const fb=document.getElementById('jf-bank').value;
   const ft=document.getElementById('jf-type').value;
+  const fs=document.getElementById('jf-sort')||{value:jrnSort};
+  jrnSort=fs.value||jrnSort;
   let recs=await loadRecordsMonth(curMonth);
   if(fb)recs=recs.filter(r=>r.bank_id===fb);
   if(ft)recs=recs.filter(r=>r.type===ft);
+
+  // Sorting
+  recs.sort((a,b)=>{
+    if(jrnSort==='date_desc') return (b.op_date||'')>(a.op_date||'')?1:(b.id-a.id);
+    if(jrnSort==='date_asc')  return (a.op_date||'')>(b.op_date||'')?1:-1;
+    if(jrnSort==='bank')      return (bank(a.bank_id).name).localeCompare(bank(b.bank_id).name);
+    if(jrnSort==='amount_desc') return parseFloat(b.amount)-parseFloat(a.amount);
+    if(jrnSort==='amount_asc')  return parseFloat(a.amount)-parseFloat(b.amount);
+    return b.id-a.id;
+  });
   const tbody=document.getElementById('jrn-body');
   const empty=document.getElementById('jrn-empty');
   if(!recs.length){tbody.innerHTML='';empty.style.display='';}
