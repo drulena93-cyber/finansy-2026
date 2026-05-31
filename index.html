@@ -281,19 +281,28 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
   <div class="ph"><h1>Дашборд</h1><p id="dash-sub">Общая картина финансов</p></div>
   <div id="dep-alerts"></div>
   <div class="mbar" id="mt-dash"></div>
-  <div class="total-card">
-    <div class="total-card-top">
-      <div><div class="total-label">Всего моих денег</div><div class="total-value" id="dash-total-money">—</div></div>
-      <div style="font-size:12px;color:var(--text3);text-align:right;line-height:1.8">карты<br>накопит.<br>вклады<br>наличные</div>
-    </div>
-    <div class="total-breakdown" id="dash-breakdown"></div>
+<div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:14px;margin-bottom:18px;align-items:stretch">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 28px;box-shadow:var(--shadow);display:flex;flex-direction:column;justify-content:center;min-width:220px">
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em">Всего моих денег</div>
+    <div id="dash-total-money" style="font-family:Manrope,sans-serif;font-size:34px;font-weight:800;color:var(--text);letter-spacing:-1px;margin:6px 0 10px"></div>
+    <div id="dash-breakdown" style="display:flex;flex-direction:column;gap:4px"></div>
   </div>
-  <div class="clean-row">
-    <div class="clean-card main">
-      <div class="cc-lbl" style="color:var(--green)">Чистый доход месяца</div>
-      <div class="cc-val" id="dash-clean" style="color:var(--green)">—</div>
-      <div class="cc-sub" style="color:var(--green)">Приход − Расход вне систем</div>
-    </div>
+  <div class="clean-card main">
+    <div class="cc-lbl" style="color:var(--green)">Чистый доход</div>
+    <div class="cc-val" id="dash-clean" style="color:var(--green)">—</div>
+    <div class="cc-sub" style="color:var(--green)">Приход − Расход</div>
+  </div>
+  <div class="clean-card inc">
+    <div class="cc-lbl" style="color:var(--green)">Приход вне систем</div>
+    <div class="cc-val" id="dash-income" style="color:var(--green)">—</div>
+    <div class="cc-sub" style="color:var(--green)">Реальные поступления</div>
+  </div>
+  <div class="clean-card exp">
+    <div class="cc-lbl" style="color:var(--red)">Расход вне систем</div>
+    <div class="cc-val" id="dash-expense" style="color:var(--red)">—</div>
+    <div class="cc-sub" style="color:var(--red)">Реальные траты</div>
+  </div>
+</div>
     <div class="clean-card inc">
       <div class="cc-lbl" style="color:var(--green)">Приход вне систем</div>
       <div class="cc-val" id="dash-income" style="color:var(--green)">—</div>
@@ -640,10 +649,10 @@ async function renderDash(){
   const totalMoney=totalDebit+totalSavings+totalDeposit+totalCash;
   document.getElementById('dash-total-money').textContent=fmtF(totalMoney);
   document.getElementById('dash-breakdown').innerHTML=`
-    <div class="tb-item"><div class="tb-lbl">Карты</div><div class="tb-val" style="color:var(--accent)">${fmtF(totalDebit)}</div></div>
-    <div class="tb-item"><div class="tb-lbl">Накопительные</div><div class="tb-val" style="color:var(--teal)">${fmtF(totalSavings)}</div></div>
-    <div class="tb-item"><div class="tb-lbl">Вклады</div><div class="tb-val" style="color:var(--purple)">${fmtF(totalDeposit)}</div></div>
-    <div class="tb-item"><div class="tb-lbl">Наличные</div><div class="tb-val" style="color:var(--amber)">${fmtF(totalCash)}</div></div>`;
+    <div style="font-size:12px;color:var(--text2)">💳 Карты: <b style="color:var(--accent)">${fmtF(totalDebit)}</b></div>
+    <div style="font-size:12px;color:var(--text2)">📈 Накопит.: <b style="color:var(--teal)">${fmtF(totalSavings)}</b></div>
+    <div style="font-size:12px;color:var(--text2)">🏦 Вклады: <b style="color:var(--purple)">${fmtF(totalDeposit)}</b></div>
+    <div style="font-size:12px;color:var(--text2)">💵 Наличные: <b style="color:var(--amber)">${fmtF(totalCash)}</b></div>`;
 
   const activeBanks=banks.filter(b=>Object.values(agg[b.id]).some(v=>v>0)||(bals[b.id]&&bals[b.id].end));
   document.getElementById('dash-banks').innerHTML=activeBanks.length
