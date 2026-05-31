@@ -868,7 +868,7 @@ async function renderSummary(){
 
 async function saveBalance(bankId,field,el){
   const val=parseFloat(el.textContent.replace(/\s|₽/g,'').replace(',','.'))||0;
-  el.textContent=val||'';
+  el.textContent=val?fmtF(val):'';
   try{
     await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET ${field==='start'?'balance_start':'balance_end'}=EXCLUDED.${field==='start'?'balance_start':'balance_end'}`,
       field==='start'?[bankId,curMonth,val,0]:[bankId,curMonth,0,val]);
@@ -876,7 +876,7 @@ async function saveBalance(bankId,field,el){
   }catch(e){toast('Ошибка сохранения');}
   async function saveBankTotalEl(bankId,field,el){
   const val=parseFloat(el.textContent.replace(/\s|₽|⚠️/g,'').replace(',','.'))||0;
-  el.textContent=val||'';
+  el.textContent=val?fmtF(val):'';
   await saveBankTotal(bankId,field,val);
   renderSummary();
 }
