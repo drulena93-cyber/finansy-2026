@@ -506,6 +506,17 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
 <!-- SETTINGS -->
 <div id="view-settings" class="view">
   <div class="ph"><h1>Настройки</h1><p>Счета, пароль и данные</p></div>
+  <div class="section-div">Категории</div>
+  <div class="panel" style="margin-bottom:20px">
+    <div class="panel-h">Категории расходов и доходов</div>
+    <div class="panel-b">
+      <div id="cat-list"></div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:8px">
+        <input class="inp" style="flex:1" id="new-cat-name" placeholder="Новая категория">
+        <button class="btn btn-p btn-sm" onclick="addCategory()">+ Добавить</button>
+      </div>
+    </div>
+  </div>
   <div class="set-grid">
     <div>
       <div class="panel">
@@ -589,7 +600,7 @@ const TYPE_LABELS={income:'Приход вне систем',income_i:'Прих�
 const TYPE_SIGN={income:1,income_i:1,tr_in:1,tr_out:-1,expense_i:-1,expense:-1};
 const BTYPE={debit:'Дебетовая',credit:'Кредитная',savings:'Накопит.',cash:'Наличные',deposit:'Вклад'};
 
-let banks=[],deposits=[];
+let banks=[],deposits=[],categories=[];
 let curMonth=MONTHS[new Date().getMonth()];
 let jrnSort='date_desc';
 
@@ -663,7 +674,9 @@ async function initApp(){
   initTabs();
   await loadBanks();
   fillBankSelects();
+  await loadCategories();
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('f-cat').innerHTML=catOptions();
   document.getElementById('df-open').value=new Date().toISOString().split('T')[0];
   renderDash();
 }
@@ -686,22 +699,18 @@ async function saveBankTotal(bankId,field,val){
     toast('✓ Сохранено');
   }catch(e){toast('Ошибка');}
 }
-  async function autoSaveEnd(bankId,autoEnd){
-  try{
-    await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET balance_end=$4`,
-      [bankId,curMonth,0,autoEnd]);
-    const nextMonth=MONTHS[MONTHS.indexOf(curMonth)+1];
-    if(nextMonth){
-      await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=$3`,
-        [bankId,nextMonth,autoEnd,0]);
-    }
-  }catch(e){console.error(e);}
-}
 async function saveBankTotalEl(bankId,field,el){
   const val=parseFloat(el.textContent.replace(/\s|₽|⚠️/g,'').replace(',','.'))||0;
   el.textContent=val?fmtF(val):'';
   await saveBankTotal(bankId,field,val);
   renderDash();
+}
+async function loadCategories(){
+  try{categories=await q('SELECT * FROM categories ORDER BY sort_order');}
+  catch(e){categories=[{name:'Еда'},{name:'Транспорт'},{name:'Медицина'},{name:'Подписка'},{name:'Аренда'},{name:'Развлечение'},{name:'Одежда'},{name:'Услуги банка'},{name:'Зарплата'},{name:'Кэшбэк'},{name:'Перевод'},{name:'Прочее'}];}
+}
+function catOptions(selected=''){
+  return`<option value="">— выбрать —</option>`+categories.map(c=>`<option${c.name===selected?' selected':''}>${c.name}</option>`).join('');
 }
 async function loadDeposits(){try{return await q('SELECT * FROM deposits WHERE is_active=true ORDER BY date_close');}catch(e){return[];}}
 
@@ -774,7 +783,6 @@ async function renderDash(){
     const diff=sumInc-sumExp;
     totStart2+=bal.start||0;totEnd2+=(bal.start||0)+sumInc-sumExp;totSumInc2+=sumInc;totSumExp2+=sumExp;
     const autoEnd=(bal.start||0)+sumInc-sumExp;
-    autoSaveEnd(b.id,autoEnd);
     return{b,sumInc,sumExp,bal,bt,diff,autoEnd};
   });
 
@@ -841,7 +849,7 @@ async function renderJournal(){
         <td class="num gc">${cols.income}</td>
         <td class="num pc">${cols.income_i}</td>
         <td class="num ac">${cols.tr_in}</td>
-        <td style="color:var(--text2)">${r.category||''}</td>
+        <td><select class="cell-edit" onchange="updateRecord(${r.id},'category',this.value)" style="width:110px">${catOptions(r.category||'')}</select></td>
         <td>${r.description||''}</td>
         <td class="num ac">${cols.tr_out}</td>
         <td class="num pc">${cols.expense_i}</td>
@@ -876,6 +884,12 @@ async function addRecord(){
   }catch(e){toast('Ошибка: '+e.message);}
 }
 
+async function updateRecord(id,field,val){
+  try{
+    await q(`UPDATE records SET ${field}=$1 WHERE id=$2`,[val||null,id]);
+    toast('✓ Сохранено');
+  }catch(e){toast('Ошибка: '+e.message);}
+}
 async function delRecord(id){
   if(!confirm('Удалить запись?'))return;
   try{await q('DELETE FROM records WHERE id=$1',[id]);renderJournal();toast('Удалено');}
@@ -1058,6 +1072,13 @@ async function closeDeposit(id){
 }
 
 async function renderSettings(){
+  await loadCategories();
+  document.getElementById('cat-list').innerHTML=categories.length
+    ?categories.map(c=>`<div class="bank-set-row">
+      <div style="flex:1;font-size:13px;font-weight:500">${c.name}</div>
+      <button class="btn btn-d btn-sm" onclick="deleteCategory(${c.id},'${c.name}')">✕</button>
+    </div>`).join('')
+    :'<div class="empty">Нет категорий</div>';
   document.getElementById('bank-list').innerHTML=banks.map(b=>`
     <div class="bank-set-row">
       <span class="color-sw" style="background:${b.color}"></span>
@@ -1067,6 +1088,26 @@ async function renderSettings(){
   document.getElementById('data-info').textContent=`Данные хранятся в Supabase (облако) · Записей загружено из базы`;
 }
 
+async function addCategory(){
+  const name=document.getElementById('new-cat-name').value.trim();
+  if(!name){toast('Введите название');return;}
+  try{
+    await q('INSERT INTO categories(name,sort_order) VALUES($1,$2)',[name,categories.length+1]);
+    await loadCategories();
+    renderSettings();
+    document.getElementById('new-cat-name').value='';
+    toast('✓ Категория добавлена');
+  }catch(e){toast('Уже существует или ошибка');}
+}
+async function deleteCategory(id,name){
+  if(!confirm(`Удалить категорию "${name}"?`))return;
+  try{
+    await q('DELETE FROM categories WHERE id=$1',[id]);
+    await loadCategories();
+    renderSettings();
+    toast('Категория удалена');
+  }catch(e){toast('Ошибка');}
+}
 async function addBank(){
   const name=document.getElementById('nb-name').value.trim();
   if(!name){toast('Введите название');return;}
