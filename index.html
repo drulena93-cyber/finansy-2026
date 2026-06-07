@@ -706,6 +706,31 @@ async function renderJournal(){
     <div class="ti"><span class="ti-l">Расход вне сис.</span><span class="ti-v" style="color:var(--red)">${fmtF(tots.expense)}</span></div>`;
 }
 
+async function renderDeposits(){
+  const deps=await loadDeposits();deposits=deps;
+  const today=new Date();today.setHours(0,0,0,0);
+  document.getElementById('dep-list').innerHTML=deps.length
+    ?deps.map(d=>{const dc=new Date(d.date_close);const diff=Math.floor((dc-today)/(1000*60*60*24));
+      const cls=diff<0?'exp':diff<=14?'warn':'ok';
+      const lbl=diff<0?'Истёк':diff<=14?`⚠️ ${diff} дн.`:dc.toLocaleDateString('ru-RU');
+      return `<div class="dep-card">
+        <div class="dep-card-head">
+          <div><div class="dep-name">${d.name}</div><div class="dep-meta">${d.bank_name}</div></div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="dep-badge ${cls}">${lbl}</span>
+            <button class="btn btn-d btn-sm" onclick="closeDeposit(${d.id})">Закрыть</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px">
+          <div><div style="font-size:11px;color:var(--text3);font-weight:600">Сумма</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--purple);margin-top:4px">${fmt(parseFloat(d.amount))}</div></div>
+          <div><div style="font-size:11px;color:var(--text3);font-weight:600">Ставка</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--green);margin-top:4px">${d.rate}%</div></div>
+          <div><div style="font-size:11px;color:var(--text3);font-weight:600">Открыт</div><div style="font-size:14px;font-weight:500;margin-top:4px">${new Date(d.date_open).toLocaleDateString('ru-RU')}</div></div>
+        </div>
+        ${d.description?`<div style="font-size:13px;color:var(--text2);margin-top:10px">${d.description}</div>`:''}
+      </div>`;}).join('')
+    :'<div class="empty">Вкладов ещё нет. Добавь первый слева.</div>';
+}
+
 function go(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
@@ -790,6 +815,17 @@ function fillBankSelects(){
   });
 }
 
+async function autoSaveEnd(bankId,autoEnd){
+  try{
+    await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET balance_end=$4`,
+      [bankId,curMonth,0,autoEnd]);
+    const nextMonth=MONTHS[MONTHS.indexOf(curMonth)+1];
+    if(nextMonth){
+      await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=$3`,
+        [bankId,nextMonth,autoEnd,0]);
+    }
+  }catch(e){console.error(e);}
+}
 async function renderDash(){
   document.getElementById('dash-sub').textContent=curMonth+' 2026';
   const[recs,bals,deps]=await Promise.all([loadRecordsMonth(curMonth),loadBalances(curMonth),loadDeposits()]);
@@ -1010,17 +1046,6 @@ async function renderSummary(){
     <tfoot><tr><td>Итог</td><td class="pos">${fmtF(totSumInc)}</td><td class="neg">${fmtF(totSumExp)}</td><td>${totStart?fmtF(totStart):'—'}</td><td>${totEnd?fmtF(totEnd):'—'}</td><td class="${totEnd-totStart>0?'pos':totEnd-totStart<0?'neg':'neu'}">${totEnd-totStart?fmtF(totEnd-totStart):'—'}</td></tr></tfoot>`;
 }
 
-async function autoSaveEnd(bankId,autoEnd){
-  try{
-    await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET balance_end=$4`,
-      [bankId,curMonth,0,autoEnd]);
-    const nextMonth=MONTHS[MONTHS.indexOf(curMonth)+1];
-    if(nextMonth){
-      await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=$3`,
-        [bankId,nextMonth,autoEnd,0]);
-    }
-  }catch(e){console.error(e);}
-}
 async function saveBalance(bankId,field,el){
   const val=parseFloat(el.textContent.replace(/\s|₽/g,'').replace(',','.'))||0;
   el.textContent=val?fmtF(val):'';
@@ -1099,31 +1124,6 @@ async function renderAnalytics(){
     <div class="cat-track"><div class="cat-fill" style="width:${Math.round(bExp[b.id]/mE*100)}%;background:${b.color}"></div></div>
     <div class="cat-val" style="color:var(--red)">${fmt(bExp[b.id])}</div>
   </div>`).join(''):'<div class="empty">Нет данных</div>';
-}
-
-async function renderDeposits(){
-  const deps=await loadDeposits();deposits=deps;
-  const today=new Date();today.setHours(0,0,0,0);
-  document.getElementById('dep-list').innerHTML=deps.length
-    ?deps.map(d=>{const dc=new Date(d.date_close);const diff=Math.floor((dc-today)/(1000*60*60*24));
-      const cls=diff<0?'exp':diff<=14?'warn':'ok';
-      const lbl=diff<0?'Истёк':diff<=14?`⚠️ ${diff} дн.`:dc.toLocaleDateString('ru-RU');
-      return `<div class="dep-card">
-        <div class="dep-card-head">
-          <div><div class="dep-name">${d.name}</div><div class="dep-meta">${d.bank_name}</div></div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <span class="dep-badge ${cls}">${lbl}</span>
-            <button class="btn btn-d btn-sm" onclick="closeDeposit(${d.id})">Закрыть</button>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px">
-          <div><div style="font-size:11px;color:var(--text3);font-weight:600">Сумма</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--purple);margin-top:4px">${fmt(parseFloat(d.amount))}</div></div>
-          <div><div style="font-size:11px;color:var(--text3);font-weight:600">Ставка</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--green);margin-top:4px">${d.rate}%</div></div>
-          <div><div style="font-size:11px;color:var(--text3);font-weight:600">Открыт</div><div style="font-size:14px;font-weight:500;margin-top:4px">${new Date(d.date_open).toLocaleDateString('ru-RU')}</div></div>
-        </div>
-        ${d.description?`<div style="font-size:13px;color:var(--text2);margin-top:10px">${d.description}</div>`:''}
-      </div>`;}).join('')
-    :'<div class="empty">Вкладов ещё нет. Добавь первый слева.</div>';
 }
 
 async function addDeposit(){
