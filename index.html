@@ -278,9 +278,6 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
     <button class="nb active" id="nb-dashboard" onclick="go('dashboard')">
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Дашборд
     </button>
-    <button class="nb" id="nb-analytics" onclick="go('analytics')">
-      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Аналитика
-    </button>
     <div class="nav-lbl">Операции</div>
     <button class="nb" id="nb-journal" onclick="go('journal')">
       <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Журнал
@@ -341,8 +338,8 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
       <div style="font-size:11px;color:var(--text3);margin-top:3px">Между своими счетами</div>
     </div>
   </div>
-  <div id="dash-summary-top"></div>
-  <div id="dash-summary-detail"></div>
+  <div id="dash-chart"></div>
+  <div id="dash-summary-combined"></div>
 </div>
 
 <!-- JOURNAL -->
@@ -401,11 +398,20 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
           <option value="amount_desc">Сумма ↓</option>
           <option value="amount_asc">Сумма ↑</option>
         </select>
+        <button class="btn btn-g btn-sm" onclick="toggleMassEdit()" id="btn-mass-edit">✏️ Категории</button>
       </div>
+    </div>
+    <!-- Mass edit panel -->
+    <div id="mass-edit-panel" style="display:none;padding:10px 18px;background:var(--accent-l);border-bottom:1px solid var(--border);display:none;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="font-size:13px;font-weight:600;color:var(--accent)">Выбрано: <span id="selected-count">0</span> записей</span>
+      <select class="inp w150" id="mass-cat-select">${'<option value="">— выбрать категорию —</option>'}</select>
+      <button class="btn btn-p btn-sm" onclick="applyMassCategory()">Применить</button>
+      <button class="btn btn-g btn-sm" onclick="cancelMassEdit()">Отмена</button>
     </div>
     <div class="tbl-wrap">
       <table class="jt">
         <thead><tr>
+          <th id="jrn-check-th" style="display:none"><input type="checkbox" onclick="toggleAllRows(this)"></th>
           <th style="cursor:pointer" onclick="setSortJrn('date')">Дата <span id="sort-date">↓</span></th>
           <th style="cursor:pointer" onclick="setSortJrn('bank')">Банк и счёт</th>
           <th class="gh">Приход вне систем</th>
@@ -773,8 +779,14 @@ async function renderDash(){
   const tots2={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
   active2.forEach(b=>Object.keys(tots2).forEach(k=>tots2[k]+=agg2[b.id][k]||0));
 
-  document.getElementById('dash-summary-top').innerHTML=`<div class="panel" style="margin-bottom:14px"><div class="panel-h">Сводка по банкам · ${curMonth}</div><div class="tbl-wrap"><table class="st"><thead><tr><th>Банк</th><th class="gh">Приход вне систем</th><th class="gh">Приход внутри</th><th class="gh">Приход+из другого Б</th><th class="rh">Списание в другой Б</th><th class="rh">Списание внутри</th><th class="rh">Расход вне систем</th></tr></thead><tbody>${active2.map(b=>{const a=agg2[b.id];return`<tr><td><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td><td class="${a.income?'pos':''}">${a.income?fmt(a.income):'—'}</td><td>${a.income_i?fmt(a.income_i):'—'}</td><td>${a.tr_in?fmt(a.tr_in):'—'}</td><td>${a.tr_out?fmt(a.tr_out):'—'}</td><td>${a.expense_i?fmt(a.expense_i):'—'}</td><td class="${a.expense?'neg':''}">${a.expense?fmt(a.expense):'—'}</td></tr>`;}).join('')}</tbody><tfoot><tr><td>Итог</td><td class="pos">${fmtF(tots2.income)}</td><td>${fmtF(tots2.income_i)}</td><td>${fmtF(tots2.tr_in)}</td><td>${fmtF(tots2.tr_out)}</td><td>${fmtF(tots2.expense_i)}</td><td class="neg">${fmtF(tots2.expense)}</td></tr></tfoot></table></div></div>`;
+  // Chart
+  const allRecsChart=await loadAllRecords();
+  const byM={};MONTHS.forEach(m=>byM[m]={inc:0,exp:0});
+  allRecsChart.forEach(r=>{if(byM[r.month]){if(r.type==='income')byM[r.month].inc+=parseFloat(r.amount)||0;if(r.type==='expense')byM[r.month].exp+=parseFloat(r.amount)||0;}});
+  const maxV=Math.max(...MONTHS.flatMap(m=>[byM[m].inc,byM[m].exp]),1);const H=120;
+  document.getElementById('dash-chart').innerHTML=`<div class="panel" style="margin-bottom:14px"><div class="panel-h"><span>Доходы и расходы по месяцам 2026</span><div style="display:flex;gap:12px;font-size:11px;color:var(--text2)"><span><span style="display:inline-block;width:8px;height:8px;background:var(--green);border-radius:2px;margin-right:4px;vertical-align:middle"></span>Приход</span><span><span style="display:inline-block;width:8px;height:8px;background:var(--red);border-radius:2px;margin-right:4px;vertical-align:middle"></span>Расход</span></div></div><div class="panel-b"><div style="display:flex;align-items:flex-end;gap:5px;height:${H}px">${MONTHS.map(m=>{const iH=Math.max((byM[m].inc/maxV)*H,byM[m].inc>0?2:0);const eH=Math.max((byM[m].exp/maxV)*H,byM[m].exp>0?2:0);return`<div style="flex:1;display:flex;flex-direction:column;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:${H}px;width:100%"><div style="flex:1;background:var(--green);border-radius:3px 3px 0 0;height:${iH}px" title="${m}: +${fmtF(byM[m].inc)}"></div><div style="flex:1;background:var(--red);border-radius:3px 3px 0 0;height:${eH}px" title="${m}: -${fmtF(byM[m].exp)}"></div></div><div style="font-size:9px;color:var(--text3);margin-top:4px;text-align:center">${m.slice(0,3)}</div></div>`;}).join('')}</div></div></div>`;
 
+  // Combined table
   const trDiff2=tots2.tr_in-tots2.tr_out;const trOk2=Math.abs(trDiff2)<0.01;
   let totStart2=0,totEnd2=0,totSumInc2=0,totSumExp2=0;
   const dRows2=active2.map(b=>{
@@ -783,15 +795,23 @@ async function renderDash(){
     const diff=sumInc-sumExp;
     totStart2+=bal.start||0;totEnd2+=(bal.start||0)+sumInc-sumExp;totSumInc2+=sumInc;totSumExp2+=sumExp;
     const autoEnd=(bal.start||0)+sumInc-sumExp;
-    return{b,sumInc,sumExp,bal,bt,diff,autoEnd};
+    autoSaveEnd(b.id,autoEnd);
+    return{b,a,sumInc,sumExp,bal,bt,diff,autoEnd};
   });
 
-  document.getElementById('dash-summary-detail').innerHTML=`<div class="panel" style="margin-bottom:14px"><div class="panel-h">Итоги с проверкой · ${curMonth}</div><div class="tbl-wrap"><table class="st"><thead><tr><th>Банк</th><th class="bh">Доход по банку</th><th class="bh">Расход по банку</th><th class="gh">∑ Доход</th><th class="gh">Проверка</th><th class="rh">∑ Расход</th><th class="rh">Проверка</th><th class="bh">Остаток на начало</th><th class="bh">Остаток на конец</th><th class="bh">Разница</th></tr></thead><tbody>${dRows2.map(({b,sumInc,sumExp,bal,bt,diff,autoEnd})=>`<tr><td><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td><td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','income',this)">${bt.income?fmtF(bt.income):''}</td><td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','expense',this)">${bt.expense?fmtF(bt.expense):''}</td><td class="pos">${fmtF(sumInc)}</td><td class="${Math.abs((bt.income||0)-sumInc)<1?'check-ok':'check-fail'}">${Math.abs((bt.income||0)-sumInc)<1?'✅':'⚠️ '+fmtF(Math.abs((bt.income||0)-sumInc))}</td><td class="${sumExp?'neg':''}">${fmtF(sumExp)}</td><td class="${Math.abs((bt.expense||0)-sumExp)<1?'check-ok':'check-fail'}">${Math.abs((bt.expense||0)-sumExp)<1?'✅':'⚠️ '+fmtF(Math.abs((bt.expense||0)-sumExp))}</td><td class="ed" contenteditable="true" onblur="saveBalance('${b.id}','start',this)">${bal.start?fmtF(bal.start):''}</td><td style="text-align:right;font-weight:600;color:${autoEnd>=0?'var(--green)':'var(--red)'}">${fmtF(autoEnd)}</td><td class="${diff>0?'pos':diff<0?'neg':'neu'}">${diff?(diff>0?'+':'')+fmtF(diff):'—'}</td></tr>`).join('')}<tr class="${trOk2?'check-row':'check-row fail'}"><td colspan="10" style="text-align:left;font-size:13px;font-weight:700">${trOk2?'✅ Переводы сходятся: '+fmtF(tots2.tr_in):'⚠️ Переводы не сходятся! Приход из др.Б: '+fmtF(tots2.tr_in)+' ≠ Списание в др.Б: '+fmtF(tots2.tr_out)+' · Разница: '+fmtF(Math.abs(trDiff2))}</td></tr></tbody><tfoot><tr><td>Итог</td><td></td><td></td><td class="pos">${fmtF(totSumInc2)}</td><td></td><td class="neg">${fmtF(totSumExp2)}</td><td></td><td>${totStart2?fmtF(totStart2):'—'}</td><td>${totEnd2?fmtF(totEnd2):'—'}</td><td class="${totEnd2-totStart2>0?'pos':totEnd2-totStart2<0?'neg':'neu'}">${totEnd2-totStart2?(totEnd2-totStart2>0?'+':'')+fmtF(totEnd2-totStart2):'—'}</td></tr></tfoot></table></div></div>`;
+  document.getElementById('dash-summary-combined').innerHTML=`<div class="panel" style="margin-bottom:14px"><div class="panel-h" style="justify-content:space-between"><span>Итоги · ${curMonth}</span><div style="display:flex;gap:8px;align-items:center"><span style="font-size:11px;color:var(--text3)">${trOk2?'✅ Переводы сходятся':'⚠️ Переводы не сходятся'}</span><button onclick="toggleSummary()" id="btn-summary" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">Развернуть</button></div></div><div class="tbl-wrap"><table class="st"><thead><tr><th>Банк</th><th class="gh">Приход вне сис.</th><th class="gh">Приход внутри</th><th class="gh">Приход+из др.Б</th><th class="rh">Списание в др.Б</th><th class="rh">Списание внутри</th><th class="rh">Расход вне сис.</th><th class="bh">Доход по банку</th><th class="bh">Расход по банку</th><th class="gh">∑ Доход</th><th class="gh">✓</th><th class="rh">∑ Расход</th><th class="rh">✓</th><th class="bh">Остаток нач.</th><th class="bh">Остаток кон.</th><th class="bh">Разница</th></tr></thead><tbody id="summary-body" style="display:none">${dRows2.map(({b,a,sumInc,sumExp,bal,bt,diff,autoEnd})=>`<tr><td><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td><td class="${a.income?'pos':''}">${a.income?fmt(a.income):'—'}</td><td>${a.income_i?fmt(a.income_i):'—'}</td><td>${a.tr_in?fmt(a.tr_in):'—'}</td><td>${a.tr_out?fmt(a.tr_out):'—'}</td><td>${a.expense_i?fmt(a.expense_i):'—'}</td><td class="${a.expense?'neg':''}">${a.expense?fmt(a.expense):'—'}</td><td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','income',this)">${bt.income?fmtF(bt.income):''}</td><td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','expense',this)">${bt.expense?fmtF(bt.expense):''}</td><td class="pos">${fmtF(sumInc)}</td><td class="${Math.abs((bt.income||0)-sumInc)<1?'check-ok':'check-fail'}">${Math.abs((bt.income||0)-sumInc)<1?'✅':'⚠️'}</td><td class="${sumExp?'neg':''}">${fmtF(sumExp)}</td><td class="${Math.abs((bt.expense||0)-sumExp)<1?'check-ok':'check-fail'}">${Math.abs((bt.expense||0)-sumExp)<1?'✅':'⚠️'}</td><td class="ed" contenteditable="true" onblur="saveBalance('${b.id}','start',this)">${bal.start?fmtF(bal.start):''}</td><td style="text-align:right;font-weight:600;color:${autoEnd>=0?'var(--green)':'var(--red)'}">${fmtF(autoEnd)}</td><td class="${diff>0?'pos':diff<0?'neg':'neu'}">${diff?(diff>0?'+':'')+fmtF(diff):'—'}</td></tr>`).join('')}</tbody><tfoot><tr><td>Итог</td><td class="pos">${fmtF(tots2.income)}</td><td>${fmtF(tots2.income_i)}</td><td>${fmtF(tots2.tr_in)}</td><td>${fmtF(tots2.tr_out)}</td><td>${fmtF(tots2.expense_i)}</td><td class="neg">${fmtF(tots2.expense)}</td><td></td><td></td><td class="pos">${fmtF(totSumInc2)}</td><td></td><td class="neg">${fmtF(totSumExp2)}</td><td></td><td>${totStart2?fmtF(totStart2):'—'}</td><td>${totEnd2?fmtF(totEnd2):'—'}</td><td class="${totEnd2-totStart2>0?'pos':totEnd2-totStart2<0?'neg':'neu'}">${totEnd2-totStart2?(totEnd2-totStart2>0?'+':'')+fmtF(totEnd2-totStart2):'—'}</td></tr></tfoot></table></div></div>`;
 }
 
-function goToBank(bankId){document.getElementById('jf-bank').value=bankId;go('journal');}
+function toggleSummary(){
+  const body=document.getElementById('summary-body');
+  const btn=document.getElementById('btn-summary');
+  if(!body||!btn)return;
+  const hidden=body.style.display==='none';
+  body.style.display=hidden?'':'none';
+  btn.textContent=hidden?'Свернуть':'Развернуть';
+}
 
-function toggleTotal(){
+function toggleTotal(){function toggleTotal(){
   const el=document.getElementById('total-content');
   const btn=document.getElementById('btn-toggle-total');
   const hidden=el.style.display==='none';
@@ -843,13 +863,14 @@ async function renderJournal(){
       const b=bank(r.bank_id);const amt=parseFloat(r.amount)||0;
       const cols={income:'',income_i:'',tr_in:'',tr_out:'',expense_i:'',expense:''};
       cols[r.type]=fmt(amt);
-      return `<tr>
+      return `<tr data-id="${r.id}">
+        <td class="jrn-check-td" style="display:none"><input type="checkbox" class="row-check" data-id="${r.id}" onchange="updateSelectedCount()"></td>
         <td style="color:var(--text2);white-space:nowrap">${r.op_date||'—'}</td>
         <td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${b.color};flex-shrink:0"></span>${b.name}</span></td>
         <td class="num gc">${cols.income}</td>
         <td class="num pc">${cols.income_i}</td>
         <td class="num ac">${cols.tr_in}</td>
-        <td><select class="cell-edit" onchange="updateRecord(${r.id},'category',this.value)" style="width:110px">${catOptions(r.category||'')}</select></td>
+        <td style="color:var(--text2)">${r.category||'—'}</td>
         <td>${r.description||''}</td>
         <td class="num ac">${cols.tr_out}</td>
         <td class="num pc">${cols.expense_i}</td>
@@ -888,6 +909,54 @@ async function updateRecord(id,field,val){
   try{
     await q(`UPDATE records SET ${field}=$1 WHERE id=$2`,[val||null,id]);
     toast('✓ Сохранено');
+  }catch(e){toast('Ошибка: '+e.message);}
+}
+
+let massEditMode=false;
+function toggleMassEdit(){
+  massEditMode=!massEditMode;
+  const th=document.getElementById('jrn-check-th');
+  const tds=document.querySelectorAll('.jrn-check-td');
+  const panel=document.getElementById('mass-edit-panel');
+  const btn=document.getElementById('btn-mass-edit');
+  if(th) th.style.display=massEditMode?'':'none';
+  tds.forEach(td=>td.style.display=massEditMode?'':'none');
+  panel.style.display=massEditMode?'flex':'none';
+  btn.style.background=massEditMode?'var(--accent-l)':'';
+  btn.style.color=massEditMode?'var(--accent)':'';
+  document.getElementById('mass-cat-select').innerHTML=catOptions();
+  updateSelectedCount();
+}
+function updateSelectedCount(){
+  const checked=document.querySelectorAll('.row-check:checked').length;
+  document.getElementById('selected-count').textContent=checked;
+}
+function toggleAllRows(cb){
+  document.querySelectorAll('.row-check').forEach(c=>c.checked=cb.checked);
+  updateSelectedCount();
+}
+function cancelMassEdit(){
+  massEditMode=false;
+  const th=document.getElementById('jrn-check-th');
+  const panel=document.getElementById('mass-edit-panel');
+  const btn=document.getElementById('btn-mass-edit');
+  if(th) th.style.display='none';
+  document.querySelectorAll('.jrn-check-td').forEach(td=>td.style.display='none');
+  panel.style.display='none';
+  btn.style.background='';btn.style.color='';
+}
+async function applyMassCategory(){
+  const cat=document.getElementById('mass-cat-select').value;
+  if(!cat){toast('Выберите категорию');return;}
+  const ids=[...document.querySelectorAll('.row-check:checked')].map(c=>c.dataset.id);
+  if(!ids.length){toast('Выберите записи');return;}
+  try{
+    for(const id of ids){
+      await q('UPDATE records SET category=$1 WHERE id=$2',[cat,id]);
+    }
+    toast(`✓ Категория "${cat}" применена к ${ids.length} записям`);
+    cancelMassEdit();
+    renderJournal();
   }catch(e){toast('Ошибка: '+e.message);}
 }
 async function delRecord(id){
