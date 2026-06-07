@@ -652,6 +652,60 @@ function closeMobMenu(){
   document.querySelector('.sidebar').classList.remove('mob-open');
   document.getElementById('mob-overlay').classList.remove('active');
 }
+async function renderJournal(){
+  document.getElementById('jrn-m-lbl').textContent=curMonth;
+  const fb=document.getElementById('jf-bank').value;
+  const ft=document.getElementById('jf-type').value;
+  const fs=document.getElementById('jf-sort')||{value:jrnSort};
+  jrnSort=fs.value||jrnSort;
+  let recs=await loadRecordsMonth(curMonth);
+  if(fb)recs=recs.filter(r=>r.bank_id===fb);
+  if(ft)recs=recs.filter(r=>r.type===ft);
+
+  // Sorting
+  recs.sort((a,b)=>{
+    if(jrnSort==='date_desc') return (b.op_date||'')>(a.op_date||'')?1:(b.id-a.id);
+    if(jrnSort==='date_asc')  return (a.op_date||'')>(b.op_date||'')?1:-1;
+    if(jrnSort==='bank')      return (bank(a.bank_id).name).localeCompare(bank(b.bank_id).name);
+    if(jrnSort==='amount_desc') return parseFloat(b.amount)-parseFloat(a.amount);
+    if(jrnSort==='amount_asc')  return parseFloat(a.amount)-parseFloat(b.amount);
+    return b.id-a.id;
+  });
+  const tbody=document.getElementById('jrn-body');
+  const empty=document.getElementById('jrn-empty');
+  if(!recs.length){tbody.innerHTML='';empty.style.display='';}
+  else{
+    empty.style.display='none';
+    tbody.innerHTML=recs.map(r=>{
+      const b=bank(r.bank_id);const amt=parseFloat(r.amount)||0;
+      const cols={income:'',income_i:'',tr_in:'',tr_out:'',expense_i:'',expense:''};
+      cols[r.type]=fmt(amt);
+      return `<tr data-id="${r.id}">
+        <td class="jrn-check-td" style="display:none"><input type="checkbox" class="row-check" data-id="${r.id}" onchange="updateSelectedCount()"></td>
+        <td style="color:var(--text2);white-space:nowrap">${r.op_date||'—'}</td>
+        <td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${b.color};flex-shrink:0"></span>${b.name}</span></td>
+        <td class="num gc">${cols.income}</td>
+        <td class="num pc">${cols.income_i}</td>
+        <td class="num ac">${cols.tr_in}</td>
+        <td style="color:var(--text2)">${r.category||'—'}</td>
+        <td>${r.description||''}</td>
+        <td class="num ac">${cols.tr_out}</td>
+        <td class="num pc">${cols.expense_i}</td>
+        <td class="num rc">${cols.expense}</td>
+        <td><button class="del-btn" onclick="delRecord(${r.id})">×</button></td>
+      </tr>`;}).join('');
+  }
+  const tots={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
+  recs.forEach(r=>tots[r.type]+=parseFloat(r.amount)||0);
+  document.getElementById('jrn-tots').innerHTML=`
+    <div class="ti"><span class="ti-l">Записей</span><span class="ti-v" style="color:var(--text2)">${recs.length}</span></div>
+    <div class="ti"><span class="ti-l">Приход вне сис.</span><span class="ti-v" style="color:var(--green)">${fmtF(tots.income)}</span></div>
+    <div class="ti"><span class="ti-l">Приход внутри</span><span class="ti-v" style="color:var(--purple)">${fmtF(tots.income_i)}</span></div>
+    <div class="ti"><span class="ti-l">Приход из др.Б</span><span class="ti-v" style="color:var(--accent)">${fmtF(tots.tr_in)}</span></div>
+    <div class="ti"><span class="ti-l">Списание в др.Б</span><span class="ti-v" style="color:var(--accent)">${fmtF(tots.tr_out)}</span></div>
+    <div class="ti"><span class="ti-l">Расход вне сис.</span><span class="ti-v" style="color:var(--red)">${fmtF(tots.expense)}</span></div>`;
+}
+
 function go(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
@@ -834,60 +888,6 @@ function setSortJrn(col){
   renderJournal();
 }
 
-async function renderJournal(){
-  document.getElementById('jrn-m-lbl').textContent=curMonth;
-  const fb=document.getElementById('jf-bank').value;
-  const ft=document.getElementById('jf-type').value;
-  const fs=document.getElementById('jf-sort')||{value:jrnSort};
-  jrnSort=fs.value||jrnSort;
-  let recs=await loadRecordsMonth(curMonth);
-  if(fb)recs=recs.filter(r=>r.bank_id===fb);
-  if(ft)recs=recs.filter(r=>r.type===ft);
-
-  // Sorting
-  recs.sort((a,b)=>{
-    if(jrnSort==='date_desc') return (b.op_date||'')>(a.op_date||'')?1:(b.id-a.id);
-    if(jrnSort==='date_asc')  return (a.op_date||'')>(b.op_date||'')?1:-1;
-    if(jrnSort==='bank')      return (bank(a.bank_id).name).localeCompare(bank(b.bank_id).name);
-    if(jrnSort==='amount_desc') return parseFloat(b.amount)-parseFloat(a.amount);
-    if(jrnSort==='amount_asc')  return parseFloat(a.amount)-parseFloat(b.amount);
-    return b.id-a.id;
-  });
-  const tbody=document.getElementById('jrn-body');
-  const empty=document.getElementById('jrn-empty');
-  if(!recs.length){tbody.innerHTML='';empty.style.display='';}
-  else{
-    empty.style.display='none';
-    tbody.innerHTML=recs.map(r=>{
-      const b=bank(r.bank_id);const amt=parseFloat(r.amount)||0;
-      const cols={income:'',income_i:'',tr_in:'',tr_out:'',expense_i:'',expense:''};
-      cols[r.type]=fmt(amt);
-      return `<tr data-id="${r.id}">
-        <td class="jrn-check-td" style="display:none"><input type="checkbox" class="row-check" data-id="${r.id}" onchange="updateSelectedCount()"></td>
-        <td style="color:var(--text2);white-space:nowrap">${r.op_date||'—'}</td>
-        <td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${b.color};flex-shrink:0"></span>${b.name}</span></td>
-        <td class="num gc">${cols.income}</td>
-        <td class="num pc">${cols.income_i}</td>
-        <td class="num ac">${cols.tr_in}</td>
-        <td style="color:var(--text2)">${r.category||'—'}</td>
-        <td>${r.description||''}</td>
-        <td class="num ac">${cols.tr_out}</td>
-        <td class="num pc">${cols.expense_i}</td>
-        <td class="num rc">${cols.expense}</td>
-        <td><button class="del-btn" onclick="delRecord(${r.id})">×</button></td>
-      </tr>`;}).join('');
-  }
-  const tots={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
-  recs.forEach(r=>tots[r.type]+=parseFloat(r.amount)||0);
-  document.getElementById('jrn-tots').innerHTML=`
-    <div class="ti"><span class="ti-l">Записей</span><span class="ti-v" style="color:var(--text2)">${recs.length}</span></div>
-    <div class="ti"><span class="ti-l">Приход вне сис.</span><span class="ti-v" style="color:var(--green)">${fmtF(tots.income)}</span></div>
-    <div class="ti"><span class="ti-l">Приход внутри</span><span class="ti-v" style="color:var(--purple)">${fmtF(tots.income_i)}</span></div>
-    <div class="ti"><span class="ti-l">Приход из др.Б</span><span class="ti-v" style="color:var(--accent)">${fmtF(tots.tr_in)}</span></div>
-    <div class="ti"><span class="ti-l">Списание в др.Б</span><span class="ti-v" style="color:var(--accent)">${fmtF(tots.tr_out)}</span></div>
-    <div class="ti"><span class="ti-l">Расход вне сис.</span><span class="ti-v" style="color:var(--red)">${fmtF(tots.expense)}</span></div>`;
-}
-
 async function addRecord(){
   const bankId=document.getElementById('f-bank').value;
   const type=document.getElementById('f-type').value;
@@ -1010,6 +1010,17 @@ async function renderSummary(){
     <tfoot><tr><td>Итог</td><td class="pos">${fmtF(totSumInc)}</td><td class="neg">${fmtF(totSumExp)}</td><td>${totStart?fmtF(totStart):'—'}</td><td>${totEnd?fmtF(totEnd):'—'}</td><td class="${totEnd-totStart>0?'pos':totEnd-totStart<0?'neg':'neu'}">${totEnd-totStart?fmtF(totEnd-totStart):'—'}</td></tr></tfoot>`;
 }
 
+async function autoSaveEnd(bankId,autoEnd){
+  try{
+    await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET balance_end=$4`,
+      [bankId,curMonth,0,autoEnd]);
+    const nextMonth=MONTHS[MONTHS.indexOf(curMonth)+1];
+    if(nextMonth){
+      await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=$3`,
+        [bankId,nextMonth,autoEnd,0]);
+    }
+  }catch(e){console.error(e);}
+}
 async function saveBalance(bankId,field,el){
   const val=parseFloat(el.textContent.replace(/\s|₽/g,'').replace(',','.'))||0;
   el.textContent=val?fmtF(val):'';
