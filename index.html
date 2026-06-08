@@ -316,29 +316,30 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
     </div>
   </div>
   <!-- METRICS ROW -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1.3fr;gap:12px;margin-bottom:16px;align-items:stretch">
     <div style="background:var(--green-bg);border:1px solid var(--green-b);border-radius:var(--radius);padding:14px 16px">
-      <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.06em">Чистый доход</div>
-      <div id="dash-clean" style="font-family:Manrope,sans-serif;font-size:22px;font-weight:800;color:var(--green);margin-top:5px">—</div>
-      <div style="font-size:11px;color:var(--green);margin-top:3px;opacity:.75">Приход − Расход</div>
-    </div>
-    <div style="background:var(--green-bg);border:1px solid var(--green-b);border-radius:var(--radius);padding:14px 16px">
-      <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.06em">Приход вне систем</div>
+      <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.06em">↑ Приход вне систем</div>
       <div id="dash-income" style="font-family:Manrope,sans-serif;font-size:22px;font-weight:800;color:var(--green);margin-top:5px">—</div>
       <div style="font-size:11px;color:var(--green);margin-top:3px;opacity:.75">Реальные поступления</div>
     </div>
     <div style="background:var(--red-bg);border:1px solid var(--red-b);border-radius:var(--radius);padding:14px 16px">
-      <div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.06em">Расход вне систем</div>
+      <div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.06em">↓ Расход вне систем</div>
       <div id="dash-expense" style="font-family:Manrope,sans-serif;font-size:22px;font-weight:800;color:var(--red);margin-top:5px">—</div>
       <div style="font-size:11px;color:var(--red);margin-top:3px;opacity:.75">Реальные траты</div>
     </div>
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px">
-      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Внутри (переводы)</div>
+      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">⇄ Внутри (переводы)</div>
       <div id="dash-internal" style="font-family:Manrope,sans-serif;font-size:22px;font-weight:800;color:var(--text2);margin-top:5px">—</div>
       <div style="font-size:11px;color:var(--text3);margin-top:3px">Между своими счетами</div>
     </div>
+    <div style="background:var(--green-bg);border:2px solid var(--green);border-radius:var(--radius);padding:14px 16px;position:relative">
+      <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.06em">= Чистый доход</div>
+      <div id="dash-clean" style="font-family:Manrope,sans-serif;font-size:28px;font-weight:800;color:var(--green);margin-top:5px">—</div>
+      <div style="font-size:11px;color:var(--green);margin-top:3px;opacity:.75">Приход − Расход вне систем</div>
+    </div>
   </div>
   <div id="dash-chart"></div>
+  <div id="dash-cats-panel"></div>
   <div id="dash-summary-top"></div>
   <div id="dash-summary-detail"></div>
   <div id="dash-summary-combined"></div>
@@ -383,7 +384,6 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
     <div class="panel-h">
       <span>Операции · <span id="jrn-m-lbl"></span></span>
       <div class="filters">
-        <select class="inp w130" id="jf-bank" onchange="renderJournal()"><option value="">Все счета</option></select>
         <select class="inp w150" id="jf-type" onchange="renderJournal()">
           <option value="">Все типы</option>
           <option value="income">Приход вне систем</option>
@@ -403,10 +403,12 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
         <button class="btn btn-g btn-sm" onclick="toggleMassEdit()" id="btn-mass-edit">✏️ Категории</button>
       </div>
     </div>
+    <!-- Bank filter buttons -->
+    <div id="bank-filter-btns" style="padding:8px 14px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--surface2)"></div>
     <!-- Mass edit panel -->
-    <div id="mass-edit-panel" style="display:none;padding:10px 18px;background:var(--accent-l);border-bottom:1px solid var(--border);display:none;align-items:center;gap:10px;flex-wrap:wrap">
+    <div id="mass-edit-panel" style="padding:10px 18px;background:var(--accent-l);border-bottom:1px solid var(--border);display:none;align-items:center;gap:10px;flex-wrap:wrap">
       <span style="font-size:13px;font-weight:600;color:var(--accent)">Выбрано: <span id="selected-count">0</span> записей</span>
-      <select class="inp w150" id="mass-cat-select">${'<option value="">— выбрать категорию —</option>'}</select>
+      <select class="inp w150" id="mass-cat-select"><option value="">— выбрать категорию —</option></select>
       <button class="btn btn-p btn-sm" onclick="applyMassCategory()">Применить</button>
       <button class="btn btn-g btn-sm" onclick="cancelMassEdit()">Отмена</button>
     </div>
@@ -611,6 +613,7 @@ const BTYPE={debit:'Дебетовая',credit:'Кредитная',savings:'Н�
 let banks=[],deposits=[],categories=[];
 let curMonth=MONTHS[new Date().getMonth()];
 let jrnSort='date_desc';
+let jrnBank='';
 
 async function q(sql,params=[]){
   const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:sql,params})});
@@ -656,12 +659,20 @@ function closeMobMenu(){
 }
 async function renderJournal(){
   document.getElementById('jrn-m-lbl').textContent=curMonth;
-  const fb=document.getElementById('jf-bank').value;
+
+  // Build bank filter buttons
+  const btnContainer=document.getElementById('bank-filter-btns');
+  if(btnContainer){
+    btnContainer.innerHTML=[{id:'',name:'Все счета',color:'#8890aa'},...banks].map(b=>`
+      <button onclick="setJrnBank('${b.id}')" style="padding:4px 10px;border-radius:20px;border:1.5px solid ${jrnBank===b.id?b.color||'var(--accent)':'var(--border)'};background:${jrnBank===b.id?(b.color||'var(--accent)'):'var(--surface)'};color:${jrnBank===b.id?'#fff':'var(--text2)'};font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .12s">${b.name}</button>
+    `).join('');
+  }
+
   const ft=document.getElementById('jf-type').value;
   const fs=document.getElementById('jf-sort')||{value:jrnSort};
   jrnSort=fs.value||jrnSort;
   let recs=await loadRecordsMonth(curMonth);
-  if(fb)recs=recs.filter(r=>r.bank_id===fb);
+  if(jrnBank)recs=recs.filter(r=>r.bank_id===jrnBank);
   if(ft)recs=recs.filter(r=>r.type===ft);
 
   // Sorting
@@ -684,7 +695,7 @@ async function renderJournal(){
       cols[r.type]=fmt(amt);
       return `<tr data-id="${r.id}">
         <td class="jrn-check-td" style="display:none"><input type="checkbox" class="row-check" data-id="${r.id}" onchange="updateSelectedCount()"></td>
-        <td style="color:var(--text2);white-space:nowrap">${r.op_date||'—'}</td>
+        <td style="color:var(--text2);white-space:nowrap">${r.op_date?r.op_date.split('-').reverse().join('.'):'—'}</td>
         <td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${b.color};flex-shrink:0"></span>${b.name}</span></td>
         <td class="num gc">${cols.income}</td>
         <td class="num pc">${cols.income_i}</td>
@@ -809,7 +820,7 @@ function catOptions(selected=''){
 async function loadDeposits(){try{return await q('SELECT * FROM deposits WHERE is_active=true ORDER BY date_close');}catch(e){return[];}}
 
 function fillBankSelects(){
-  ['f-bank','jf-bank'].forEach(id=>{
+  ['f-bank'].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
     const cur=el.value;
     el.innerHTML=(id==='jf-bank'?'<option value="">Все счета</option>':'')+banks.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
@@ -898,8 +909,54 @@ async function renderDash(){
     return{b,a,sumInc,sumExp,bal,bt,diff,autoEnd};
   });
 
-  // Table 1 - Сводка по банкам
-  document.getElementById('dash-summary-top').innerHTML=`<div class="panel" style="margin-bottom:14px"><div class="panel-h">Сводка по банкам · ${curMonth}</div><div class="tbl-wrap"><table class="st"><thead><tr><th>Банк</th><th class="gh">Приход вне систем</th><th class="gh">Приход внутри</th><th class="gh">Приход+из другого Б</th><th class="rh">Списание в другой Б</th><th class="rh">Списание внутри</th><th class="rh">Расход вне систем</th></tr></thead><tbody>${active2.map(b=>{const a=agg2[b.id];return`<tr><td><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td><td class="${a.income?'pos':''}">${a.income?fmt(a.income):'—'}</td><td>${a.income_i?fmt(a.income_i):'—'}</td><td>${a.tr_in?fmt(a.tr_in):'—'}</td><td>${a.tr_out?fmt(a.tr_out):'—'}</td><td>${a.expense_i?fmt(a.expense_i):'—'}</td><td class="${a.expense?'neg':''}">${a.expense?fmt(a.expense):'—'}</td></tr>`;}).join('')}</tbody><tfoot><tr><td>Итог</td><td class="pos">${fmtF(tots2.income)}</td><td>${fmtF(tots2.income_i)}</td><td>${fmtF(tots2.tr_in)}</td><td>${fmtF(tots2.tr_out)}</td><td>${fmtF(tots2.expense_i)}</td><td class="neg">${fmtF(tots2.expense)}</td></tr></tfoot></table></div></div>`;
+  // Categories panel
+  const catExp={};
+  recs.filter(r=>r.type==='expense').forEach(r=>{const c=r.category||'Прочее';catExp[c]=(catExp[c]||0)+parseFloat(r.amount);});
+  const sortedCats=Object.entries(catExp).sort((a,b)=>b[1]-a[1]);
+  const maxCat=sortedCats[0]?sortedCats[0][1]:1;
+  const totalCatExp=sortedCats.reduce((s,[,v])=>s+v,0);
+  document.getElementById('dash-cats-panel').innerHTML=sortedCats.length?`<div class="panel" style="margin-bottom:14px">
+    <div class="panel-h">Расходы по категориям · ${curMonth}</div>
+    <div class="panel-b" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+      ${sortedCats.map(([cat,val])=>{
+        const pct=Math.round(val/totalCatExp*100);
+        const colors=['#ef4444','#f97316','#eab308','#22c55e','#06b6d4','#8b5cf6','#ec4899','#14b8a6','#f59e0b','#6366f1','#84cc16','#0ea5e9'];
+        const ci=sortedCats.findIndex(([c])=>c===cat);
+        const col=colors[ci%colors.length];
+        return`<div style="background:var(--surface2);border-radius:var(--radius-sm);padding:10px 12px;border:1px solid var(--border)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-size:12px;font-weight:600;color:var(--text)">${cat}</span>
+            <span style="font-size:11px;font-weight:700;color:${col}">${pct}%</span>
+          </div>
+          <div style="height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin-bottom:5px">
+            <div style="height:6px;background:${col};border-radius:3px;width:${pct}%"></div>
+          </div>
+          <div style="font-size:13px;font-weight:700;color:${col}">${fmt(val)}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`:'';
+
+  // Table 1 - Сводка по банкам with toggle
+  document.getElementById('dash-summary-top').innerHTML=`<div class="panel" style="margin-bottom:14px">
+    <div class="panel-h" style="justify-content:space-between">
+      <span>Сводка по банкам · ${curMonth}</span>
+      <button onclick="toggleSummaryTop()" id="btn-summary-top" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">Развернуть</button>
+    </div>
+    <div class="tbl-wrap"><table class="st">
+      <thead><tr><th>Банк</th><th class="gh">Приход вне систем</th><th class="gh">Приход внутри</th><th class="gh">Приход+из другого Б</th><th class="rh">Списание в другой Б</th><th class="rh">Списание внутри</th><th class="rh">Расход вне систем</th></tr></thead>
+      <tbody id="summary-top-body" style="display:none">${active2.map(b=>{const a=agg2[b.id];return`<tr>
+        <td><span class="bdot-sm" style="background:${b.color}"></span><a href="javascript:void(0)" onclick="goToBank('${b.id}')" style="color:var(--accent);text-decoration:underline;cursor:pointer">${b.name}</a></td>
+        <td class="${a.income?'pos':''}">${a.income?fmt(a.income):'—'}</td>
+        <td>${a.income_i?fmt(a.income_i):'—'}</td>
+        <td>${a.tr_in?fmt(a.tr_in):'—'}</td>
+        <td>${a.tr_out?fmt(a.tr_out):'—'}</td>
+        <td>${a.expense_i?fmt(a.expense_i):'—'}</td>
+        <td class="${a.expense?'neg':''}">${a.expense?fmt(a.expense):'—'}</td>
+      </tr>`;}).join('')}</tbody>
+      <tfoot><tr><td>Итог</td><td class="pos">${fmtF(tots2.income)}</td><td>${fmtF(tots2.income_i)}</td><td>${fmtF(tots2.tr_in)}</td><td>${fmtF(tots2.tr_out)}</td><td>${fmtF(tots2.expense_i)}</td><td class="neg">${fmtF(tots2.expense)}</td></tr></tfoot>
+    </table></div>
+  </div>`;
 
   // Table 2 - Итоги с проверкой
   document.getElementById('dash-summary-detail').innerHTML=`<div class="panel" style="margin-bottom:14px"><div class="panel-h">Итоги с проверкой · ${curMonth}</div><div class="tbl-wrap"><table class="st"><thead><tr><th>Банк</th><th class="bh">Доход по банку</th><th class="bh">Расход по банку</th><th class="gh">∑ Доход</th><th class="gh">Проверка</th><th class="rh">∑ Расход</th><th class="rh">Проверка</th><th class="bh">Остаток на начало</th><th class="bh">Остаток на конец</th><th class="bh">Разница</th></tr></thead><tbody>${dRows2.map(({b,sumInc,sumExp,bal,bt,diff,autoEnd})=>`<tr><td><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td><td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','income',this)">${bt.income?fmtF(bt.income):''}</td><td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','expense',this)">${bt.expense?fmtF(bt.expense):''}</td><td class="pos">${fmtF(sumInc)}</td><td class="${Math.abs((bt.income||0)-sumInc)<1?'check-ok':'check-fail'}">${Math.abs((bt.income||0)-sumInc)<1?'✅':'⚠️ '+fmtF(Math.abs((bt.income||0)-sumInc))}</td><td class="${sumExp?'neg':''}">${fmtF(sumExp)}</td><td class="${Math.abs((bt.expense||0)-sumExp)<1?'check-ok':'check-fail'}">${Math.abs((bt.expense||0)-sumExp)<1?'✅':'⚠️ '+fmtF(Math.abs((bt.expense||0)-sumExp))}</td><td class="ed" contenteditable="true" onblur="saveBalance('${b.id}','start',this)">${bal.start?fmtF(bal.start):''}</td><td style="text-align:right;font-weight:600;color:${autoEnd>=0?'var(--green)':'var(--red)'}">${fmtF(autoEnd)}</td><td class="${diff>0?'pos':diff<0?'neg':'neu'}">${diff?(diff>0?'+':'')+fmtF(diff):'—'}</td></tr>`).join('')}<tr class="${trOk2?'check-row':'check-row fail'}"><td colspan="10" style="text-align:left;font-size:13px;font-weight:700">${trOk2?'✅ Переводы сходятся: '+fmtF(tots2.tr_in):'⚠️ Переводы не сходятся! Разница: '+fmtF(Math.abs(trDiff2))}</td></tr></tbody><tfoot><tr><td>Итог</td><td></td><td></td><td class="pos">${fmtF(totSumInc2)}</td><td></td><td class="neg">${fmtF(totSumExp2)}</td><td></td><td>${totStart2?fmtF(totStart2):'—'}</td><td>${totEnd2?fmtF(totEnd2):'—'}</td><td class="${totEnd2-totStart2>0?'pos':totEnd2-totStart2<0?'neg':'neu'}">${totEnd2-totStart2?(totEnd2-totStart2>0?'+':'')+fmtF(totEnd2-totStart2):'—'}</td></tr></tfoot></table></div></div>`;
@@ -907,6 +964,16 @@ async function renderDash(){
   document.getElementById('dash-summary-combined').innerHTML=`<div class="panel" style="margin-bottom:14px"><div class="panel-h" style="justify-content:space-between"><span>Итоги · ${curMonth}</span><div style="display:flex;gap:8px;align-items:center"><span style="font-size:11px;color:var(--text3)">${trOk2?'✅ Переводы сходятся':'⚠️ Переводы не сходятся'}</span><button onclick="toggleSummary()" id="btn-summary" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">Развернуть</button></div></div><div class="tbl-wrap"><table class="st"><thead><tr><th>Банк</th><th class="gh">Приход вне сис.</th><th class="gh">Приход внутри</th><th class="gh">Приход+из др.Б</th><th class="rh">Списание в др.Б</th><th class="rh">Списание внутри</th><th class="rh">Расход вне сис.</th><th class="bh">Доход по банку</th><th class="bh">Расход по банку</th><th class="gh">∑ Доход</th><th class="gh">✓</th><th class="rh">∑ Расход</th><th class="rh">✓</th><th class="bh">Остаток нач.</th><th class="bh">Остаток кон.</th><th class="bh">Разница</th></tr></thead><tbody id="summary-body" style="display:none">${dRows2.map(({b,a,sumInc,sumExp,bal,bt,diff,autoEnd})=>`<tr><td><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td><td class="${a.income?'pos':''}">${a.income?fmt(a.income):'—'}</td><td>${a.income_i?fmt(a.income_i):'—'}</td><td>${a.tr_in?fmt(a.tr_in):'—'}</td><td>${a.tr_out?fmt(a.tr_out):'—'}</td><td>${a.expense_i?fmt(a.expense_i):'—'}</td><td class="${a.expense?'neg':''}">${a.expense?fmt(a.expense):'—'}</td><td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','income',this)">${bt.income?fmtF(bt.income):''}</td><td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','expense',this)">${bt.expense?fmtF(bt.expense):''}</td><td class="pos">${fmtF(sumInc)}</td><td class="${Math.abs((bt.income||0)-sumInc)<1?'check-ok':'check-fail'}">${Math.abs((bt.income||0)-sumInc)<1?'✅':'⚠️'}</td><td class="${sumExp?'neg':''}">${fmtF(sumExp)}</td><td class="${Math.abs((bt.expense||0)-sumExp)<1?'check-ok':'check-fail'}">${Math.abs((bt.expense||0)-sumExp)<1?'✅':'⚠️'}</td><td class="ed" contenteditable="true" onblur="saveBalance('${b.id}','start',this)">${bal.start?fmtF(bal.start):''}</td><td style="text-align:right;font-weight:600;color:${autoEnd>=0?'var(--green)':'var(--red)'}">${fmtF(autoEnd)}</td><td class="${diff>0?'pos':diff<0?'neg':'neu'}">${diff?(diff>0?'+':'')+fmtF(diff):'—'}</td></tr>`).join('')}</tbody><tfoot><tr><td>Итог</td><td class="pos">${fmtF(tots2.income)}</td><td>${fmtF(tots2.income_i)}</td><td>${fmtF(tots2.tr_in)}</td><td>${fmtF(tots2.tr_out)}</td><td>${fmtF(tots2.expense_i)}</td><td class="neg">${fmtF(tots2.expense)}</td><td></td><td></td><td class="pos">${fmtF(totSumInc2)}</td><td></td><td class="neg">${fmtF(totSumExp2)}</td><td></td><td>${totStart2?fmtF(totStart2):'—'}</td><td>${totEnd2?fmtF(totEnd2):'—'}</td><td class="${totEnd2-totStart2>0?'pos':totEnd2-totStart2<0?'neg':'neu'}">${totEnd2-totStart2?(totEnd2-totStart2>0?'+':'')+fmtF(totEnd2-totStart2):'—'}</td></tr></tfoot></table></div></div>`;
 }
 
+function setJrnBank(id){jrnBank=id;renderJournal();}
+function goToBank(bankId){jrnBank=bankId;go('journal');}
+function toggleSummaryTop(){
+  const body=document.getElementById('summary-top-body');
+  const btn=document.getElementById('btn-summary-top');
+  if(!body||!btn)return;
+  const hidden=body.style.display==='none';
+  body.style.display=hidden?'':'none';
+  btn.textContent=hidden?'Свернуть':'Развернуть';
+}
 function toggleSummary(){
   const body=document.getElementById('summary-body');
   const btn=document.getElementById('btn-summary');
@@ -916,7 +983,7 @@ function toggleSummary(){
   btn.textContent=hidden?'Свернуть':'Развернуть';
 }
 
-function toggleTotal(){function toggleTotal(){
+function toggleTotal(){
   const el=document.getElementById('total-content');
   const btn=document.getElementById('btn-toggle-total');
   const hidden=el.style.display==='none';
@@ -1243,7 +1310,6 @@ window.onload=()=>{
     initApp();
   }
 };
-}
 </script>
 </body>
 </html>
