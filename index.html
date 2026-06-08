@@ -137,10 +137,10 @@ table.jt{width:100%;border-collapse:collapse;font-size:13px;min-width:1000px;}
 table.jt th{background:var(--surface2);padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--border);white-space:nowrap;}
 table.jt th.gh{background:var(--green-bg);color:var(--green);}
 table.jt th.rh{background:var(--red-bg);color:var(--red);}
-table.jt td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px;}
+table.jt td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis;}
 table.jt tr:last-child td{border-bottom:none;}
 table.jt tr:hover td{background:var(--surface2);}
-table.jt td.num{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;}
+table.jt td.num{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;}
 table.jt td.gc{color:var(--green);}
 table.jt td.rc{color:var(--red);}
 table.jt td.ac{color:var(--accent);}
@@ -708,7 +708,7 @@ async function renderJournal(){
       return `<tr data-id="${r.id}">
         <td class="jrn-check-td" style="display:none"><input type="checkbox" class="row-check" data-id="${r.id}" onchange="updateSelectedCount()"></td>
         <td style="color:var(--text2);white-space:nowrap">${r.op_date?r.op_date.split('-').reverse().join('.'):'—'}</td>
-        <td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${b.color};flex-shrink:0"></span>${b.name}</span></td>
+        <td><span style="display:inline-flex;align-items:center;gap:6px;max-width:130px;overflow:hidden"><span style="width:8px;height:8px;border-radius:50%;background:${b.color};flex-shrink:0"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${b.name}">${b.name}</span></span></td>
         <td class="num gc">${cols.income}</td>
         <td class="num pc">${cols.income_i}</td>
         <td class="num ac">${cols.tr_in}</td>
