@@ -73,26 +73,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 
 /* TOTAL CARD */
 .total-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:18px;box-shadow:var(--shadow);}
-.total-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
-.total-label{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;}
-.total-value{font-family:'Manrope',sans-serif;font-size:42px;font-weight:800;color:var(--text);letter-spacing:-1px;line-height:1;}
-.total-breakdown{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px;}
-.tb-item{background:var(--surface2);border-radius:var(--radius-sm);padding:14px 16px;border:1px solid var(--border);}
-.tb-lbl{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
-.tb-val{font-family:'Manrope',sans-serif;font-size:18px;font-weight:700;margin-top:6px;}
-
-/* CLEAN CARDS */
-.clean-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px;}
-.clean-card{border-radius:var(--radius);padding:20px 22px;border:1px solid;box-shadow:var(--shadow);}
-.clean-card.main{background:var(--green-bg);border-color:var(--green-b);}
-.clean-card.inc{background:#f0fdf4;border-color:#bbf7d0;}
-.clean-card.exp{background:var(--red-bg);border-color:var(--red-b);}
-.cc-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
-.cc-val{font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;margin-top:8px;line-height:1;}
-.cc-sub{font-size:12px;margin-top:6px;opacity:.75;}
-
-/* DASH GRID */
-.dash-grid{display:grid;grid-template-columns:1.1fr 1fr 0.9fr;gap:16px;margin-bottom:18px;}
 
 /* PANEL */
 .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
@@ -127,16 +107,24 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .dep-badge.warn{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-b);}
 .dep-badge.exp{background:var(--red-bg);color:var(--red);border:1px solid var(--red-b);}
 
-/* RECENT */
-.rec-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
-.rec-row:last-child{border-bottom:none;}
-
 /* JOURNAL */
+.jrn-tabs{display:flex;gap:2px;padding:8px 14px;background:var(--surface2);border-bottom:1px solid var(--border);}
+.jtab{padding:6px 16px;border-radius:var(--radius-xs);font-size:13px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--text2);transition:all .12s;font-family:inherit;}
+.jtab:hover{background:var(--bg);}
+.jtab.active{background:var(--accent);color:#fff;}
+
 .tbl-wrap{overflow-x:auto;}
 table.jt{width:100%;border-collapse:collapse;font-size:13px;min-width:1000px;}
 table.jt th{background:var(--surface2);padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--border);white-space:nowrap;}
 table.jt th.gh{background:var(--green-bg);color:var(--green);}
 table.jt th.rh{background:var(--red-bg);color:var(--red);}
+/* Sticky totals row */
+table.jt tr.tots-row td{background:var(--surface2);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;padding:7px 12px;border-bottom:2px solid var(--border2);position:sticky;top:0;z-index:2;}
+table.jt tr.tots-row td.gc{color:var(--green);}
+table.jt tr.tots-row td.rc{color:var(--red);}
+table.jt tr.tots-row td.ac{color:var(--accent);}
+table.jt tr.tots-row td.pc{color:var(--purple);}
+table.jt tr.tots-row td.meta{color:var(--text3);font-size:11px;}
 table.jt td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px;}
 table.jt tr:last-child td{border-bottom:none;}
 table.jt tr:hover td{background:var(--surface2);}
@@ -147,6 +135,30 @@ table.jt td.ac{color:var(--accent);}
 table.jt td.pc{color:var(--purple);}
 .del-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;transition:all .1s;padding:0;}
 .del-btn:hover{background:var(--red-bg);color:var(--red);}
+
+/* SVERKA TABLE */
+table.svt{width:100%;border-collapse:collapse;font-size:13px;}
+table.svt th{background:var(--surface2);padding:9px 12px;text-align:right;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--border);white-space:nowrap;}
+table.svt th:first-child{text-align:left;}
+table.svt th.gh{background:var(--green-bg);color:var(--green);}
+table.svt th.rh{background:var(--red-bg);color:var(--red);}
+table.svt th.bh{background:var(--accent-l);color:var(--accent);}
+table.svt td{padding:9px 12px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums;font-size:13px;}
+table.svt td:first-child{text-align:left;font-weight:600;}
+table.svt tr:hover td{background:var(--surface2);}
+table.svt td.pos{color:var(--green);font-weight:700;}
+table.svt td.neg{color:var(--red);font-weight:700;}
+table.svt td.neu{color:var(--text3);}
+table.svt tr.check-row td{background:var(--green-bg);font-weight:700;color:var(--green);text-align:left;}
+table.svt tr.check-row.fail td{background:var(--red-bg);color:var(--red);}
+table.svt tr.check-row-warn td{background:var(--amber-bg);font-weight:700;color:var(--amber);text-align:left;}
+.bdot-sm{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle;}
+
+/* SVERKA VERIFY INPUT */
+.ver-inp{width:90px;height:28px;border:1.5px solid var(--border2);border-radius:4px;padding:0 6px;font-size:12px;font-family:inherit;text-align:right;outline:none;background:var(--surface);}
+.ver-inp:focus{border-color:var(--accent);}
+.ver-ok{color:var(--green);font-weight:700;font-size:13px;}
+.ver-fail{color:var(--red);font-weight:700;font-size:13px;}
 
 /* ADD BAR */
 .add-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;padding:14px 18px;background:var(--surface2);border-top:1px solid var(--border);}
@@ -163,12 +175,6 @@ select.inp{cursor:pointer;}
 .btn-d:hover{background:#fee2e2;}
 .btn-sm{height:32px;padding:0 14px;font-size:12px;}
 
-/* TOTALS STRIP */
-.tot-strip{display:flex;gap:20px;padding:12px 18px;background:var(--surface2);border-top:1px solid var(--border);flex-wrap:wrap;}
-.ti{display:flex;flex-direction:column;gap:2px;}
-.ti-l{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;font-weight:700;}
-.ti-v{font-family:'Manrope',sans-serif;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;}
-
 /* SUMMARY */
 table.st{width:100%;border-collapse:collapse;font-size:13px;}
 table.st th{background:var(--surface2);padding:10px 14px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--border);text-align:right;}
@@ -182,11 +188,6 @@ table.st tr:last-child td{border-bottom:none;font-weight:700;background:var(--su
 table.st td.pos{color:var(--green);font-weight:700;}
 table.st td.neg{color:var(--red);font-weight:700;}
 table.st td.neu{color:var(--text3);}
-table.st td.ed{background:#fffde7;cursor:text;}
-table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
-.bdot-sm{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle;}
-.check-row td{background:var(--green-bg);font-weight:700;color:var(--green);}
-.check-row.fail td{background:var(--red-bg);color:var(--red);}
 
 /* ANALYTICS */
 .an-chart{display:flex;align-items:flex-end;gap:6px;height:160px;padding-top:10px;}
@@ -222,6 +223,18 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
 .section-div{font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;color:var(--text2);margin:20px 0 10px;padding-bottom:8px;border-bottom:2px solid var(--border);}
 .filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
 
+/* NET INCOME TABLE */
+table.nit{width:100%;border-collapse:collapse;font-size:13px;}
+table.nit th{background:var(--surface2);padding:10px 14px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--border);text-align:right;}
+table.nit th:first-child{text-align:left;}
+table.nit td{padding:10px 14px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums;}
+table.nit td:first-child{text-align:left;font-weight:600;color:var(--text2);}
+table.nit tr.cur-month td{background:var(--accent-l);}
+table.nit tr.cur-month td:first-child{color:var(--accent);font-weight:700;}
+table.nit td.pos{color:var(--green);font-weight:700;}
+table.nit td.neg{color:var(--red);font-weight:700;}
+table.nit td.empty-cell{color:var(--text3);}
+
 /* MOBILE NAV */
 .mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:200;padding:6px 0;}
 .mob-nav-items{display:flex;justify-content:space-around;align-items:center;}
@@ -239,7 +252,6 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
   .main{margin-left:0;padding:16px;padding-bottom:80px;}
   .mob-nav{display:block;}
   .mob-hamburger{display:block;}
-  .stats-grid,.clean-row,.dash-grid,.total-breakdown{grid-template-columns:1fr 1fr!important;}
   table.jt{font-size:11px;}
   table.jt th,table.jt td{padding:6px 8px;}
   .add-bar{padding:10px 12px;}
@@ -302,8 +314,9 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
   <div class="ph"><h1>Дашборд</h1><p id="dash-sub">Общая картина финансов</p></div>
   <div id="dep-alerts"></div>
   <div class="mbar" id="mt-dash"></div>
+
   <!-- TOTAL MONEY -->
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 22px;margin-bottom:12px;box-shadow:var(--shadow)">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 22px;margin-bottom:14px;box-shadow:var(--shadow)">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
       <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em">Всего моих денег</div>
       <button onclick="toggleTotal()" id="btn-toggle-total" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">Показать</button>
@@ -315,36 +328,22 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
       </div>
     </div>
   </div>
-  <!-- METRICS ROW - compact -->
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 18px;margin-bottom:14px;display:flex;align-items:center;gap:0;box-shadow:var(--shadow)">
-    <div style="flex:1;padding:0 16px 0 0;border-right:1px solid var(--border)">
-      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">↑ Приход вне систем</div>
-      <div id="dash-income" style="font-family:Manrope,sans-serif;font-size:20px;font-weight:800;color:var(--green);margin-top:3px">—</div>
-    </div>
-    <div style="flex:1;padding:0 16px;border-right:1px solid var(--border)">
-      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">↓ Расход вне систем</div>
-      <div id="dash-expense" style="font-family:Manrope,sans-serif;font-size:20px;font-weight:800;color:var(--red);margin-top:3px">—</div>
-    </div>
-    <div style="flex:1;padding:0 16px;border-right:1px solid var(--border)">
-      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">⇄ Внутри (переводы)</div>
-      <div id="dash-internal" style="font-family:Manrope,sans-serif;font-size:20px;font-weight:800;color:var(--text2);margin-top:3px">—</div>
-    </div>
-    <div style="flex:1.2;padding:0 0 0 16px">
-      <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.06em">= Чистый доход</div>
-      <div id="dash-clean" style="font-family:Manrope,sans-serif;font-size:24px;font-weight:800;color:var(--green);margin-top:3px">—</div>
-    </div>
-  </div>
+
+  <!-- CHART -->
   <div id="dash-chart"></div>
+
+  <!-- NET INCOME BY MONTHS -->
+  <div id="dash-net-income"></div>
+
+  <!-- CATEGORIES -->
   <div id="dash-cats-panel"></div>
-  <div id="dash-summary-top"></div>
-  <div id="dash-summary-detail"></div>
-  <div id="dash-summary-combined"></div>
 </div>
 
 <!-- JOURNAL -->
 <div id="view-journal" class="view">
   <div class="ph"><h1>Журнал операций</h1><p>Все операции строка за строкой — как в Excel</p></div>
   <div class="mbar" id="mt-journal"></div>
+
   <!-- ADD FORM TOP -->
   <div class="panel" style="margin-bottom:14px">
     <div class="panel-h">+ Новая операция</div>
@@ -361,22 +360,19 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
           <option value="expense">Расход вне систем</option>
         </select>
       </div>
-      <div class="fg"><label>Сумма ₽</label><input type="number" class="inp w90" id="f-amount" placeholder="0" min="0"></div>
+      <div class="fg"><label>Сумма</label><input type="number" class="inp w90" id="f-amount" placeholder="0" min="0"></div>
       <div class="fg"><label>Категория</label>
         <select class="inp w130" id="f-cat">
           <option value="">— выбрать —</option>
-          <option>Еда</option><option>Транспорт</option><option>Медицина</option>
-          <option>Подписка</option><option>Аренда</option><option>Развлечение</option>
-          <option>Одежда</option><option>Услуги банка</option><option>Зарплата</option>
-          <option>Кэшбэк</option><option>Перевод</option><option>Прочее</option>
         </select>
       </div>
       <div class="fg"><label>Описание</label><input type="text" class="inp w170" id="f-desc" placeholder="Пятёрочка, зарплата…"></div>
       <button class="btn btn-p" onclick="addRecord()" style="margin-top:20px">+ Добавить</button>
     </div>
   </div>
-  <!-- TABLE -->
-  <div class="panel">
+
+  <!-- JOURNAL TABLE PANEL -->
+  <div class="panel" style="margin-bottom:14px">
     <div class="panel-h">
       <span>Операции · <span id="jrn-m-lbl"></span></span>
       <div class="filters">
@@ -411,40 +407,81 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
       <button class="btn btn-p btn-sm" onclick="applyMassCategory()">Применить</button>
       <button class="btn btn-g btn-sm" onclick="cancelMassEdit()">Отмена</button>
     </div>
-    <div class="tbl-wrap">
+    <div class="tbl-wrap" style="max-height:500px;overflow-y:auto;">
       <table class="jt">
-        <thead><tr>
-          <th id="jrn-check-th" style="display:none"><input type="checkbox" onclick="toggleAllRows(this)"></th>
-          <th style="cursor:pointer" onclick="setSortJrn('date')">Дата <span id="sort-date">↓</span></th>
-          <th style="cursor:pointer" onclick="setSortJrn('bank')">Банк и счёт</th>
-          <th class="gh">Приход вне систем</th>
-          <th class="gh">Приход внутри</th>
-          <th class="gh">Приход+из другого Б</th>
-          <th style="cursor:pointer" onclick="setSortJrn('cat')">Категория</th>
-          <th>Описание</th>
-          <th class="rh">Списание в другой Б</th>
-          <th class="rh">Списание внутри</th>
-          <th class="rh">Расход вне систем</th>
-          <th></th>
-        </tr></thead>
+        <thead>
+          <tr>
+            <th id="jrn-check-th" style="display:none"><input type="checkbox" onclick="toggleAllRows(this)"></th>
+            <th style="cursor:pointer" onclick="setSortJrn('date')">Дата <span id="sort-date">↓</span></th>
+            <th style="cursor:pointer" onclick="setSortJrn('bank')">Банк и счёт</th>
+            <th class="gh">Приход вне систем</th>
+            <th class="gh">Приход внутри</th>
+            <th class="gh">Приход+из другого Б</th>
+            <th style="cursor:pointer" onclick="setSortJrn('cat')">Категория</th>
+            <th>Описание</th>
+            <th class="rh">Списание в другой Б</th>
+            <th class="rh">Списание внутри</th>
+            <th class="rh">Расход вне систем</th>
+            <th></th>
+          </tr>
+          <!-- STICKY TOTALS ROW -->
+          <tr class="tots-row" id="jrn-tots-row">
+            <td class="meta" id="tots-check-td" style="display:none"></td>
+            <td class="meta" id="tots-count">0 записей</td>
+            <td class="meta">Итого ↓</td>
+            <td class="gc num" id="tots-income">—</td>
+            <td class="pc num" id="tots-income-i">—</td>
+            <td class="ac num" id="tots-tr-in">—</td>
+            <td></td>
+            <td></td>
+            <td class="ac num" id="tots-tr-out">—</td>
+            <td class="pc num" id="tots-expense-i">—</td>
+            <td class="rc num" id="tots-expense">—</td>
+            <td></td>
+          </tr>
+        </thead>
         <tbody id="jrn-body"></tbody>
       </table>
     </div>
     <div id="jrn-empty" class="empty" style="display:none">Нет операций за этот месяц.</div>
-    <div class="tot-strip" id="jrn-tots"></div>
   </div>
-</div>
 
-<!-- SUMMARY -->
-<div id="view-summary" class="view">
-  <div class="ph"><h1>Итоги по месяцу</h1><p>Сводные таблицы с проверкой переводов и остатками</p></div>
-  <div class="mbar" id="mt-summary"></div>
-  <div class="section-div">Сводка по банкам · <span id="sum-m-lbl"></span></div>
-  <div class="panel" style="margin-bottom:18px"><div class="tbl-wrap"><table class="st" id="sum-top"></table></div></div>
-  <div class="section-div">Итоги с проверкой переводов и остатками</div>
-  <div class="panel">
-    <div class="tbl-wrap"><table class="st" id="sum-detail"></table></div>
-    <div style="font-size:12px;color:var(--text3);padding:8px 18px">* Жёлтые ячейки — кликни и введи остаток, сохранится автоматически</div>
+  <!-- SVERKA PANEL -->
+  <div class="panel" id="panel-sverka">
+    <div class="panel-h">
+      <span>Сверка месяца · <span id="sverka-m-lbl"></span></span>
+      <div style="display:flex;gap:10px;align-items:center">
+        <span id="sverka-status" style="font-size:12px;font-weight:600"></span>
+        <button class="btn btn-g btn-sm" onclick="renderSverka()">↻ Обновить</button>
+      </div>
+    </div>
+    <div style="padding:8px 18px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:12px;color:var(--text2)">
+      Данные из журнала считаются автоматически. Колонки «Выписка» — введи цифру из приложения банка для сверки (не сохраняется).
+    </div>
+    <div class="tbl-wrap">
+      <table class="svt" id="sverka-table">
+        <thead>
+          <tr>
+            <th>Банк</th>
+            <th class="gh">Доход (жур.)</th>
+            <th class="gh" style="background:#fff8e1;color:#b45309">Выписка Д</th>
+            <th class="gh">✓</th>
+            <th class="rh">Расход (жур.)</th>
+            <th class="rh" style="background:#fff8e1;color:#b45309">Выписка Р</th>
+            <th class="rh">✓</th>
+            <th class="bh">Перев. ↑ (tr_in)</th>
+            <th class="bh">Перев. ↓ (tr_out)</th>
+            <th class="bh">Внутр. ↑</th>
+            <th class="bh">Внутр. ↓</th>
+            <th>Нач.</th>
+            <th>Кон.</th>
+            <th>Δ</th>
+          </tr>
+        </thead>
+        <tbody id="sverka-body"></tbody>
+      </table>
+    </div>
+    <div id="sverka-checks" style="padding:12px 18px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--border);background:var(--surface2)"></div>
   </div>
 </div>
 
@@ -452,8 +489,7 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
 <div id="view-analytics" class="view">
   <div class="ph"><h1>Аналитика</h1><p>Динамика доходов и расходов за 2026</p></div>
   <div class="mbar" id="mt-analytics"></div>
-  <!-- По счетам, категории, вклады -->
-  <div class="dash-grid" style="margin-bottom:18px">
+  <div style="display:grid;grid-template-columns:1.1fr 1fr 0.9fr;gap:16px;margin-bottom:18px">
     <div class="panel">
       <div class="panel-h">По счетам · <span id="an-month-lbl"></span> <span style="font-size:12px;color:var(--text3);font-weight:400">· клик → журнал</span></div>
       <div class="panel-b" id="an-banks"></div>
@@ -467,7 +503,6 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
       <div class="panel-b" id="an-deps"></div>
     </div>
   </div>
-  <!-- График -->
   <div class="panel" style="margin-bottom:18px">
     <div class="panel-h">
       <span>Чистый доход по месяцам</span>
@@ -497,7 +532,7 @@ table.st td.ed:focus{outline:2px solid var(--accent);border-radius:3px;}
         <div class="dep-form-grid">
           <div class="fg full"><label>Название</label><input class="inp" style="width:100%" id="df-name" placeholder="ФинУСЛУГИ ВКЛАД"></div>
           <div class="fg"><label>Банк</label><input class="inp" style="width:100%" id="df-bank" placeholder="Альфа Банк"></div>
-          <div class="fg"><label>Сумма ₽</label><input type="number" class="inp" style="width:100%" id="df-amount" placeholder="0"></div>
+          <div class="fg"><label>Сумма</label><input type="number" class="inp" style="width:100%" id="df-amount" placeholder="0"></div>
           <div class="fg"><label>Ставка %</label><input type="number" class="inp" style="width:100%" id="df-rate" placeholder="18.5" step="0.1"></div>
           <div class="fg"><label>Дата открытия</label><input type="date" class="inp" style="width:100%" id="df-open"></div>
           <div class="fg"><label>Дата закрытия</label><input type="date" class="inp" style="width:100%" id="df-close"></div>
@@ -668,24 +703,20 @@ function closeMobMenu(){
   document.querySelector('.sidebar').classList.remove('mob-open');
   document.getElementById('mob-overlay').classList.remove('active');
 }
+
+// ─── JOURNAL ────────────────────────────────────────────────────
 async function renderJournal(){
   document.getElementById('jrn-m-lbl').textContent=curMonth+(jrnCat?' · '+jrnCat:'')+(jrnBank?' · '+bank(jrnBank).name:'');
   if(jrnCat||jrnBank){
-    // show clear filter button
     const existing=document.getElementById('clear-filter-btn');
     if(!existing){
       const btn=document.createElement('button');
-      btn.id='clear-filter-btn';
-      btn.className='btn btn-g btn-sm';
-      btn.textContent='✕ Сбросить фильтр';
+      btn.id='clear-filter-btn';btn.className='btn btn-g btn-sm';btn.textContent='✕ Сбросить фильтр';
       btn.onclick=()=>{jrnCat='';jrnBank='';document.getElementById('clear-filter-btn')?.remove();renderJournal();};
       document.querySelector('.filters').appendChild(btn);
     }
-  } else {
-    document.getElementById('clear-filter-btn')?.remove();
-  }
+  } else {document.getElementById('clear-filter-btn')?.remove();}
 
-  // Build bank filter buttons
   const btnContainer=document.getElementById('bank-filter-btns');
   if(btnContainer){
     btnContainer.innerHTML=[{id:'',name:'Все счета',color:'#8890aa'},...banks].map(b=>`
@@ -701,7 +732,6 @@ async function renderJournal(){
   if(jrnCat)recs=recs.filter(r=>r.category===jrnCat);
   if(ft)recs=recs.filter(r=>r.type===ft);
 
-  // Sorting
   recs.sort((a,b)=>{
     if(jrnSort==='date_desc') return (b.op_date||'')>(a.op_date||'')?1:(b.id-a.id);
     if(jrnSort==='date_asc')  return (a.op_date||'')>(b.op_date||'')?1:-1;
@@ -712,6 +742,7 @@ async function renderJournal(){
     if(jrnSort==='cat_desc')    return (b.category||'').localeCompare(a.category||'');
     return b.id-a.id;
   });
+
   const tbody=document.getElementById('jrn-body');
   const empty=document.getElementById('jrn-empty');
   if(!recs.length){tbody.innerHTML='';empty.style.display='';}
@@ -723,10 +754,7 @@ async function renderJournal(){
       cols[r.type]=fmt(amt);
       const dateStr=r.op_date?r.op_date.split('-').reverse().join('.'):'—';
       const isoDate=r.op_date||'';
-
       if(editMode){
-        // Editable row
-        const amtField=r.type==='income'||r.type==='income_i'||r.type==='tr_in'?amt:(r.type==='tr_out'||r.type==='expense_i'||r.type==='expense'?amt:0);
         return `<tr data-id="${r.id}" style="background:#fffef5">
           <td class="jrn-check-td" style="display:none"><input type="checkbox" class="row-check" data-id="${r.id}" onchange="updateSelectedCount()"></td>
           <td><input type="date" value="${isoDate}" style="border:1px solid var(--border2);border-radius:4px;padding:2px 6px;font-size:12px;font-family:inherit;background:#fff;width:130px" onchange="updateRecord(${r.id},'op_date',this.value)"></td>
@@ -756,143 +784,115 @@ async function renderJournal(){
           <td class="num rc">${cols.expense}</td>
           <td><button class="del-btn" onclick="delRecord(${r.id})">×</button></td>
         </tr>`;
-      }}).join('');
+      }
+    }).join('');
   }
+
+  // Update sticky totals row
   const tots={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
   recs.forEach(r=>tots[r.type]+=parseFloat(r.amount)||0);
-  document.getElementById('jrn-tots').innerHTML=`
-    <div class="ti"><span class="ti-l">Записей</span><span class="ti-v" style="color:var(--text2)">${recs.length}</span></div>
-    <div class="ti"><span class="ti-l">Приход вне сис.</span><span class="ti-v" style="color:var(--green)">${fmtF(tots.income)}</span></div>
-    <div class="ti"><span class="ti-l">Приход внутри</span><span class="ti-v" style="color:var(--purple)">${fmtF(tots.income_i)}</span></div>
-    <div class="ti"><span class="ti-l">Приход из др.Б</span><span class="ti-v" style="color:var(--accent)">${fmtF(tots.tr_in)}</span></div>
-    <div class="ti"><span class="ti-l">Списание в др.Б</span><span class="ti-v" style="color:var(--accent)">${fmtF(tots.tr_out)}</span></div>
-    <div class="ti"><span class="ti-l">Расход вне сис.</span><span class="ti-v" style="color:var(--red)">${fmtF(tots.expense)}</span></div>`;
+  document.getElementById('tots-count').textContent=recs.length+' зап.';
+  document.getElementById('tots-income').textContent=tots.income?fmtF(tots.income):'—';
+  document.getElementById('tots-income-i').textContent=tots.income_i?fmtF(tots.income_i):'—';
+  document.getElementById('tots-tr-in').textContent=tots.tr_in?fmtF(tots.tr_in):'—';
+  document.getElementById('tots-tr-out').textContent=tots.tr_out?fmtF(tots.tr_out):'—';
+  document.getElementById('tots-expense-i').textContent=tots.expense_i?fmtF(tots.expense_i):'—';
+  document.getElementById('tots-expense').textContent=tots.expense?fmtF(tots.expense):'—';
+
+  // Also update sverka
+  renderSverka();
 }
 
-async function renderDeposits(){
-  const deps=await loadDeposits();deposits=deps;
-  const today=new Date();today.setHours(0,0,0,0);
-  document.getElementById('dep-list').innerHTML=deps.length
-    ?deps.map(d=>{const dc=new Date(d.date_close);const diff=Math.floor((dc-today)/(1000*60*60*24));
-      const cls=diff<0?'exp':diff<=14?'warn':'ok';
-      const lbl=diff<0?'Истёк':diff<=14?`⚠️ ${diff} дн.`:dc.toLocaleDateString('ru-RU');
-      return `<div class="dep-card">
-        <div class="dep-card-head">
-          <div><div class="dep-name">${d.name}</div><div class="dep-meta">${d.bank_name}</div></div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <span class="dep-badge ${cls}">${lbl}</span>
-            <button class="btn btn-d btn-sm" onclick="closeDeposit(${d.id})">Закрыть</button>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px">
-          <div><div style="font-size:11px;color:var(--text3);font-weight:600">Сумма</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--purple);margin-top:4px">${fmt(parseFloat(d.amount))}</div></div>
-          <div><div style="font-size:11px;color:var(--text3);font-weight:600">Ставка</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--green);margin-top:4px">${d.rate}%</div></div>
-          <div><div style="font-size:11px;color:var(--text3);font-weight:600">Открыт</div><div style="font-size:14px;font-weight:500;margin-top:4px">${new Date(d.date_open).toLocaleDateString('ru-RU')}</div></div>
-        </div>
-        ${d.description?`<div style="font-size:13px;color:var(--text2);margin-top:10px">${d.description}</div>`:''}
-      </div>`;}).join('')
-    :'<div class="empty">Вкладов ещё нет. Добавь первый слева.</div>';
+// ─── SVERKA ─────────────────────────────────────────────────────
+async function renderSverka(){
+  document.getElementById('sverka-m-lbl').textContent=curMonth;
+  const recs=await loadRecordsMonth(curMonth);
+  const bals=await loadBalances(curMonth);
+
+  const agg={};
+  banks.forEach(b=>agg[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
+  recs.forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
+
+  const active=banks.filter(b=>Object.values(agg[b.id]).some(v=>v>0)||(bals[b.id]&&(bals[b.id].start||bals[b.id].end)));
+
+  // Totals for check rows
+  let totTrIn=0,totTrOut=0,totIncI=0,totExpI=0;
+  active.forEach(b=>{totTrIn+=agg[b.id].tr_in;totTrOut+=agg[b.id].tr_out;totIncI+=agg[b.id].income_i;totExpI+=agg[b.id].expense_i;});
+
+  const trOk=Math.abs(totTrIn-totTrOut)<0.01;
+  const intOk=Math.abs(totIncI-totExpI)<0.01;
+  const allOk=trOk&&intOk;
+
+  document.getElementById('sverka-status').textContent=allOk?'✅ Всё сходится':'⚠️ Есть расхождения';
+  document.getElementById('sverka-status').style.color=allOk?'var(--green)':'var(--red)';
+
+  document.getElementById('sverka-body').innerHTML=active.map(b=>{
+    const a=agg[b.id];
+    const bal=bals[b.id]||{start:0,end:0};
+    const sumInc=a.income+a.income_i+a.tr_in;
+    const sumExp=a.tr_out+a.expense_i+a.expense;
+    const autoEnd=(bal.start||0)+sumInc-sumExp;
+    const delta=autoEnd-(bal.start||0);
+    return `<tr>
+      <td><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td>
+      <td class="pos" style="text-align:right">${sumInc?fmtF(sumInc):'—'}</td>
+      <td style="padding:4px 8px;text-align:right"><input class="ver-inp" type="number" placeholder="из банка" oninput="checkVerify(this,${sumInc})" style="width:90px"></td>
+      <td id="vchk-inc-${b.id}" style="text-align:center">—</td>
+      <td class="${sumExp?'neg':''}" style="text-align:right">${sumExp?fmtF(sumExp):'—'}</td>
+      <td style="padding:4px 8px;text-align:right"><input class="ver-inp" type="number" placeholder="из банка" oninput="checkVerify(this,${sumExp})" style="width:90px"></td>
+      <td id="vchk-exp-${b.id}" style="text-align:center">—</td>
+      <td style="text-align:right;color:var(--accent)">${a.tr_in?fmtF(a.tr_in):'—'}</td>
+      <td style="text-align:right;color:var(--accent)">${a.tr_out?fmtF(a.tr_out):'—'}</td>
+      <td style="text-align:right;color:var(--purple)">${a.income_i?fmtF(a.income_i):'—'}</td>
+      <td style="text-align:right;color:var(--purple)">${a.expense_i?fmtF(a.expense_i):'—'}</td>
+      <td style="text-align:right;color:var(--text2)">${bal.start?fmtF(bal.start):'—'}</td>
+      <td style="text-align:right;font-weight:600;color:${autoEnd>=0?'var(--green)':'var(--red)'}">${fmtF(autoEnd)}</td>
+      <td class="${delta>0?'pos':delta<0?'neg':'neu'}" style="text-align:right">${delta?(delta>0?'+':'')+fmtF(delta):'—'}</td>
+    </tr>`;
+  }).join('');
+
+  // Check rows at bottom
+  document.getElementById('sverka-checks').innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-sm);background:${trOk?'var(--green-bg)':'var(--red-bg)'};border:1px solid ${trOk?'var(--green-b)':'var(--red-b)'}">
+      <span style="font-size:18px">${trOk?'✅':'❌'}</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:${trOk?'var(--green)':'var(--red)'}">Переводы между банками (tr_in ↔ tr_out)</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px">∑ Приход из др.Б: <strong>${fmtF(totTrIn)}</strong> ${trOk?'=':'≠'} ∑ Списание в др.Б: <strong>${fmtF(totTrOut)}</strong>${trOk?'':' · Разница: '+fmtF(Math.abs(totTrIn-totTrOut))}</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-sm);background:${intOk?'var(--green-bg)':'var(--red-bg)'};border:1px solid ${intOk?'var(--green-b)':'var(--red-b)'}">
+      <span style="font-size:18px">${intOk?'✅':'❌'}</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:${intOk?'var(--green)':'var(--red)'}">Внутренние операции (income_i ↔ expense_i)</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px">∑ Приход внутри: <strong>${fmtF(totIncI)}</strong> ${intOk?'=':'≠'} ∑ Списание внутри: <strong>${fmtF(totExpI)}</strong>${intOk?'':' · Разница: '+fmtF(Math.abs(totIncI-totExpI))}</div>
+      </div>
+    </div>`;
 }
 
-function go(name){
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.mob-nb').forEach(b=>b.classList.remove('active'));
-  document.getElementById('view-'+name).classList.add('active');
-  const nb=document.getElementById('nb-'+name);if(nb)nb.classList.add('active');
-  const mob=document.getElementById('mob-'+name);if(mob)mob.classList.add('active');
-  closeMobMenu();
-  if(name==='dashboard')renderDash();
-  if(name==='journal')renderJournal();
-  if(name==='summary')renderSummary();
-  if(name==='deposits')renderDeposits();
-  if(name==='settings')renderSettings();
+function checkVerify(inp,journalVal){
+  const entered=parseFloat(inp.value)||0;
+  if(!inp.value){inp.style.borderColor='var(--border2)';return;}
+  const ok=Math.abs(entered-journalVal)<1;
+  inp.style.borderColor=ok?'var(--green)':'var(--red)';
+  // Show inline result next to input
+  const existingMsg=inp.nextElementSibling;
+  if(existingMsg&&existingMsg.classList.contains('ver-msg'))existingMsg.remove();
+  if(inp.value){
+    const msg=document.createElement('span');
+    msg.className='ver-msg';
+    msg.style.cssText=`font-size:11px;font-weight:700;color:${ok?'var(--green)':'var(--red)'};margin-left:4px`;
+    msg.textContent=ok?'✓':'Δ '+fmtF(Math.abs(entered-journalVal));
+    inp.parentNode.insertBefore(msg,inp.nextSibling);
+  }
 }
 
-function initTabs(){
-  ['mt-dash','mt-journal','mt-summary'].forEach(id=>{
-    const c=document.getElementById(id);if(!c)return;
-    c.innerHTML=MONTHS.map(m=>`<button class="mtab${m===curMonth?' active':''}" onclick="selMonth('${m}')">${m.slice(0,3)}</button>`).join('');
-  });
-}
-function selMonth(m){
-  curMonth=m;
-  document.querySelectorAll('.mtab').forEach(t=>t.classList.toggle('active',t.textContent===m.slice(0,3)));
-  const av=document.querySelector('.view.active');if(!av)return;
-  const id=av.id.replace('view-','');
-  if(id==='dashboard')renderDash();
-  if(id==='journal')renderJournal();
-  if(id==='summary')renderSummary();
-}
-
-async function initApp(){
-  initTabs();
-  await loadBanks();
-  fillBankSelects();
-  await loadCategories();
-  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
-  document.getElementById('f-cat').innerHTML=catOptions();
-  document.getElementById('df-open').value=new Date().toISOString().split('T')[0];
-  renderDash();
-}
-
-async function loadBanks(){try{banks=await q('SELECT * FROM banks ORDER BY sort_order');}catch(e){console.error(e);}}
-async function loadRecordsMonth(month){try{return await q('SELECT * FROM records WHERE month=$1 ORDER BY op_date,id',[month]);}catch(e){return[];}}
-async function loadAllRecords(){try{return await q('SELECT * FROM records ORDER BY month,op_date,id');}catch(e){return[];}}
-async function loadBalances(month){
-  try{const rows=await q('SELECT * FROM balances WHERE month=$1',[month]);const out={};rows.forEach(r=>out[r.bank_id]={start:parseFloat(r.balance_start)||0,end:parseFloat(r.balance_end)||0});return out;}
-  catch(e){return{};}
-}
-async function loadBankTotals(month){
-  try{const rows=await q('SELECT * FROM bank_totals WHERE month=$1',[month]);const out={};rows.forEach(r=>out[r.bank_id]={income:parseFloat(r.income_bank)||0,expense:parseFloat(r.expense_bank)||0});return out;}
-  catch(e){return{};}
-}
-async function saveBankTotal(bankId,field,val){
-  try{
-    await q(`INSERT INTO bank_totals(bank_id,month,income_bank,expense_bank) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET ${field==='income'?'income_bank':'expense_bank'}=EXCLUDED.${field==='income'?'income_bank':'expense_bank'}`,
-      field==='income'?[bankId,curMonth,val,0]:[bankId,curMonth,0,val]);
-    toast('✓ Сохранено');
-  }catch(e){toast('Ошибка');}
-}
-async function saveBankTotalEl(bankId,field,el){
-  const val=parseFloat(el.textContent.replace(/\s|₽|⚠️/g,'').replace(',','.'))||0;
-  el.textContent=val?fmtF(val):'';
-  await saveBankTotal(bankId,field,val);
-  renderDash();
-}
-async function loadCategories(){
-  try{categories=await q('SELECT * FROM categories ORDER BY sort_order');}
-  catch(e){categories=[{name:'Еда'},{name:'Транспорт'},{name:'Медицина'},{name:'Подписка'},{name:'Аренда'},{name:'Развлечение'},{name:'Одежда'},{name:'Услуги банка'},{name:'Зарплата'},{name:'Кэшбэк'},{name:'Перевод'},{name:'Прочее'}];}
-}
-function catOptions(selected=''){
-  return`<option value="">— выбрать —</option>`+categories.map(c=>`<option${c.name===selected?' selected':''}>${c.name}</option>`).join('');
-}
-async function loadDeposits(){try{return await q('SELECT * FROM deposits WHERE is_active=true ORDER BY date_close');}catch(e){return[];}}
-
-function fillBankSelects(){
-  ['f-bank'].forEach(id=>{
-    const el=document.getElementById(id);if(!el)return;
-    const cur=el.value;
-    el.innerHTML=(id==='jf-bank'?'<option value="">Все счета</option>':'')+banks.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
-    if(cur)el.value=cur;
-  });
-}
-
-async function autoSaveEnd(bankId,autoEnd){
-  try{
-    await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET balance_end=$4`,
-      [bankId,curMonth,0,autoEnd]);
-    const nextMonth=MONTHS[MONTHS.indexOf(curMonth)+1];
-    if(nextMonth){
-      await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=$3`,
-        [bankId,nextMonth,autoEnd,0]);
-    }
-  }catch(e){console.error(e);}
-}
+// ─── DASHBOARD ──────────────────────────────────────────────────
 async function renderDash(){
   document.getElementById('dash-sub').textContent=curMonth+' 2026';
   const[recs,bals,deps]=await Promise.all([loadRecordsMonth(curMonth),loadBalances(curMonth),loadDeposits()]);
   deposits=deps;
+
+  // Alerts
   const today=new Date();today.setHours(0,0,0,0);
   const alerts=deps.filter(d=>{const dc=new Date(d.date_close);const diff=Math.floor((dc-today)/(1000*60*60*24));return diff<=14;});
   document.getElementById('dep-alerts').innerHTML=alerts.map(d=>{
@@ -901,17 +901,11 @@ async function renderDash(){
     return `<div class="alert-banner"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Вклад <strong style="margin:0 4px">${d.name}</strong> ${txt}</div>`;
   }).join('');
 
+  // Totals
   const agg={};banks.forEach(b=>agg[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
   recs.forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
-  let totalInc=0,totalExp=0,totalInternal=0;
-  banks.forEach(b=>{totalInc+=agg[b.id].income;totalExp+=agg[b.id].expense;totalInternal+=agg[b.id].tr_in+agg[b.id].income_i;});
-  const clean=totalInc-totalExp;
-  document.getElementById('dash-clean').textContent=(clean>=0?'+':'')+fmtF(clean);
-  document.getElementById('dash-clean').style.color=clean>=0?'var(--green)':'var(--red)';
-  document.getElementById('dash-income').textContent=fmtF(totalInc);
-  document.getElementById('dash-expense').textContent=fmtF(totalExp);
-  const intEl=document.getElementById('dash-internal');if(intEl)intEl.textContent=fmtF(totalInternal);
 
+  // Total money
   let totalDebit=0,totalSavings=0,totalDeposit=0,totalCash=0;
   banks.forEach(b=>{const bal=bals[b.id];const end=bal?bal.end:0;
     if(b.type==='debit'||b.type==='credit')totalDebit+=end;
@@ -930,20 +924,11 @@ async function renderDash(){
     <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
     <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase">Наличные</span><span style="font-size:15px;font-weight:700;color:var(--amber);font-family:Manrope,sans-serif">${fmtF(totalCash)}</span></div>`;
 
-  // Summary tables on dashboard
-  const bals2=await loadBalances(curMonth);
-  const btots2=await loadBankTotals(curMonth);
-  const agg2={};banks.forEach(b=>agg2[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
-  recs.forEach(r=>{if(agg2[r.bank_id])agg2[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
-  const active2=banks.filter(b=>Object.values(agg2[b.id]).some(v=>v>0)||(bals2[b.id]&&(bals2[b.id].start||bals2[b.id].end)));
-  const tots2={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
-  active2.forEach(b=>Object.keys(tots2).forEach(k=>tots2[k]+=agg2[b.id][k]||0));
-
   // Chart
   const allRecsChart=await loadAllRecords();
   const byM={};MONTHS.forEach(m=>byM[m]={inc:0,exp:0});
   allRecsChart.forEach(r=>{if(byM[r.month]){if(r.type==='income')byM[r.month].inc+=parseFloat(r.amount)||0;if(r.type==='expense')byM[r.month].exp+=parseFloat(r.amount)||0;}});
-  const maxV=Math.max(...MONTHS.flatMap(m=>[byM[m].inc,byM[m].exp]),1);const H=120;
+  const maxV=Math.max(...MONTHS.flatMap(m=>[byM[m].inc,byM[m].exp]),1);
   document.getElementById('dash-chart').innerHTML=`<div class="panel" style="margin-bottom:14px">
     <div class="panel-h"><span>Доходы и расходы по месяцам 2026</span>
       <div style="display:flex;gap:12px;font-size:11px;color:var(--text2)">
@@ -958,8 +943,8 @@ async function renderDash(){
         const hasData=byM[m].inc>0||byM[m].exp>0;
         return`<div style="flex:1;display:flex;flex-direction:column;align-items:center">
           <div style="display:flex;gap:1px;align-items:flex-end;height:70px;width:100%">
-            <div style="flex:1;background:var(--green);border-radius:2px 2px 0 0;height:${iH}px;position:relative;cursor:pointer" title="${m}: ${fmtF(byM[m].inc)}"></div>
-            <div style="flex:1;background:var(--red);border-radius:2px 2px 0 0;height:${eH}px;position:relative;cursor:pointer" title="${m}: ${fmtF(byM[m].exp)}"></div>
+            <div style="flex:1;background:var(--green);border-radius:2px 2px 0 0;height:${iH}px;cursor:pointer" title="${m}: ${fmtF(byM[m].inc)}"></div>
+            <div style="flex:1;background:var(--red);border-radius:2px 2px 0 0;height:${eH}px;cursor:pointer" title="${m}: ${fmtF(byM[m].exp)}"></div>
           </div>
           <div style="font-size:9px;color:${hasData?'var(--text2)':'var(--text3)'};margin-top:3px;text-align:center;font-weight:${hasData?'600':'400'}">${m.slice(0,3)}</div>
           ${hasData?`<div style="font-size:8px;color:var(--green);text-align:center;line-height:1.2">${byM[m].inc>0?fmtF(byM[m].inc):''}</div><div style="font-size:8px;color:var(--red);text-align:center;line-height:1.2">${byM[m].exp>0?fmtF(byM[m].exp):''}</div>`:''}
@@ -968,45 +953,24 @@ async function renderDash(){
     </div>
   </div>`;
 
-  // Combined vars needed for all tables
-  const trDiff2=tots2.tr_in-tots2.tr_out;const trOk2=Math.abs(trDiff2)<0.01;
-  let totStart2=0,totEnd2=0,totSumInc2=0,totSumExp2=0;
-  const dRows2=active2.map(b=>{
-    const a=agg2[b.id];const bal=bals2[b.id]||{start:0,end:0};const bt=btots2[b.id]||{income:0,expense:0};
-    const sumInc=a.income+a.income_i+a.tr_in;const sumExp=a.tr_out+a.expense_i+a.expense;
-    const diff=sumInc-sumExp;
-    totStart2+=bal.start||0;totEnd2+=(bal.start||0)+sumInc-sumExp;totSumInc2+=sumInc;totSumExp2+=sumExp;
-    const autoEnd=(bal.start||0)+sumInc-sumExp;
-    autoSaveEnd(b.id,autoEnd);
-    return{b,a,sumInc,sumExp,bal,bt,diff,autoEnd};
-  });
+  // Net income by months table
+  await renderNetIncomeTable(allRecsChart);
 
-  // Categories panel
-  // Expense categories
-  const catExp={};
-  recs.filter(r=>r.type==='expense').forEach(r=>{const c=r.category||'Прочее';catExp[c]=(catExp[c]||0)+parseFloat(r.amount);});
+  // Categories
+  const catExp={};recs.filter(r=>r.type==='expense').forEach(r=>{const c=r.category||'Прочее';catExp[c]=(catExp[c]||0)+parseFloat(r.amount);});
   const sortedCats=Object.entries(catExp).sort((a,b)=>b[1]-a[1]);
   const totalCatExp=sortedCats.reduce((s,[,v])=>s+v,0);
-
-  // Income categories
-  const catInc={};
-  recs.filter(r=>r.type==='income').forEach(r=>{const c=r.category||'Прочее';catInc[c]=(catInc[c]||0)+parseFloat(r.amount);});
+  const catInc={};recs.filter(r=>r.type==='income').forEach(r=>{const c=r.category||'Прочее';catInc[c]=(catInc[c]||0)+parseFloat(r.amount);});
   const sortedCatsInc=Object.entries(catInc).sort((a,b)=>b[1]-a[1]);
   const totalCatInc=sortedCatsInc.reduce((s,[,v])=>s+v,0);
 
   function catCards(cats,total,type){
     const colors=type==='exp'?['#ef4444','#f97316','#eab308','#e879f9','#f59e0b','#dc2626','#ec4899','#fb923c','#facc15','#a855f7']:['#16a34a','#0d9488','#2563eb','#059669','#0891b2','#15803d','#0284c7','#047857','#1d4ed8','#065f46'];
     return cats.map(([cat,val],ci)=>{
-      const pct=Math.round(val/total*100);
-      const col=colors[ci%colors.length];
+      const pct=Math.round(val/total*100);const col=colors[ci%colors.length];
       return`<div onclick="goToCat('${cat}')" style="background:var(--surface2);border-radius:var(--radius-sm);padding:10px 12px;border:1.5px solid var(--border);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='${col}';this.style.background='#fff'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface2)'">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <span style="font-size:12px;font-weight:600;color:var(--text)">${cat}</span>
-          <span style="font-size:11px;font-weight:700;color:${col}">${pct}%</span>
-        </div>
-        <div style="height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin-bottom:6px">
-          <div style="height:6px;background:${col};border-radius:3px;width:${pct}%"></div>
-        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:12px;font-weight:600;color:var(--text)">${cat}</span><span style="font-size:11px;font-weight:700;color:${col}">${pct}%</span></div>
+        <div style="height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin-bottom:6px"><div style="height:6px;background:${col};border-radius:3px;width:${pct}%"></div></div>
         <div style="font-size:14px;font-weight:700;color:${col}">${fmt(val)}</div>
         <div style="font-size:10px;color:var(--text3);margin-top:3px">→ смотреть операции</div>
       </div>`;
@@ -1014,111 +978,79 @@ async function renderDash(){
   }
 
   document.getElementById('dash-cats-panel').innerHTML=`
-    ${sortedCats.length?`<div class="panel" style="margin-bottom:14px">
-      <div class="panel-h">↓ Расходы по категориям · ${curMonth}</div>
-      <div class="panel-b" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px">
-        ${catCards(sortedCats,totalCatExp,'exp')}
-      </div>
-    </div>`:''}
-    ${sortedCatsInc.length?`<div class="panel" style="margin-bottom:14px">
-      <div class="panel-h">↑ Доходы по категориям · ${curMonth}</div>
-      <div class="panel-b" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px">
-        ${catCards(sortedCatsInc,totalCatInc,'inc')}
-      </div>
-    </div>`:''}
-  `;
+    ${sortedCats.length?`<div class="panel" style="margin-bottom:14px"><div class="panel-h">↓ Расходы по категориям · ${curMonth}</div><div class="panel-b" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px">${catCards(sortedCats,totalCatExp,'exp')}</div></div>`:''}
+    ${sortedCatsInc.length?`<div class="panel" style="margin-bottom:14px"><div class="panel-h">↑ Доходы по категориям · ${curMonth}</div><div class="panel-b" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px">${catCards(sortedCatsInc,totalCatInc,'inc')}</div></div>`:''}`;
+}
 
-  // Table 1 - Сводка по банкам with toggle
-  document.getElementById('dash-summary-top').innerHTML=`<div class="panel" style="margin-bottom:14px">
-    <div class="panel-h" style="justify-content:space-between">
-      <span>Сводка по банкам · ${curMonth}</span>
-      <button onclick="toggleSummaryTop()" id="btn-summary-top" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">Развернуть</button>
-    </div>
-    <div class="tbl-wrap"><table class="st">
-      <thead><tr><th>Банк</th><th class="gh">Приход вне систем</th><th class="gh">Приход внутри</th><th class="gh">Приход+из другого Б</th><th class="rh">Списание в другой Б</th><th class="rh">Списание внутри</th><th class="rh">Расход вне систем</th></tr></thead>
-      <tbody id="summary-top-body" style="display:none">${active2.map(b=>{const a=agg2[b.id];return`<tr>
-        <td><span class="bdot-sm" style="background:${b.color}"></span><a href="javascript:void(0)" onclick="goToBank('${b.id}')" style="color:var(--accent);text-decoration:underline;cursor:pointer">${b.name}</a></td>
-        <td class="${a.income?'pos':''}">${a.income?fmt(a.income):'—'}</td>
-        <td>${a.income_i?fmt(a.income_i):'—'}</td>
-        <td>${a.tr_in?fmt(a.tr_in):'—'}</td>
-        <td>${a.tr_out?fmt(a.tr_out):'—'}</td>
-        <td>${a.expense_i?fmt(a.expense_i):'—'}</td>
-        <td class="${a.expense?'neg':''}">${a.expense?fmt(a.expense):'—'}</td>
-      </tr>`;}).join('')}</tbody>
-      <tfoot><tr><td>Итог</td><td class="pos">${fmtF(tots2.income)}</td><td>${fmtF(tots2.income_i)}</td><td>${fmtF(tots2.tr_in)}</td><td>${fmtF(tots2.tr_out)}</td><td>${fmtF(tots2.expense_i)}</td><td class="neg">${fmtF(tots2.expense)}</td></tr></tfoot>
-    </table></div>
-  </div>`;
+async function renderNetIncomeTable(allRecs){
+  // Load balances for all months that have data
+  const monthsWithData=MONTHS.filter(m=>allRecs.some(r=>r.month===m));
+  const balsByMonth={};
+  for(const m of MONTHS){
+    try{balsByMonth[m]=await loadBalances(m);}catch(e){balsByMonth[m]={};}
+  }
 
-  // Table 2 - Итоги с проверкой (with toggle)
-  document.getElementById('dash-summary-detail').innerHTML=`<div class="panel" style="margin-bottom:14px">
-    <div class="panel-h" style="justify-content:space-between">
-      <span>Итоги с проверкой · ${curMonth}</span>
-      <div style="display:flex;gap:8px;align-items:center">
-        <span style="font-size:11px;color:var(--text3)">${trOk2?'✅ Переводы сходятся':'⚠️ Не сходятся'}</span>
-        <button onclick="toggleSummaryDetail()" id="btn-summary-detail" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">Развернуть</button>
+  // Compute per-month: start = sum of all bank balance_start, end = sum of all bank balance_end (auto-computed)
+  // For each month compute agg
+  const aggByMonth={};
+  MONTHS.forEach(m=>{
+    const agg={};banks.forEach(b=>agg[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
+    allRecs.filter(r=>r.month===m).forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
+    aggByMonth[m]=agg;
+  });
+
+  const rows=MONTHS.map(m=>{
+    const bals=balsByMonth[m]||{};
+    const agg=aggByMonth[m]||{};
+    let totStart=0,totEnd=0;
+    banks.forEach(b=>{
+      const bal=bals[b.id]||{start:0,end:0};
+      const a=agg[b.id]||{income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
+      const sumInc=a.income+a.income_i+a.tr_in;
+      const sumExp=a.tr_out+a.expense_i+a.expense;
+      const autoEnd=(bal.start||0)+sumInc-sumExp;
+      totStart+=bal.start||0;
+      totEnd+=autoEnd;
+    });
+    const hasData=allRecs.some(r=>r.month===m)||Object.values(bals).some(b=>b.start||b.end);
+    return{m,totStart,totEnd,delta:totEnd-totStart,hasData};
+  });
+
+  const hasAny=rows.some(r=>r.hasData);
+  if(!hasAny){
+    document.getElementById('dash-net-income').innerHTML='';
+    return;
+  }
+
+  document.getElementById('dash-net-income').innerHTML=`
+    <div class="panel" style="margin-bottom:14px">
+      <div class="panel-h">Чистый доход по месяцам · 2026</div>
+      <div class="tbl-wrap">
+        <table class="nit">
+          <thead><tr>
+            <th style="text-align:left">Месяц</th>
+            <th>Остаток начало</th>
+            <th>Остаток конец</th>
+            <th>Чистый доход Δ</th>
+          </tr></thead>
+          <tbody>${rows.map(({m,totStart,totEnd,delta,hasData})=>`
+            <tr class="${m===curMonth?'cur-month':''}">
+              <td>${m}</td>
+              ${hasData?`
+                <td>${totStart?fmtF(totStart):'<span style="color:var(--text3)">—</span>'}</td>
+                <td>${fmtF(totEnd)}</td>
+                <td class="${delta>0?'pos':delta<0?'neg':'empty-cell'}">${delta?(delta>0?'+':'')+fmtF(delta):'—'}</td>
+              `:`<td class="empty-cell">—</td><td class="empty-cell">—</td><td class="empty-cell">—</td>`}
+            </tr>`).join('')}
+          </tbody>
+        </table>
       </div>
-    </div>
-    <div class="tbl-wrap"><table class="st">
-      <thead><tr><th>Банк</th><th class="bh">Доход по банку</th><th class="bh">Расход по банку</th><th class="gh">∑ Доход</th><th class="gh">Проверка</th><th class="rh">∑ Расход</th><th class="rh">Проверка</th><th class="bh">Остаток на начало</th><th class="bh">Остаток на конец</th><th class="bh">Разница</th></tr></thead>
-      <tbody id="summary-detail-body" style="display:none">
-        ${dRows2.map(({b,sumInc,sumExp,bal,bt,diff,autoEnd})=>`<tr>
-          <td><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td>
-          <td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','income',this)">${bt.income?fmtF(bt.income):''}</td>
-          <td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','expense',this)">${bt.expense?fmtF(bt.expense):''}</td>
-          <td class="pos">${fmtF(sumInc)}</td>
-          <td class="${Math.abs((bt.income||0)-sumInc)<1?'check-ok':'check-fail'}">${Math.abs((bt.income||0)-sumInc)<1?'✅':'⚠️ '+fmtF(Math.abs((bt.income||0)-sumInc))}</td>
-          <td class="${sumExp?'neg':''}">${fmtF(sumExp)}</td>
-          <td class="${Math.abs((bt.expense||0)-sumExp)<1?'check-ok':'check-fail'}">${Math.abs((bt.expense||0)-sumExp)<1?'✅':'⚠️ '+fmtF(Math.abs((bt.expense||0)-sumExp))}</td>
-          <td class="ed" contenteditable="true" onblur="saveBalance('${b.id}','start',this)">${bal.start?fmtF(bal.start):''}</td>
-          <td style="text-align:right;font-weight:600;color:${autoEnd>=0?'var(--green)':'var(--red)'}">${fmtF(autoEnd)}</td>
-          <td class="${diff>0?'pos':diff<0?'neg':'neu'}">${diff?(diff>0?'+':'')+fmtF(diff):'—'}</td>
-        </tr>`).join('')}
-        <tr class="${trOk2?'check-row':'check-row fail'}">
-          <td colspan="10" style="text-align:left;font-size:13px;font-weight:700">${trOk2?'✅ Переводы сходятся: '+fmtF(tots2.tr_in):'⚠️ Переводы не сходятся! Разница: '+fmtF(Math.abs(trDiff2))}</td>
-        </tr>
-      </tbody>
-      <tfoot><tr>
-        <td>Итог</td><td></td><td></td>
-        <td class="pos">${fmtF(totSumInc2)}</td><td></td>
-        <td class="neg">${fmtF(totSumExp2)}</td><td></td>
-        <td>${totStart2?fmtF(totStart2):'—'}</td>
-        <td>${totEnd2?fmtF(totEnd2):'—'}</td>
-        <td class="${totEnd2-totStart2>0?'pos':totEnd2-totStart2<0?'neg':'neu'}">${totEnd2-totStart2?(totEnd2-totStart2>0?'+':'')+fmtF(totEnd2-totStart2):'—'}</td>
-      </tr></tfoot>
-    </table></div>
-  </div>`;
-
-  document.getElementById('dash-summary-combined').innerHTML=`<div class="panel" style="margin-bottom:14px"><div class="panel-h" style="justify-content:space-between"><span>Итоги · ${curMonth}</span><div style="display:flex;gap:8px;align-items:center"><span style="font-size:11px;color:var(--text3)">${trOk2?'✅ Переводы сходятся':'⚠️ Переводы не сходятся'}</span><button onclick="toggleSummary()" id="btn-summary" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">Развернуть</button></div></div><div class="tbl-wrap"><table class="st"><thead><tr><th>Банк</th><th class="gh">Приход вне сис.</th><th class="gh">Приход внутри</th><th class="gh">Приход+из др.Б</th><th class="rh">Списание в др.Б</th><th class="rh">Списание внутри</th><th class="rh">Расход вне сис.</th><th class="bh">Доход по банку</th><th class="bh">Расход по банку</th><th class="gh">∑ Доход</th><th class="gh">✓</th><th class="rh">∑ Расход</th><th class="rh">✓</th><th class="bh">Остаток нач.</th><th class="bh">Остаток кон.</th><th class="bh">Разница</th></tr></thead><tbody id="summary-body" style="display:none">${dRows2.map(({b,a,sumInc,sumExp,bal,bt,diff,autoEnd})=>`<tr><td><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td><td class="${a.income?'pos':''}">${a.income?fmt(a.income):'—'}</td><td>${a.income_i?fmt(a.income_i):'—'}</td><td>${a.tr_in?fmt(a.tr_in):'—'}</td><td>${a.tr_out?fmt(a.tr_out):'—'}</td><td>${a.expense_i?fmt(a.expense_i):'—'}</td><td class="${a.expense?'neg':''}">${a.expense?fmt(a.expense):'—'}</td><td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','income',this)">${bt.income?fmtF(bt.income):''}</td><td class="ed" contenteditable="true" onblur="saveBankTotalEl('${b.id}','expense',this)">${bt.expense?fmtF(bt.expense):''}</td><td class="pos">${fmtF(sumInc)}</td><td class="${Math.abs((bt.income||0)-sumInc)<1?'check-ok':'check-fail'}">${Math.abs((bt.income||0)-sumInc)<1?'✅':'⚠️'}</td><td class="${sumExp?'neg':''}">${fmtF(sumExp)}</td><td class="${Math.abs((bt.expense||0)-sumExp)<1?'check-ok':'check-fail'}">${Math.abs((bt.expense||0)-sumExp)<1?'✅':'⚠️'}</td><td class="ed" contenteditable="true" onblur="saveBalance('${b.id}','start',this)">${bal.start?fmtF(bal.start):''}</td><td style="text-align:right;font-weight:600;color:${autoEnd>=0?'var(--green)':'var(--red)'}">${fmtF(autoEnd)}</td><td class="${diff>0?'pos':diff<0?'neg':'neu'}">${diff?(diff>0?'+':'')+fmtF(diff):'—'}</td></tr>`).join('')}</tbody><tfoot><tr><td>Итог</td><td class="pos">${fmtF(tots2.income)}</td><td>${fmtF(tots2.income_i)}</td><td>${fmtF(tots2.tr_in)}</td><td>${fmtF(tots2.tr_out)}</td><td>${fmtF(tots2.expense_i)}</td><td class="neg">${fmtF(tots2.expense)}</td><td></td><td></td><td class="pos">${fmtF(totSumInc2)}</td><td></td><td class="neg">${fmtF(totSumExp2)}</td><td></td><td>${totStart2?fmtF(totStart2):'—'}</td><td>${totEnd2?fmtF(totEnd2):'—'}</td><td class="${totEnd2-totStart2>0?'pos':totEnd2-totStart2<0?'neg':'neu'}">${totEnd2-totStart2?(totEnd2-totStart2>0?'+':'')+fmtF(totEnd2-totStart2):'—'}</td></tr></tfoot></table></div></div>`;
+    </div>`;
 }
 
 function setJrnBank(id){jrnBank=id;renderJournal();}
 function goToBank(bankId){jrnBank=bankId;jrnCat='';go('journal');}
 function goToCat(cat){jrnCat=cat;jrnBank='';go('journal');}
-function toggleSummaryTop(){
-  const body=document.getElementById('summary-top-body');
-  const btn=document.getElementById('btn-summary-top');
-  if(!body||!btn)return;
-  const hidden=body.style.display==='none';
-  body.style.display=hidden?'':'none';
-  btn.textContent=hidden?'Свернуть':'Развернуть';
-}
-function toggleSummaryDetail(){
-  const body=document.getElementById('summary-detail-body');
-  const btn=document.getElementById('btn-summary-detail');
-  if(!body||!btn)return;
-  const hidden=body.style.display==='none';
-  body.style.display=hidden?'':'none';
-  btn.textContent=hidden?'Свернуть':'Развернуть';
-}
-function toggleSummary(){
-  const body=document.getElementById('summary-body');
-  const btn=document.getElementById('btn-summary');
-  if(!body||!btn)return;
-  const hidden=body.style.display==='none';
-  body.style.display=hidden?'':'none';
-  btn.textContent=hidden?'Свернуть':'Развернуть';
-}
-
 function toggleTotal(){
   const el=document.getElementById('total-content');
   const btn=document.getElementById('btn-toggle-total');
@@ -1126,8 +1058,6 @@ function toggleTotal(){
   el.style.display=hidden?'block':'none';
   btn.textContent=hidden?'Скрыть':'Показать';
 }
-
-
 function setSortJrn(col){
   const sortMap={date:'date_desc',bank:'bank',cat:'cat',amount:'amount_desc'};
   const sel=document.getElementById('jf-sort');
@@ -1135,6 +1065,7 @@ function setSortJrn(col){
   renderJournal();
 }
 
+// ─── RECORDS ─────────────────────────────────────────────────────
 async function addRecord(){
   const bankId=document.getElementById('f-bank').value;
   const type=document.getElementById('f-type').value;
@@ -1150,33 +1081,22 @@ async function addRecord(){
     renderJournal();toast('✓ Запись добавлена');
   }catch(e){toast('Ошибка: '+e.message);}
 }
-
 async function updateRecord(id,field,val){
-  try{
-    await q(`UPDATE records SET ${field}=$1 WHERE id=$2`,[val||null,id]);
-    if(field!=='op_date')toast('✓ Сохранено');
-  }catch(e){toast('Ошибка: '+e.message);}
+  try{await q(`UPDATE records SET ${field}=$1 WHERE id=$2`,[val||null,id]);if(field!=='op_date')toast('✓ Сохранено');}
+  catch(e){toast('Ошибка: '+e.message);}
 }
 async function updateRecordAmount(id,type,val){
   const amt=parseFloat(val)||0;
   if(amt<=0){toast('Введите сумму больше 0');return;}
-  try{
-    await q('UPDATE records SET amount=$1 WHERE id=$2',[amt,id]);
-    toast('✓ Сумма обновлена');
-  }catch(e){toast('Ошибка: '+e.message);}
+  try{await q('UPDATE records SET amount=$1 WHERE id=$2',[amt,id]);toast('✓ Сумма обновлена');}
+  catch(e){toast('Ошибка: '+e.message);}
 }
 function toggleEditMode(){
   editMode=!editMode;
   const btn=document.getElementById('btn-edit-mode');
-  if(btn){
-    btn.textContent=editMode?'✅ Режим редактирования':'✏️ Редактировать';
-    btn.style.background=editMode?'var(--accent-l)':'';
-    btn.style.color=editMode?'var(--accent)':'';
-    btn.style.borderColor=editMode?'var(--accent)':'';
-  }
+  if(btn){btn.textContent=editMode?'✅ Режим редактирования':'✏️ Редактировать';btn.style.background=editMode?'var(--accent-l)':'';btn.style.color=editMode?'var(--accent)':'';btn.style.borderColor=editMode?'var(--accent)':'';}
   renderJournal();
 }
-
 let massEditMode=false;
 function toggleMassEdit(){
   massEditMode=!massEditMode;
@@ -1184,31 +1104,27 @@ function toggleMassEdit(){
   const tds=document.querySelectorAll('.jrn-check-td');
   const panel=document.getElementById('mass-edit-panel');
   const btn=document.getElementById('btn-mass-edit');
+  const totsTd=document.getElementById('tots-check-td');
   if(th) th.style.display=massEditMode?'':'none';
+  if(totsTd) totsTd.style.display=massEditMode?'':'none';
   tds.forEach(td=>td.style.display=massEditMode?'':'none');
   panel.style.display=massEditMode?'flex':'none';
-  btn.style.background=massEditMode?'var(--accent-l)':'';
-  btn.style.color=massEditMode?'var(--accent)':'';
+  btn.style.background=massEditMode?'var(--accent-l)':'';btn.style.color=massEditMode?'var(--accent)':'';
   document.getElementById('mass-cat-select').innerHTML=catOptions();
   updateSelectedCount();
 }
-function updateSelectedCount(){
-  const checked=document.querySelectorAll('.row-check:checked').length;
-  document.getElementById('selected-count').textContent=checked;
-}
-function toggleAllRows(cb){
-  document.querySelectorAll('.row-check').forEach(c=>c.checked=cb.checked);
-  updateSelectedCount();
-}
+function updateSelectedCount(){const checked=document.querySelectorAll('.row-check:checked').length;document.getElementById('selected-count').textContent=checked;}
+function toggleAllRows(cb){document.querySelectorAll('.row-check').forEach(c=>c.checked=cb.checked);updateSelectedCount();}
 function cancelMassEdit(){
   massEditMode=false;
   const th=document.getElementById('jrn-check-th');
-  const panel=document.getElementById('mass-edit-panel');
-  const btn=document.getElementById('btn-mass-edit');
+  const totsTd=document.getElementById('tots-check-td');
   if(th) th.style.display='none';
+  if(totsTd) totsTd.style.display='none';
   document.querySelectorAll('.jrn-check-td').forEach(td=>td.style.display='none');
-  panel.style.display='none';
-  btn.style.background='';btn.style.color='';
+  document.getElementById('mass-edit-panel').style.display='none';
+  document.getElementById('btn-mass-edit').style.background='';
+  document.getElementById('btn-mass-edit').style.color='';
 }
 async function applyMassCategory(){
   const cat=document.getElementById('mass-cat-select').value;
@@ -1216,12 +1132,8 @@ async function applyMassCategory(){
   const ids=[...document.querySelectorAll('.row-check:checked')].map(c=>c.dataset.id);
   if(!ids.length){toast('Выберите записи');return;}
   try{
-    for(const id of ids){
-      await q('UPDATE records SET category=$1 WHERE id=$2',[cat,id]);
-    }
-    toast(`✓ Категория "${cat}" применена к ${ids.length} записям`);
-    cancelMassEdit();
-    renderJournal();
+    for(const id of ids){await q('UPDATE records SET category=$1 WHERE id=$2',[cat,id]);}
+    toast(`✓ Категория "${cat}" применена к ${ids.length} записям`);cancelMassEdit();renderJournal();
   }catch(e){toast('Ошибка: '+e.message);}
 }
 async function delRecord(id){
@@ -1230,132 +1142,98 @@ async function delRecord(id){
   catch(e){toast('Ошибка');}
 }
 
-async function renderSummary(){
-  document.getElementById('sum-m-lbl').textContent=curMonth;
-  const recs=await loadRecordsMonth(curMonth);
-  const bals=await loadBalances(curMonth);
-  const agg={};banks.forEach(b=>agg[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
-  recs.forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
-  const active=banks.filter(b=>Object.values(agg[b.id]).some(v=>v>0)||(bals[b.id]&&(bals[b.id].start||bals[b.id].end)));
-  const tots={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
-  active.forEach(b=>Object.keys(tots).forEach(k=>tots[k]+=agg[b.id][k]||0));
-  document.getElementById('sum-top').innerHTML=`
-    <thead><tr><th>Банк</th><th class="gh">Приход вне систем</th><th class="gh">Приход внутри</th><th class="gh">Приход+из другого Б</th><th class="rh">Списание в другой Б</th><th class="rh">Списание внутри</th><th class="rh">Расход вне систем</th></tr></thead>
-    <tbody>${active.map(b=>{const a=agg[b.id];return `<tr>
-      <td><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td>
-      <td class="${a.income?'pos':''}">${a.income?fmt(a.income):'—'}</td><td>${a.income_i?fmt(a.income_i):'—'}</td>
-      <td>${a.tr_in?fmt(a.tr_in):'—'}</td><td>${a.tr_out?fmt(a.tr_out):'—'}</td>
-      <td>${a.expense_i?fmt(a.expense_i):'—'}</td><td class="${a.expense?'neg':''}">${a.expense?fmt(a.expense):'—'}</td>
-    </tr>`;}).join('')}</tbody>
-    <tfoot><tr><td>Общий итог</td><td class="pos">${fmtF(tots.income)}</td><td>${fmtF(tots.income_i)}</td><td>${fmtF(tots.tr_in)}</td><td>${fmtF(tots.tr_out)}</td><td>${fmtF(tots.expense_i)}</td><td class="neg">${fmtF(tots.expense)}</td></tr></tfoot>`;
-
-  const trDiff=tots.tr_in-tots.tr_out;const trOk=Math.abs(trDiff)<0.01;
-  let totStart=0,totEnd=0,totSumInc=0,totSumExp=0;
-  const dRows=active.map(b=>{const a=agg[b.id];const bal=bals[b.id]||{start:0,end:0};
-    const sumInc=a.income+a.income_i+a.tr_in;const sumExp=a.tr_out+a.expense_i+a.expense;
-    const diff=(bal.end||0)-(bal.start||0);
-    totStart+=bal.start||0;totEnd+=bal.end||0;totSumInc+=sumInc;totSumExp+=sumExp;
-    return{b,sumInc,sumExp,bal,diff};
-  });
-  document.getElementById('sum-detail').innerHTML=`
-    <thead><tr><th>Банк</th><th class="gh">∑ Доход</th><th class="rh">∑ Расход</th><th class="bh">Остаток начало</th><th class="bh">Остаток конец</th><th class="bh">Разница</th></tr></thead>
-    <tbody>
-      ${dRows.map(({b,sumInc,sumExp,bal,diff})=>`<tr>
-        <td><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td>
-        <td class="pos">${fmtF(sumInc)}</td><td class="${sumExp?'neg':''}">${fmtF(sumExp)}</td>
-        <td class="ed" contenteditable="true" onblur="saveBalance('${b.id}','start',this)">${bal.start||''}</td>
-        <td class="ed" contenteditable="true" onblur="saveBalance('${b.id}','end',this)">${bal.end||''}</td>
-        <td class="${diff>0?'pos':diff<0?'neg':'neu'}">${diff?fmtF(diff):'—'}</td>
-      </tr>`).join('')}
-      <tr class="${trOk?'check-row':'check-row fail'}">
-        <td colspan="6" style="text-align:left;font-size:13px;font-weight:700">
-          ${trOk?'✅ Переводы сходятся: '+fmtF(tots.tr_in):'⚠️ Переводы не сходятся! Приход из др.Б: '+fmtF(tots.tr_in)+' ≠ Списание в др.Б: '+fmtF(tots.tr_out)+' · Разница: '+fmtF(Math.abs(trDiff))}
-        </td>
-      </tr>
-    </tbody>
-    <tfoot><tr><td>Итог</td><td class="pos">${fmtF(totSumInc)}</td><td class="neg">${fmtF(totSumExp)}</td><td>${totStart?fmtF(totStart):'—'}</td><td>${totEnd?fmtF(totEnd):'—'}</td><td class="${totEnd-totStart>0?'pos':totEnd-totStart<0?'neg':'neu'}">${totEnd-totStart?fmtF(totEnd-totStart):'—'}</td></tr></tfoot>`;
+// ─── DATA LOADERS ─────────────────────────────────────────────────
+async function loadBanks(){try{banks=await q('SELECT * FROM banks ORDER BY sort_order');}catch(e){console.error(e);}}
+async function loadRecordsMonth(month){try{return await q('SELECT * FROM records WHERE month=$1 ORDER BY op_date,id',[month]);}catch(e){return[];}}
+async function loadAllRecords(){try{return await q('SELECT * FROM records ORDER BY month,op_date,id');}catch(e){return[];}}
+async function loadBalances(month){
+  try{const rows=await q('SELECT * FROM balances WHERE month=$1',[month]);const out={};rows.forEach(r=>out[r.bank_id]={start:parseFloat(r.balance_start)||0,end:parseFloat(r.balance_end)||0});return out;}
+  catch(e){return{};}
 }
+async function loadBankTotals(month){
+  try{const rows=await q('SELECT * FROM bank_totals WHERE month=$1',[month]);const out={};rows.forEach(r=>out[r.bank_id]={income:parseFloat(r.income_bank)||0,expense:parseFloat(r.expense_bank)||0});return out;}
+  catch(e){return{};}
+}
+async function loadCategories(){
+  try{categories=await q('SELECT * FROM categories ORDER BY sort_order');}
+  catch(e){categories=[{name:'Еда'},{name:'Транспорт'},{name:'Медицина'},{name:'Подписка'},{name:'Аренда'},{name:'Развлечение'},{name:'Одежда'},{name:'Услуги банка'},{name:'Зарплата'},{name:'Кэшбэк'},{name:'Перевод'},{name:'Прочее'}];}
+}
+function catOptions(selected=''){
+  return`<option value="">— выбрать —</option>`+categories.map(c=>`<option${c.name===selected?' selected':''}>${c.name}</option>`).join('');
+}
+async function loadDeposits(){try{return await q('SELECT * FROM deposits WHERE is_active=true ORDER BY date_close');}catch(e){return[];}}
 
-async function saveBalance(bankId,field,el){
-  const val=parseFloat(el.textContent.replace(/\s|₽/g,'').replace(',','.'))||0;
-  el.textContent=val?fmtF(val):'';
+async function autoSaveEnd(bankId,autoEnd){
   try{
-    await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET ${field==='start'?'balance_start':'balance_end'}=EXCLUDED.${field==='start'?'balance_start':'balance_end'}`,
-      field==='start'?[bankId,curMonth,val,0]:[bankId,curMonth,0,val]);
-    if(field==='end'){
-      const nextMonth=MONTHS[MONTHS.indexOf(curMonth)+1];
-      if(nextMonth){
-        await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=EXCLUDED.balance_start`,
-          [bankId,nextMonth,val,0]);
-      }
-    }
-    toast('✓ Остаток сохранён');
-  }catch(e){toast('Ошибка сохранения');}
+    await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET balance_end=$4`,[bankId,curMonth,0,autoEnd]);
+    const nextMonth=MONTHS[MONTHS.indexOf(curMonth)+1];
+    if(nextMonth){await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=$3`,[bankId,nextMonth,autoEnd,0]);}
+  }catch(e){console.error(e);}
 }
 
-async function renderAnalytics(){
-  // Month tabs for analytics
-  const mtAn=document.getElementById('mt-analytics');
-  if(mtAn&&!mtAn.innerHTML) mtAn.innerHTML=MONTHS.map(m=>`<button class="mtab${m===curMonth?' active':''}" onclick="selMonth('${m}')">${m.slice(0,3)}</button>`).join('');
-  document.getElementById('an-month-lbl').textContent=curMonth;
+function fillBankSelects(){
+  ['f-bank'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const cur=el.value;
+    el.innerHTML=banks.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
+    if(cur)el.value=cur;
+  });
+}
 
-  // Per-month banks/cats/deps
-  const recsA=await loadRecordsMonth(curMonth);
-  const balsA=await loadBalances(curMonth);
-  const aggA={};banks.forEach(b=>aggA[b.id]={income:0,expense:0});
-  recsA.forEach(r=>{if(aggA[r.bank_id]){if(r.type==='income')aggA[r.bank_id].income+=parseFloat(r.amount)||0;if(r.type==='expense')aggA[r.bank_id].expense+=parseFloat(r.amount)||0;}});
-  const activeBanksA=banks.filter(b=>Object.values(aggA[b.id]).some(v=>v>0)||(balsA[b.id]&&balsA[b.id].end));
-  document.getElementById('an-banks').innerHTML=activeBanksA.length
-    ?activeBanksA.map(b=>{const bal=balsA[b.id];const net=aggA[b.id].income-aggA[b.id].expense;
-      return`<div class="brow" onclick="goToBank('${b.id}')"><div class="bdot" style="background:${b.color}"></div><div style="flex:1"><div class="bname">${b.name}</div>${bal&&bal.end?`<div style="font-size:12px;color:var(--text3)">остаток: ${fmt(bal.end)}</div>`:''}</div><div class="${net>=0?'binc':'bexp'}">${net>=0?'+':'-'}${fmt(net)}</div></div>`;}).join('')
-    :'<div class="empty">Нет данных</div>';
+// ─── NAVIGATION ───────────────────────────────────────────────────
+function go(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.mob-nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  const nb=document.getElementById('nb-'+name);if(nb)nb.classList.add('active');
+  const mob=document.getElementById('mob-'+name);if(mob)mob.classList.add('active');
+  closeMobMenu();
+  if(name==='dashboard')renderDash();
+  if(name==='journal')renderJournal();
+  if(name==='deposits')renderDeposits();
+  if(name==='settings')renderSettings();
+  if(name==='analytics')renderAnalytics();
+}
 
-  const catExpA={};recsA.filter(r=>r.type==='expense').forEach(r=>{const c=r.category||'Прочее';catExpA[c]=(catExpA[c]||0)+parseFloat(r.amount);});
-  const sortedCatsA=Object.entries(catExpA).sort((a,b)=>b[1]-a[1]);const maxCatA=sortedCatsA[0]?sortedCatsA[0][1]:1;
-  document.getElementById('an-cats').innerHTML=sortedCatsA.length
-    ?sortedCatsA.slice(0,7).map(([c,v])=>`<div class="cat-row"><div class="cat-name">${c}</div><div class="cat-track"><div class="cat-fill" style="width:${Math.round(v/maxCatA*100)}%;background:var(--red)"></div></div><div class="cat-val" style="color:var(--red)">-${fmt(v)}</div></div>`).join('')
-    :'<div class="empty">Нет расходов</div>';
+function initTabs(){
+  ['mt-dash','mt-journal'].forEach(id=>{
+    const c=document.getElementById(id);if(!c)return;
+    c.innerHTML=MONTHS.map(m=>`<button class="mtab${m===curMonth?' active':''}" onclick="selMonth('${m}')">${m.slice(0,3)}</button>`).join('');
+  });
+}
+function selMonth(m){
+  curMonth=m;
+  document.querySelectorAll('.mtab').forEach(t=>t.classList.toggle('active',t.textContent===m.slice(0,3)));
+  const av=document.querySelector('.view.active');if(!av)return;
+  const id=av.id.replace('view-','');
+  if(id==='dashboard')renderDash();
+  if(id==='journal')renderJournal();
+}
 
-  const depsA=await loadDeposits();const todayA=new Date();todayA.setHours(0,0,0,0);
-  document.getElementById('an-deps').innerHTML=depsA.length
-    ?depsA.slice(0,5).map(d=>{const dc=new Date(d.date_close);const diff=Math.floor((dc-todayA)/(1000*60*60*24));
+async function initApp(){
+  initTabs();
+  await loadBanks();
+  fillBankSelects();
+  await loadCategories();
+  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('f-cat').innerHTML=catOptions();
+  document.getElementById('df-open').value=new Date().toISOString().split('T')[0];
+  renderDash();
+}
+
+// ─── DEPOSITS ─────────────────────────────────────────────────────
+async function renderDeposits(){
+  const deps=await loadDeposits();deposits=deps;
+  const today=new Date();today.setHours(0,0,0,0);
+  document.getElementById('dep-list').innerHTML=deps.length
+    ?deps.map(d=>{const dc=new Date(d.date_close);const diff=Math.floor((dc-today)/(1000*60*60*24));
       const cls=diff<0?'exp':diff<=14?'warn':'ok';
-      const lbl=diff<0?'Истёк':diff<=14?diff+' дн.':dc.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'});
-      return`<div class="dep-row"><div style="display:flex;align-items:center;justify-content:space-between"><div class="dep-name">${d.name}</div><span class="dep-badge ${cls}">${lbl}</span></div><div class="dep-meta">${d.bank_name} · ${d.rate}% годовых</div><div class="dep-amount">${fmt(parseFloat(d.amount))}</div></div>`;}).join('')
-    :'<div class="empty">Вкладов нет</div>';
-
-  const all=await loadAllRecords();
-  const byM={};MONTHS.forEach(m=>byM[m]={inc:0,exp:0});
-  all.forEach(r=>{if(byM[r.month]){if(r.type==='income')byM[r.month].inc+=parseFloat(r.amount)||0;if(r.type==='expense')byM[r.month].exp+=parseFloat(r.amount)||0;}});
-  const maxV=Math.max(...MONTHS.flatMap(m=>[byM[m].inc,byM[m].exp]),1);const H=160;
-  document.getElementById('an-chart').innerHTML=MONTHS.map(m=>{
-    const iH=Math.max((byM[m].inc/maxV)*H,byM[m].inc>0?3:0);
-    const eH=Math.max((byM[m].exp/maxV)*H,byM[m].exp>0?3:0);
-    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center">
-      <div style="display:flex;gap:3px;align-items:flex-end;height:${H}px;width:100%">
-        <div class="an-bar inc" style="height:${iH}px;flex:1" title="${m}: +${fmtF(byM[m].inc)}"></div>
-        <div class="an-bar exp" style="height:${eH}px;flex:1" title="${m}: -${fmtF(byM[m].exp)}"></div>
-      </div>
-      <div class="an-lbl">${m.slice(0,3)}</div>
-    </div>`;}).join('');
-
-  const bInc={},bExp={};banks.forEach(b=>{bInc[b.id]=0;bExp[b.id]=0;});
-  all.forEach(r=>{if(r.type==='income'&&bInc[r.bank_id]!==undefined)bInc[r.bank_id]+=parseFloat(r.amount)||0;if(r.type==='expense'&&bExp[r.bank_id]!==undefined)bExp[r.bank_id]+=parseFloat(r.amount)||0;});
-  const mI=Math.max(...Object.values(bInc),1),mE=Math.max(...Object.values(bExp),1);
-  const si=banks.filter(b=>bInc[b.id]>0).sort((a,b)=>bInc[b.id]-bInc[a.id]).reverse();
-  const se=banks.filter(b=>bExp[b.id]>0).sort((a,b)=>bExp[b.id]-bExp[a.id]).reverse();
-  document.getElementById('an-inc').innerHTML=si.length?si.slice(0,8).map(b=>`<div class="cat-row">
-    <div class="cat-name">${b.name}</div>
-    <div class="cat-track"><div class="cat-fill" style="width:${Math.round(bInc[b.id]/mI*100)}%;background:${b.color}"></div></div>
-    <div class="cat-val" style="color:var(--green)">${fmt(bInc[b.id])}</div>
-  </div>`).join(''):'<div class="empty">Нет данных</div>';
-  document.getElementById('an-exp').innerHTML=se.length?se.slice(0,8).map(b=>`<div class="cat-row">
-    <div class="cat-name">${b.name}</div>
-    <div class="cat-track"><div class="cat-fill" style="width:${Math.round(bExp[b.id]/mE*100)}%;background:${b.color}"></div></div>
-    <div class="cat-val" style="color:var(--red)">${fmt(bExp[b.id])}</div>
-  </div>`).join(''):'<div class="empty">Нет данных</div>';
+      const lbl=diff<0?'Истёк':diff<=14?`⚠️ ${diff} дн.`:dc.toLocaleDateString('ru-RU');
+      return `<div class="dep-card"><div class="dep-card-head"><div><div class="dep-name">${d.name}</div><div class="dep-meta">${d.bank_name}</div></div><div style="display:flex;gap:8px;align-items:center"><span class="dep-badge ${cls}">${lbl}</span><button class="btn btn-d btn-sm" onclick="closeDeposit(${d.id})">Закрыть</button></div></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px"><div><div style="font-size:11px;color:var(--text3);font-weight:600">Сумма</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--purple);margin-top:4px">${fmt(parseFloat(d.amount))}</div></div><div><div style="font-size:11px;color:var(--text3);font-weight:600">Ставка</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--green);margin-top:4px">${d.rate}%</div></div><div><div style="font-size:11px;color:var(--text3);font-weight:600">Открыт</div><div style="font-size:14px;font-weight:500;margin-top:4px">${new Date(d.date_open).toLocaleDateString('ru-RU')}</div></div></div>${d.description?`<div style="font-size:13px;color:var(--text2);margin-top:10px">${d.description}</div>`:''}</div>`;
+    }).join('')
+    :'<div class="empty">Вкладов ещё нет. Добавь первый слева.</div>';
 }
-
 async function addDeposit(){
   const name=document.getElementById('df-name').value.trim();
   const bankName=document.getElementById('df-bank').value.trim();
@@ -1373,88 +1251,98 @@ async function addDeposit(){
     renderDeposits();toast('✓ Вклад добавлен');
   }catch(e){toast('Ошибка: '+e.message);}
 }
-
 async function closeDeposit(id){
   if(!confirm('Отметить вклад как закрытый?'))return;
   try{await q('UPDATE deposits SET is_active=false WHERE id=$1',[id]);renderDeposits();toast('Вклад закрыт');}
   catch(e){toast('Ошибка');}
 }
 
+// ─── ANALYTICS ───────────────────────────────────────────────────
+async function renderAnalytics(){
+  const mtAn=document.getElementById('mt-analytics');
+  if(mtAn&&!mtAn.innerHTML) mtAn.innerHTML=MONTHS.map(m=>`<button class="mtab${m===curMonth?' active':''}" onclick="selMonth('${m}')">${m.slice(0,3)}</button>`).join('');
+  document.getElementById('an-month-lbl').textContent=curMonth;
+  const recsA=await loadRecordsMonth(curMonth);
+  const balsA=await loadBalances(curMonth);
+  const aggA={};banks.forEach(b=>aggA[b.id]={income:0,expense:0});
+  recsA.forEach(r=>{if(aggA[r.bank_id]){if(r.type==='income')aggA[r.bank_id].income+=parseFloat(r.amount)||0;if(r.type==='expense')aggA[r.bank_id].expense+=parseFloat(r.amount)||0;}});
+  const activeBanksA=banks.filter(b=>Object.values(aggA[b.id]).some(v=>v>0)||(balsA[b.id]&&balsA[b.id].end));
+  document.getElementById('an-banks').innerHTML=activeBanksA.length
+    ?activeBanksA.map(b=>{const bal=balsA[b.id];const net=aggA[b.id].income-aggA[b.id].expense;
+      return`<div class="brow" onclick="goToBank('${b.id}')"><div class="bdot" style="background:${b.color}"></div><div style="flex:1"><div class="bname">${b.name}</div>${bal&&bal.end?`<div style="font-size:12px;color:var(--text3)">остаток: ${fmt(bal.end)}</div>`:''}</div><div class="${net>=0?'binc':'bexp'}">${net>=0?'+':'-'}${fmt(net)}</div></div>`;}).join('')
+    :'<div class="empty">Нет данных</div>';
+  const catExpA={};recsA.filter(r=>r.type==='expense').forEach(r=>{const c=r.category||'Прочее';catExpA[c]=(catExpA[c]||0)+parseFloat(r.amount);});
+  const sortedCatsA=Object.entries(catExpA).sort((a,b)=>b[1]-a[1]);const maxCatA=sortedCatsA[0]?sortedCatsA[0][1]:1;
+  document.getElementById('an-cats').innerHTML=sortedCatsA.length
+    ?sortedCatsA.slice(0,7).map(([c,v])=>`<div class="cat-row"><div class="cat-name">${c}</div><div class="cat-track"><div class="cat-fill" style="width:${Math.round(v/maxCatA*100)}%;background:var(--red)"></div></div><div class="cat-val" style="color:var(--red)">-${fmt(v)}</div></div>`).join('')
+    :'<div class="empty">Нет расходов</div>';
+  const depsA=await loadDeposits();const todayA=new Date();todayA.setHours(0,0,0,0);
+  document.getElementById('an-deps').innerHTML=depsA.length
+    ?depsA.slice(0,5).map(d=>{const dc=new Date(d.date_close);const diff=Math.floor((dc-todayA)/(1000*60*60*24));
+      const cls=diff<0?'exp':diff<=14?'warn':'ok';const lbl=diff<0?'Истёк':diff<=14?diff+' дн.':dc.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'});
+      return`<div class="dep-row"><div style="display:flex;align-items:center;justify-content:space-between"><div class="dep-name">${d.name}</div><span class="dep-badge ${cls}">${lbl}</span></div><div class="dep-meta">${d.bank_name} · ${d.rate}% годовых</div><div class="dep-amount">${fmt(parseFloat(d.amount))}</div></div>`;}).join('')
+    :'<div class="empty">Вкладов нет</div>';
+  const all=await loadAllRecords();
+  const byM={};MONTHS.forEach(m=>byM[m]={inc:0,exp:0});
+  all.forEach(r=>{if(byM[r.month]){if(r.type==='income')byM[r.month].inc+=parseFloat(r.amount)||0;if(r.type==='expense')byM[r.month].exp+=parseFloat(r.amount)||0;}});
+  const maxV=Math.max(...MONTHS.flatMap(m=>[byM[m].inc,byM[m].exp]),1);const H=160;
+  document.getElementById('an-chart').innerHTML=MONTHS.map(m=>{
+    const iH=Math.max((byM[m].inc/maxV)*H,byM[m].inc>0?3:0);
+    const eH=Math.max((byM[m].exp/maxV)*H,byM[m].exp>0?3:0);
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center"><div style="display:flex;gap:3px;align-items:flex-end;height:${H}px;width:100%"><div class="an-bar inc" style="height:${iH}px;flex:1" title="${m}: +${fmtF(byM[m].inc)}"></div><div class="an-bar exp" style="height:${eH}px;flex:1" title="${m}: -${fmtF(byM[m].exp)}"></div></div><div class="an-lbl">${m.slice(0,3)}</div></div>`;
+  }).join('');
+  const bInc={},bExp={};banks.forEach(b=>{bInc[b.id]=0;bExp[b.id]=0;});
+  all.forEach(r=>{if(r.type==='income'&&bInc[r.bank_id]!==undefined)bInc[r.bank_id]+=parseFloat(r.amount)||0;if(r.type==='expense'&&bExp[r.bank_id]!==undefined)bExp[r.bank_id]+=parseFloat(r.amount)||0;});
+  const mI=Math.max(...Object.values(bInc),1),mE=Math.max(...Object.values(bExp),1);
+  const si=banks.filter(b=>bInc[b.id]>0).sort((a,b)=>bInc[b.id]-bInc[a.id]).reverse();
+  const se=banks.filter(b=>bExp[b.id]>0).sort((a,b)=>bExp[b.id]-bExp[a.id]).reverse();
+  document.getElementById('an-inc').innerHTML=si.length?si.slice(0,8).map(b=>`<div class="cat-row"><div class="cat-name">${b.name}</div><div class="cat-track"><div class="cat-fill" style="width:${Math.round(bInc[b.id]/mI*100)}%;background:${b.color}"></div></div><div class="cat-val" style="color:var(--green)">${fmt(bInc[b.id])}</div></div>`).join(''):'<div class="empty">Нет данных</div>';
+  document.getElementById('an-exp').innerHTML=se.length?se.slice(0,8).map(b=>`<div class="cat-row"><div class="cat-name">${b.name}</div><div class="cat-track"><div class="cat-fill" style="width:${Math.round(bExp[b.id]/mE*100)}%;background:${b.color}"></div></div><div class="cat-val" style="color:var(--red)">${fmt(bExp[b.id])}</div></div>`).join(''):'<div class="empty">Нет данных</div>';
+}
+
+// ─── SETTINGS ────────────────────────────────────────────────────
 async function renderSettings(){
   await loadCategories();
   document.getElementById('cat-list').innerHTML=categories.length
-    ?categories.map(c=>`<div class="bank-set-row">
-      <div style="flex:1;font-size:13px;font-weight:500">${c.name}</div>
-      <button class="btn btn-d btn-sm" onclick="deleteCategory(${c.id},'${c.name}')">✕</button>
-    </div>`).join('')
+    ?categories.map(c=>`<div class="bank-set-row"><div style="flex:1;font-size:13px;font-weight:500">${c.name}</div><button class="btn btn-d btn-sm" onclick="deleteCategory(${c.id},'${c.name}')">✕</button></div>`).join('')
     :'<div class="empty">Нет категорий</div>';
-  // Bank list with drag-drop
   document.getElementById('bank-list').innerHTML=banks.map((b,i)=>`
     <div class="bank-set-row" draggable="true" data-id="${b.id}" data-idx="${i}"
-      ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropBank(event)"
-      style="cursor:grab">
+      ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropBank(event)" style="cursor:grab">
       <span style="color:var(--text3);margin-right:4px;cursor:grab">⠿</span>
       <span class="color-sw" style="background:${b.color}"></span>
       <div style="flex:1"><div style="font-size:14px;font-weight:600">${b.name}</div><div style="font-size:12px;color:var(--text3)">${BTYPE[b.type]||b.type}</div></div>
       <button class="btn btn-d btn-sm" onclick="removeBank('${b.id}')">✕</button>
     </div>`).join('');
-
-  // Month banks selector
   const mbSel=document.getElementById('month-banks-sel');
-  if(mbSel&&!mbSel.value){
-    mbSel.innerHTML='<option value="">— выбрать месяц —</option>'+MONTHS.map(m=>`<option value="${m}">${m}</option>`).join('');
-  }
-
-  document.getElementById('data-info').textContent=`Данные хранятся в Supabase (облако) · Записей загружено из базы`;
+  if(mbSel&&!mbSel.value){mbSel.innerHTML='<option value="">— выбрать месяц —</option>'+MONTHS.map(m=>`<option value="${m}">${m}</option>`).join('');}
+  document.getElementById('data-info').textContent=`Данные хранятся в Supabase (облако)`;
 }
 
-// Drag-drop for bank reordering
 let dragSrcId=null;
 function dragStart(e){dragSrcId=e.currentTarget.dataset.id;e.dataTransfer.effectAllowed='move';}
 function dragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';e.currentTarget.style.background='var(--accent-l)';}
 async function dropBank(e){
-  e.preventDefault();
-  const targetId=e.currentTarget.dataset.id;
-  e.currentTarget.style.background='';
+  e.preventDefault();const targetId=e.currentTarget.dataset.id;e.currentTarget.style.background='';
   if(!dragSrcId||dragSrcId===targetId)return;
-  const srcIdx=banks.findIndex(b=>b.id===dragSrcId);
-  const tgtIdx=banks.findIndex(b=>b.id===targetId);
-  const moved=banks.splice(srcIdx,1)[0];
-  banks.splice(tgtIdx,0,moved);
-  // Save new order
-  for(let i=0;i<banks.length;i++){
-    await q('UPDATE banks SET sort_order=$1 WHERE id=$2',[i+1,banks[i].id]);
-  }
-  banks.forEach((b,i)=>b.sort_order=i+1);
-  renderSettings();
-  toast('✓ Порядок сохранён');
+  const srcIdx=banks.findIndex(b=>b.id===dragSrcId);const tgtIdx=banks.findIndex(b=>b.id===targetId);
+  const moved=banks.splice(srcIdx,1)[0];banks.splice(tgtIdx,0,moved);
+  for(let i=0;i<banks.length;i++){await q('UPDATE banks SET sort_order=$1 WHERE id=$2',[i+1,banks[i].id]);}
+  banks.forEach((b,i)=>b.sort_order=i+1);renderSettings();toast('✓ Порядок сохранён');
 }
 
-// Month banks
-let monthBanksCache={};
 async function loadMonthBanks(month){
-  try{
-    const rows=await q('SELECT bank_id FROM month_banks WHERE month=$1',[month]);
-    if(rows.length===0) return null; // not configured = show all
-    return rows.map(r=>r.bank_id);
-  }catch(e){return null;}
+  try{const rows=await q('SELECT bank_id FROM month_banks WHERE month=$1',[month]);if(rows.length===0)return null;return rows.map(r=>r.bank_id);}
+  catch(e){return null;}
 }
 async function renderMonthBanks(){
   const month=document.getElementById('month-banks-sel').value;
   document.getElementById('month-banks-lbl').textContent=month||'';
   if(!month){document.getElementById('month-banks-list').innerHTML='<div class="empty">Выберите месяц</div>';return;}
-  const active=await loadMonthBanks(month);
-  const activeSet=new Set(active||banks.map(b=>b.id));
+  const active=await loadMonthBanks(month);const activeSet=new Set(active||banks.map(b=>b.id));
   document.getElementById('month-banks-list').innerHTML=`
-    <div style="margin-bottom:10px;font-size:12px;color:var(--text2)">Отметь банки которые активны в ${month}. Если ничего не отмечено — показываются все.</div>
-    ${banks.map(b=>`<div class="bank-set-row">
-      <span class="color-sw" style="background:${b.color}"></span>
-      <div style="flex:1"><div style="font-size:14px;font-weight:600">${b.name}</div></div>
-      <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
-        <input type="checkbox" ${activeSet.has(b.id)?'checked':''} onchange="saveMonthBank('${month}','${b.id}',this.checked)" style="width:16px;height:16px;cursor:pointer">
-        <span style="font-size:12px;color:var(--text2)">Активен</span>
-      </label>
-    </div>`).join('')}
+    <div style="margin-bottom:10px;font-size:12px;color:var(--text2)">Отметь банки которые активны в ${month}.</div>
+    ${banks.map(b=>`<div class="bank-set-row"><span class="color-sw" style="background:${b.color}"></span><div style="flex:1"><div style="font-size:14px;font-weight:600">${b.name}</div></div><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" ${activeSet.has(b.id)?'checked':''} onchange="saveMonthBank('${month}','${b.id}',this.checked)" style="width:16px;height:16px;cursor:pointer"><span style="font-size:12px;color:var(--text2)">Активен</span></label></div>`).join('')}
     <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;gap:8px">
       <button class="btn btn-g btn-sm" onclick="selectAllMonthBanks('${month}',true)">Выбрать все</button>
       <button class="btn btn-g btn-sm" onclick="selectAllMonthBanks('${month}',false)">Снять все</button>
@@ -1462,38 +1350,23 @@ async function renderMonthBanks(){
 }
 async function saveMonthBank(month,bankId,checked){
   try{
-    if(checked){
-      await q('INSERT INTO month_banks(month,bank_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[month,bankId]);
-    } else {
-      await q('DELETE FROM month_banks WHERE month=$1 AND bank_id=$2',[month,bankId]);
-    }
+    if(checked){await q('INSERT INTO month_banks(month,bank_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[month,bankId]);}
+    else{await q('DELETE FROM month_banks WHERE month=$1 AND bank_id=$2',[month,bankId]);}
   }catch(e){toast('Ошибка: '+e.message);}
 }
 async function selectAllMonthBanks(month,val){
-  for(const b of banks){await saveMonthBank(month,b.id,val);}
-  renderMonthBanks();
-  toast(val?'Все банки выбраны':'Все банки сняты');
+  for(const b of banks){await saveMonthBank(month,b.id,val);}renderMonthBanks();toast(val?'Все банки выбраны':'Все банки сняты');
 }
-
 async function addCategory(){
   const name=document.getElementById('new-cat-name').value.trim();
   if(!name){toast('Введите название');return;}
-  try{
-    await q('INSERT INTO categories(name,sort_order) VALUES($1,$2)',[name,categories.length+1]);
-    await loadCategories();
-    renderSettings();
-    document.getElementById('new-cat-name').value='';
-    toast('✓ Категория добавлена');
-  }catch(e){toast('Уже существует или ошибка');}
+  try{await q('INSERT INTO categories(name,sort_order) VALUES($1,$2)',[name,categories.length+1]);await loadCategories();renderSettings();document.getElementById('new-cat-name').value='';toast('✓ Категория добавлена');}
+  catch(e){toast('Уже существует или ошибка');}
 }
 async function deleteCategory(id,name){
   if(!confirm(`Удалить категорию "${name}"?`))return;
-  try{
-    await q('DELETE FROM categories WHERE id=$1',[id]);
-    await loadCategories();
-    renderSettings();
-    toast('Категория удалена');
-  }catch(e){toast('Ошибка');}
+  try{await q('DELETE FROM categories WHERE id=$1',[id]);await loadCategories();renderSettings();toast('Категория удалена');}
+  catch(e){toast('Ошибка');}
 }
 async function addBank(){
   const name=document.getElementById('nb-name').value.trim();
@@ -1501,17 +1374,24 @@ async function addBank(){
   const id='b'+Date.now();
   try{
     await q('INSERT INTO banks(id,name,type,color,sort_order) VALUES($1,$2,$3,$4,$5)',[id,name,document.getElementById('nb-type').value,document.getElementById('nb-color').value,banks.length+1]);
-    await loadBanks();fillBankSelects();renderSettings();document.getElementById('nb-name').value='';
-    toast('✓ Счёт добавлен');
+    await loadBanks();fillBankSelects();renderSettings();document.getElementById('nb-name').value='';toast('✓ Счёт добавлен');
   }catch(e){toast('Ошибка: '+e.message);}
 }
-
 async function removeBank(id){
   if(!confirm('Удалить этот счёт?'))return;
   try{await q('DELETE FROM banks WHERE id=$1',[id]);await loadBanks();fillBankSelects();renderSettings();toast('Удалено');}
   catch(e){toast('Ошибка');}
 }
-
+async function saveBalance(bankId,field,el){
+  const val=parseFloat(el.textContent.replace(/\s|₽/g,'').replace(',','.'))||0;
+  el.textContent=val?fmtF(val):'';
+  try{
+    await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET ${field==='start'?'balance_start':'balance_end'}=EXCLUDED.${field==='start'?'balance_start':'balance_end'}`,
+      field==='start'?[bankId,curMonth,val,0]:[bankId,curMonth,0,val]);
+    if(field==='end'){const nextMonth=MONTHS[MONTHS.indexOf(curMonth)+1];if(nextMonth){await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=EXCLUDED.balance_start`,[bankId,nextMonth,val,0]);}}
+    toast('✓ Остаток сохранён');
+  }catch(e){toast('Ошибка сохранения');}
+}
 async function exportData(){
   const[recs,deps]=await Promise.all([loadAllRecords(),loadDeposits()]);
   const d={banks,records:recs,deposits:deps,exported:new Date().toISOString()};
@@ -1519,22 +1399,18 @@ async function exportData(){
   a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));
   a.download='finansy_2026_backup.json';a.click();toast('✓ Экспорт выполнен');
 }
-
 async function importData(input){
   const fr=new FileReader();
   fr.onload=async e=>{
     try{
       const d=JSON.parse(e.target.result);
-      if(d.records)for(const r of d.records){
-        await q('INSERT INTO records(month,bank_id,type,amount,category,description,op_date) VALUES($1,$2,$3,$4,$5,$6,$7)',[r.month,r.bank_id,r.type,r.amount,r.category||null,r.description||null,r.op_date||null]);
-      }
+      if(d.records)for(const r of d.records){await q('INSERT INTO records(month,bank_id,type,amount,category,description,op_date) VALUES($1,$2,$3,$4,$5,$6,$7)',[r.month,r.bank_id,r.type,r.amount,r.category||null,r.description||null,r.op_date||null]);}
       toast('✓ Импорт выполнен');renderDash();
     }catch(e){toast('Ошибка файла');}
   };
   fr.readAsText(input.files[0]);input.value='';
 }
 
-// Auto-login if no password set
 window.onload=()=>{
   const stored=localStorage.getItem(PWD_KEY);
   if(!stored){
