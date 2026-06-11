@@ -891,6 +891,16 @@ async function saveSverka(bankId, field, val, journalVal, inp){
   const num=parseFloat(val)||0;
   const ok=num>0&&Math.abs(num-journalVal)<1;
   inp.style.borderColor=num>0?(ok?'var(--green)':'var(--red)'):'var(--border2)';
+  // Show diff below input
+  let diffEl=inp.parentNode.querySelector('.sverka-diff');
+  if(!diffEl){diffEl=document.createElement('div');diffEl.className='sverka-diff';diffEl.style.cssText='font-size:10px;font-weight:700;margin-top:2px;text-align:right;white-space:nowrap';inp.parentNode.appendChild(diffEl);}
+  if(num>0&&!ok){
+    const diff=num-journalVal;
+    diffEl.style.color='var(--red)';
+    diffEl.textContent=(diff>0?'+':'')+fmtF(diff);
+  } else {
+    diffEl.textContent='';
+  }
   if(!num)return;
   try{
     await q(
@@ -1004,40 +1014,48 @@ async function renderNetIncomeTable(allRecs){
     return`<td style="text-align:right;padding:6px 10px;font-size:12px;font-weight:700;color:${col};${m===curMonth?'background:var(--accent-l);':''}">${val}</td>`;
   }).join('');
 
+  const niHidden=localStorage.getItem('ni_hidden')==='1';
   document.getElementById('dash-net-income').innerHTML=`
     <div class="panel" style="margin-bottom:14px">
-      <div class="panel-h">Чистый доход по месяцам · 2026</div>
-      <div class="tbl-wrap">
-        <table style="width:100%;border-collapse:collapse;font-size:12px;">
-          <thead><tr>
-            <th style="text-align:left;padding:7px 12px;background:var(--surface2);border-bottom:2px solid var(--border);font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;white-space:nowrap;min-width:90px"></th>
-            ${thCols}
-          </tr></thead>
-          <tbody>
-            <tr style="border-bottom:1px solid var(--border)">
-              <td style="padding:6px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;background:var(--surface2)">Нач.</td>
-              ${startRow}
-            </tr>
-            <tr style="border-bottom:1px solid var(--border)">
-              <td style="padding:6px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;background:var(--surface2)">Кон.</td>
-              ${endRow}
-            </tr>
-            <tr>
-              <td style="padding:6px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;background:var(--surface2)">Δ</td>
-              ${deltaRow}
-            </tr>
-          </tbody>
-        </table>
+      <div class="panel-h">
+        <span>Чистый доход по месяцам · 2026</span>
+        <button onclick="toggleNetIncome()" id="btn-ni" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">${niHidden?'Показать':'Скрыть'}</button>
+      </div>
+      <div id="ni-body" style="display:${niHidden?'none':'block'}">
+        <div class="tbl-wrap">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead><tr>
+              <th style="text-align:left;padding:7px 12px;background:var(--surface2);border-bottom:2px solid var(--border);font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;white-space:nowrap;min-width:90px"></th>
+              ${thCols}
+            </tr></thead>
+            <tbody>
+              <tr style="border-bottom:1px solid var(--border)">
+                <td style="padding:6px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;background:var(--surface2)">Нач.</td>
+                ${startRow}
+              </tr>
+              <tr style="border-bottom:1px solid var(--border)">
+                <td style="padding:6px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;background:var(--surface2)">Кон.</td>
+                ${endRow}
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;background:var(--surface2)">Δ</td>
+                ${deltaRow}
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>`;
 }
 
 // ─── CATEGORY × MONTH TABLES ──────────────────────────────────────
 async function renderCatMonthTables(allRecs){
-  // Build: catExp[cat][month] and catInc[cat][month]
-  const catExp={},catInc={};
   const NO_CAT='— Не выбрано —';
-  allRecs.forEach(r=>{
+  // Filter by selected banks
+  const filteredRecs=dashBankFilter.size>0?allRecs.filter(r=>dashBankFilter.has(r.bank_id)):allRecs;
+
+  const catExp={},catInc={};
+  filteredRecs.forEach(r=>{
     const cat=r.category||NO_CAT;
     const amt=parseFloat(r.amount)||0;
     if(r.type==='expense'){
@@ -1050,8 +1068,16 @@ async function renderCatMonthTables(allRecs){
     }
   });
 
-  // Only months that have any data
-  const activeMonths=MONTHS.filter(m=>allRecs.some(r=>r.month===m));
+  const activeMonths=MONTHS.filter(m=>filteredRecs.some(r=>r.month===m));
+
+  // Bank filter buttons HTML
+  const filterHTML=`<div style="display:flex;gap:6px;flex-wrap:wrap;padding:10px 18px;border-bottom:1px solid var(--border);background:var(--surface2)">
+    <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;align-self:center;margin-right:4px">Банк:</span>
+    <button onclick="toggleDashBank('')" style="padding:4px 10px;border-radius:20px;border:1.5px solid ${dashBankFilter.size===0?'var(--accent)':'var(--border)'};background:${dashBankFilter.size===0?'var(--accent)':'var(--surface)'};color:${dashBankFilter.size===0?'#fff':'var(--text2)'};font-size:11px;font-weight:600;cursor:pointer">Все</button>
+    ${banks.map(b=>`<button onclick="toggleDashBank('${b.id}')" style="padding:4px 10px;border-radius:20px;border:1.5px solid ${dashBankFilter.has(b.id)?b.color:'var(--border)'};background:${dashBankFilter.has(b.id)?b.color:'var(--surface)'};color:${dashBankFilter.has(b.id)?'#fff':'var(--text2)'};font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap">
+      <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${dashBankFilter.has(b.id)?'#fff':b.color};margin-right:4px;vertical-align:middle"></span>${b.name}
+    </button>`).join('')}
+  </div>`;
 
   function buildTable(data,type){
     if(!Object.keys(data).length)return'';
@@ -1096,6 +1122,7 @@ async function renderCatMonthTables(allRecs){
 
     return`<div class="panel" style="margin-bottom:14px">
       <div class="panel-h">${type==='exp'?'↓ Расходы':'↑ Доходы'} по категориям · 2026</div>
+      ${type==='exp'?filterHTML:''}
       <div class="tbl-wrap">
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
           <thead><tr>
@@ -1120,6 +1147,17 @@ async function renderCatMonthTables(allRecs){
     buildTable(catInc,'inc');
 }
 
+async function toggleDashBank(bankId){
+  if(bankId===''){
+    dashBankFilter.clear();
+  } else {
+    if(dashBankFilter.has(bankId))dashBankFilter.delete(bankId);
+    else dashBankFilter.add(bankId);
+  }
+  const allRecs=await loadAllRecords();
+  await renderCatMonthTables(allRecs);
+}
+
 function setJrnBank(id){jrnBank=id;renderJournal();}
 function goToBank(bankId){jrnBank=bankId;jrnCat='';go('journal');}
 function goToCat(cat){jrnCat=cat;jrnBank='';go('journal');}
@@ -1130,7 +1168,17 @@ function goToCatMonth(cat,month){
   if(cat==='__nocat__'){jrnCat='__nocat__';}else{jrnCat=cat;}
   go('journal');
 }
-function toggleTotal(){
+function toggleNetIncome(){
+  const el=document.getElementById('ni-body');
+  const btn=document.getElementById('btn-ni');
+  if(!el||!btn)return;
+  const hidden=el.style.display==='none';
+  el.style.display=hidden?'block':'none';
+  btn.textContent=hidden?'Скрыть':'Показать';
+  localStorage.setItem('ni_hidden',hidden?'0':'1');
+}
+
+let dashBankFilter=new Set(); // empty = all banks
   const el=document.getElementById('total-content');
   const btn=document.getElementById('btn-toggle-total');
   const hidden=el.style.display==='none';
@@ -1268,6 +1316,7 @@ function go(name){
   const nb=document.getElementById('nb-'+name);if(nb)nb.classList.add('active');
   const mob=document.getElementById('mob-'+name);if(mob)mob.classList.add('active');
   closeMobMenu();
+  localStorage.setItem('last_view',name);
   if(name==='dashboard')renderDash();
   if(name==='journal')renderJournal();
   if(name==='deposits')renderDeposits();
@@ -1298,7 +1347,8 @@ async function initApp(){
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('f-cat').innerHTML=catOptions();
   document.getElementById('df-open').value=new Date().toISOString().split('T')[0];
-  renderDash();
+  const lastView=localStorage.getItem('last_view')||'dashboard';
+  go(lastView);
 }
 
 // ─── DEPOSITS ─────────────────────────────────────────────────────
