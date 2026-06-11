@@ -845,21 +845,32 @@ async function renderSverka(){
     const savedExp=bt.expense||0;
     const incOk=savedInc>0&&Math.abs(savedInc-sumInc)<1;
     const expOk=savedExp>0&&Math.abs(savedExp-sumExp)<1;
-    const incChk=savedInc>0?(incOk?'<span style="color:var(--green);font-weight:700">✓</span>':'<span style="color:var(--red);font-weight:700">✗</span>'):'';
-    const expChk=savedExp>0?(expOk?'<span style="color:var(--green);font-weight:700">✓</span>':'<span style="color:var(--red);font-weight:700">✗</span>'):'';
+    const incDiff=savedInc>0&&!incOk?savedInc-sumInc:0;
+    const expDiff=savedExp>0&&!expOk?savedExp-sumExp:0;
+
+    const incChk=savedInc>0
+      ?(incOk
+        ?'<span style="color:var(--green);font-weight:700;font-size:13px">✓</span>'
+        :`<span style="color:var(--red);font-weight:700;font-size:11px;white-space:nowrap">${incDiff>0?'+':''}${fmtF(incDiff)}</span>`)
+      :'';
+    const expChk=savedExp>0
+      ?(expOk
+        ?'<span style="color:var(--green);font-weight:700;font-size:13px">✓</span>'
+        :`<span style="color:var(--red);font-weight:700;font-size:11px;white-space:nowrap">${expDiff>0?'+':''}${fmtF(expDiff)}</span>`)
+      :'';
 
     return `<tr>
       <td style="padding:6px 10px;white-space:nowrap"><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td>
       <td ${tdNum} style="text-align:right;padding:6px 10px;color:var(--green);font-weight:700;white-space:nowrap">${sumInc?fmtF(sumInc):'—'}</td>
       <td ${tdInp}><input class="ver-inp" type="number" value="${savedInc||''}" placeholder="выписка"
         style="width:100px;height:28px;border:1.5px solid ${savedInc?(incOk?'var(--green)':'var(--red)'):'var(--border2)'};border-radius:4px;padding:0 6px;font-size:12px;font-family:inherit;text-align:right;outline:none;background:var(--surface)"
-        onchange="saveSverka('${b.id}','income',this.value,${sumInc},this)"></td>
-      <td style="text-align:center;padding:6px 4px;width:24px">${incChk}</td>
+        onchange="saveSverka('${b.id}','income',this.value,${sumInc},this,'chk-inc-${b.id}')"></td>
+      <td id="chk-inc-${b.id}" style="text-align:right;padding:4px 6px;width:60px;white-space:nowrap">${incChk}</td>
       <td ${tdNum} style="text-align:right;padding:6px 10px;color:${sumExp?'var(--red)':'inherit'};font-weight:${sumExp?'700':'400'};white-space:nowrap">${sumExp?fmtF(sumExp):'—'}</td>
       <td ${tdInp}><input class="ver-inp" type="number" value="${savedExp||''}" placeholder="выписка"
         style="width:100px;height:28px;border:1.5px solid ${savedExp?(expOk?'var(--green)':'var(--red)'):'var(--border2)'};border-radius:4px;padding:0 6px;font-size:12px;font-family:inherit;text-align:right;outline:none;background:var(--surface)"
-        onchange="saveSverka('${b.id}','expense',this.value,${sumExp},this)"></td>
-      <td style="text-align:center;padding:6px 4px;width:24px">${expChk}</td>
+        onchange="saveSverka('${b.id}','expense',this.value,${sumExp},this,'chk-exp-${b.id}')"></td>
+      <td id="chk-exp-${b.id}" style="text-align:right;padding:4px 6px;width:60px;white-space:nowrap">${expChk}</td>
       <td ${tdNum} style="color:var(--accent)">${a.tr_in?fmtF(a.tr_in):'—'}</td>
       <td ${tdNum} style="color:var(--accent)">${a.tr_out?fmtF(a.tr_out):'—'}</td>
       <td ${tdNum} style="color:var(--purple)">${a.income_i?fmtF(a.income_i):'—'}</td>
@@ -887,19 +898,19 @@ async function renderSverka(){
     </div>`;
 }
 
-async function saveSverka(bankId, field, val, journalVal, inp){
+async function saveSverka(bankId, field, val, journalVal, inp, chkId){
   const num=parseFloat(val)||0;
   const ok=num>0&&Math.abs(num-journalVal)<1;
   inp.style.borderColor=num>0?(ok?'var(--green)':'var(--red)'):'var(--border2)';
-  // Show diff below input
-  let diffEl=inp.parentNode.querySelector('.sverka-diff');
-  if(!diffEl){diffEl=document.createElement('div');diffEl.className='sverka-diff';diffEl.style.cssText='font-size:10px;font-weight:700;margin-top:2px;text-align:right;white-space:nowrap';inp.parentNode.appendChild(diffEl);}
-  if(num>0&&!ok){
-    const diff=num-journalVal;
-    diffEl.style.color='var(--red)';
-    diffEl.textContent=(diff>0?'+':'')+fmtF(diff);
-  } else {
-    diffEl.textContent='';
+  // Update check cell
+  const chkEl=document.getElementById(chkId);
+  if(chkEl){
+    if(!num){chkEl.innerHTML='';}
+    else if(ok){chkEl.innerHTML='<span style="color:var(--green);font-weight:700;font-size:13px">✓</span>';}
+    else{
+      const diff=num-journalVal;
+      chkEl.innerHTML=`<span style="color:var(--red);font-weight:700;font-size:11px;white-space:nowrap">${diff>0?'+':''}${fmtF(diff)}</span>`;
+    }
   }
   if(!num)return;
   try{
