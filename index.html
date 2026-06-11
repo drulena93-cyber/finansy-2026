@@ -703,7 +703,8 @@ function closeMobMenu(){
 
 // ─── JOURNAL ────────────────────────────────────────────────────
 async function renderJournal(){
-  document.getElementById('jrn-m-lbl').textContent=curMonth+(jrnCat?' · '+jrnCat:'')+(jrnBank?' · '+bank(jrnBank).name:'');
+  const catLabel=jrnCat==='__nocat__'?'Без категории':jrnCat;
+  document.getElementById('jrn-m-lbl').textContent=curMonth+(catLabel?' · '+catLabel:'')+(jrnBank?' · '+bank(jrnBank).name:'');
   if(jrnCat||jrnBank){
     const existing=document.getElementById('clear-filter-btn');
     if(!existing){
@@ -726,7 +727,8 @@ async function renderJournal(){
   jrnSort=fs.value||jrnSort;
   let recs=await loadRecordsMonth(curMonth);
   if(jrnBank)recs=recs.filter(r=>r.bank_id===jrnBank);
-  if(jrnCat)recs=recs.filter(r=>r.category===jrnCat);
+  if(jrnCat==='__nocat__')recs=recs.filter(r=>!r.category||r.category==='');
+  else if(jrnCat)recs=recs.filter(r=>r.category===jrnCat);
   if(ft)recs=recs.filter(r=>r.type===ft);
 
   recs.sort((a,b)=>{
@@ -1017,8 +1019,9 @@ async function renderNetIncomeTable(allRecs){
 async function renderCatMonthTables(allRecs){
   // Build: catExp[cat][month] and catInc[cat][month]
   const catExp={},catInc={};
+  const NO_CAT='— Не выбрано —';
   allRecs.forEach(r=>{
-    const cat=r.category||'Прочее';
+    const cat=r.category||NO_CAT;
     const amt=parseFloat(r.amount)||0;
     if(r.type==='expense'){
       if(!catExp[cat])catExp[cat]={};
@@ -1053,14 +1056,17 @@ async function renderCatMonthTables(allRecs){
 
     const bodyRows=cats.map(cat=>{
       const rowTotal=Object.values(data[cat]).reduce((s,v)=>s+v,0);
+      const isNoCat=cat===NO_CAT;
+      const clickArg=isNoCat?'__nocat__':cat;
       const cells=activeMonths.map(m=>{
         const val=data[cat][m];
         return val
-          ?`<td style="text-align:right;padding:6px 10px;font-size:12px;font-weight:600;color:${color};cursor:pointer;transition:background .1s" onclick="goToCatMonth('${cat}','${m}')" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">${fmtF(val)}</td>`
+          ?`<td style="text-align:right;padding:6px 10px;font-size:12px;font-weight:600;color:${color};cursor:pointer;transition:background .1s" onclick="goToCatMonth('${clickArg}','${m}')" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">${fmtF(val)}</td>`
           :`<td style="text-align:right;padding:6px 10px;font-size:12px;color:var(--text3)">—</td>`;
       }).join('');
-      return`<tr style="border-bottom:1px solid var(--border)">
-        <td style="padding:6px 12px;font-size:13px;font-weight:600;white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis" title="${cat}">${cat}</td>
+      const catLabel=isNoCat?`<span style="color:var(--text3);font-style:italic">${cat}</span>`:cat;
+      return`<tr style="border-bottom:1px solid var(--border)${isNoCat?';background:#fffbeb':''}">
+        <td style="padding:6px 12px;font-size:13px;font-weight:600;white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis" title="${cat}">${catLabel}</td>
         ${cells}
         <td style="text-align:right;padding:6px 10px;font-size:12px;font-weight:700;color:${color};border-left:1px solid var(--border)">${fmtF(rowTotal)}</td>
       </tr>`;
@@ -1100,7 +1106,13 @@ async function renderCatMonthTables(allRecs){
 function setJrnBank(id){jrnBank=id;renderJournal();}
 function goToBank(bankId){jrnBank=bankId;jrnCat='';go('journal');}
 function goToCat(cat){jrnCat=cat;jrnBank='';go('journal');}
-function goToCatMonth(cat,month){jrnCat=cat;jrnBank='';curMonth=month;document.querySelectorAll('.mtab').forEach(t=>t.classList.toggle('active',t.textContent===month.slice(0,3)));go('journal');}
+function goToCatMonth(cat,month){
+  jrnBank='';
+  curMonth=month;
+  document.querySelectorAll('.mtab').forEach(t=>t.classList.toggle('active',t.textContent===month.slice(0,3)));
+  if(cat==='__nocat__'){jrnCat='__nocat__';}else{jrnCat=cat;}
+  go('journal');
+}
 function toggleTotal(){
   const el=document.getElementById('total-content');
   const btn=document.getElementById('btn-toggle-total');
