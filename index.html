@@ -875,7 +875,12 @@ async function renderSverka(){
       <td ${tdNum} style="color:var(--accent)">${a.tr_out?fmtF(a.tr_out):'—'}</td>
       <td ${tdNum} style="color:var(--purple)">${a.income_i?fmtF(a.income_i):'—'}</td>
       <td ${tdNum} style="color:var(--purple)">${a.expense_i?fmtF(a.expense_i):'—'}</td>
-      <td ${tdNum} style="color:var(--text2)">${bal.start?fmtF(bal.start):'—'}</td>
+      <td style="padding:4px 6px;width:110px;">
+        <input type="number" value="${bal.start||''}" placeholder="нач. остаток"
+          style="width:100px;height:28px;border:1.5px solid ${bal.start?'var(--accent)':'var(--border2)'};border-radius:4px;padding:0 6px;font-size:12px;font-family:inherit;text-align:right;outline:none;background:${bal.start?'var(--accent-l)':'var(--surface)'}"
+          onchange="saveStartBalance('${b.id}',this.value,this)"
+          title="Начальный остаток — введи для первого месяца, остальные считаются автоматически">
+      </td>
       <td ${tdNum} style="font-weight:600;color:${autoEnd>=0?'var(--green)':'var(--red)'}">${fmtF(autoEnd)}</td>
       <td ${tdNum} style="color:${delta>0?'var(--green)':delta<0?'var(--red)':'var(--text3)'}">${delta?(delta>0?'+':'')+fmtF(delta):'—'}</td>
     </tr>`;
@@ -898,6 +903,21 @@ async function renderSverka(){
     </div>`;
 }
 
+async function saveStartBalance(bankId, val, inp){
+  const num=parseFloat(val)||0;
+  inp.style.borderColor=num?'var(--accent)':'var(--border2)';
+  inp.style.background=num?'var(--accent-l)':'var(--surface)';
+  try{
+    await q(
+      `INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4)
+       ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=$3`,
+      [bankId,curMonth,num,0]
+    );
+    await recalcAllBalances();
+    toast('✓ Начало сохранено, цепочка пересчитана');
+    renderSverka();
+  }catch(e){toast('Ошибка сохранения');}
+}
 async function saveSverka(bankId, field, val, journalVal, inp, chkId){
   const num=parseFloat(val)||0;
   const ok=num>0&&Math.abs(num-journalVal)<1;
@@ -1332,14 +1352,14 @@ async function transferBalancesToNextMonth(){
   toast(`✓ Остатки ${curMonth} перенесены в ${nextMonth} (${count} банков)`);
   renderSverka();
 }
-// Пересчёт остатков по всей цепочке месяцев — вызывается после любого изменения записей
+// Пересчёт остатков по всей цепочке месяцев
 async function recalcAllBalances(){
   const allRecs=await loadAllRecords();
-  // Для каждого банка считаем цепочку месяцев последовательно
+  // Загружаем начальные остатки января один раз (вводятся вручную)
+  const janBals=await loadBalances(MONTHS[0]);
+
   for(const b of banks){
-    // Загружаем начальный остаток января (вводится вручную — не трогаем)
-    const janBal=await loadBalances(MONTHS[0]);
-    let prevEnd=(janBal[b.id]?.start)||0;
+    let prevEnd=(janBals[b.id]?.start)||0;
 
     for(let i=0;i<MONTHS.length;i++){
       const m=MONTHS[i];
@@ -1351,12 +1371,21 @@ async function recalcAllBalances(){
       const autoEnd=prevEnd+sumInc-sumExp;
 
       try{
-        // Сохраняем конец текущего месяца
-        await q(
-          `INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4)
-           ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=$3, balance_end=$4`,
-          [b.id,m,prevEnd,autoEnd]
-        );
+        if(i===0){
+          // Январь: начало не трогаем (вручную), только конец
+          await q(
+            `INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4)
+             ON CONFLICT(bank_id,month) DO UPDATE SET balance_end=$4`,
+            [b.id,m,prevEnd,autoEnd]
+          );
+        } else {
+          // Остальные месяцы: обновляем и начало и конец
+          await q(
+            `INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4)
+             ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=$3, balance_end=$4`,
+            [b.id,m,prevEnd,autoEnd]
+          );
+        }
       }catch(e){console.error('recalc error',b.id,m,e);}
 
       prevEnd=autoEnd;
@@ -1374,7 +1403,7 @@ function fillBankSelects(){
 }
 
 // ─── NAVIGATION ───────────────────────────────────────────────────
-function go(name){
+async function go(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.mob-nb').forEach(b=>b.classList.remove('active'));
@@ -1384,7 +1413,7 @@ function go(name){
   closeMobMenu();
   localStorage.setItem('last_view',name);
   if(name==='dashboard')renderDash();
-  if(name==='journal')renderJournal();
+  if(name==='journal'){await recalcAllBalances();renderJournal();}
   if(name==='deposits')renderDeposits();
   if(name==='settings')renderSettings();
   if(name==='analytics')renderAnalytics();
