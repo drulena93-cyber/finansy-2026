@@ -1217,6 +1217,7 @@ async function addRecord(){
   try{
     await q('INSERT INTO records(month,bank_id,type,amount,category,description,op_date) VALUES($1,$2,$3,$4,$5,$6,$7)',[curMonth,bankId,type,amount,cat||null,desc||null,date||null]);
     document.getElementById('f-amount').value='';document.getElementById('f-desc').value='';
+    await recalcAllBalances();
     renderJournal();toast('✓ Запись добавлена');
   }catch(e){toast('Ошибка: '+e.message);}
 }
@@ -1227,7 +1228,7 @@ async function updateRecord(id,field,val){
 async function updateRecordAmount(id,type,val){
   const amt=parseFloat(val)||0;
   if(amt<=0){toast('Введите сумму больше 0');return;}
-  try{await q('UPDATE records SET amount=$1 WHERE id=$2',[amt,id]);toast('✓ Сумма обновлена');}
+  try{await q('UPDATE records SET amount=$1 WHERE id=$2',[amt,id]);await recalcAllBalances();toast('✓ Сумма обновлена');}
   catch(e){toast('Ошибка: '+e.message);}
 }
 function toggleEditMode(){
@@ -1277,7 +1278,7 @@ async function applyMassCategory(){
 }
 async function delRecord(id){
   if(!confirm('Удалить запись?'))return;
-  try{await q('DELETE FROM records WHERE id=$1',[id]);renderJournal();toast('Удалено');}
+  try{await q('DELETE FROM records WHERE id=$1',[id]);await recalcAllBalances();renderJournal();toast('Удалено');}
   catch(e){toast('Ошибка');}
 }
 
@@ -1302,12 +1303,65 @@ function catOptions(selected=''){
 }
 async function loadDeposits(){try{return await q('SELECT * FROM deposits WHERE is_active=true ORDER BY date_close');}catch(e){return[];}}
 
-async function autoSaveEnd(bankId,autoEnd){
-  try{
-    await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET balance_end=$4`,[bankId,curMonth,0,autoEnd]);
-    const nextMonth=MONTHS[MONTHS.indexOf(curMonth)+1];
-    if(nextMonth){await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=$3`,[bankId,nextMonth,autoEnd,0]);}
-  }catch(e){console.error(e);}
+async function transferBalancesToNextMonth(){
+  const nextMonth=MONTHS[MONTHS.indexOf(curMonth)+1];
+  if(!nextMonth){toast('Декабрь — следующего месяца нет');return;}
+  if(!confirm(`Перенести конечные остатки ${curMonth} как начальные ${nextMonth}?\n\nЭто перезапишет начальные остатки ${nextMonth}.`))return;
+  const [recs,bals]=await Promise.all([loadRecordsMonth(curMonth),loadBalances(curMonth)]);
+  const agg={};
+  banks.forEach(b=>agg[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
+  recs.forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
+  let count=0;
+  for(const b of banks){
+    const a=agg[b.id];
+    const bal=bals[b.id]||{start:0,end:0};
+    const sumInc=a.income+a.income_i+a.tr_in;
+    const sumExp=a.tr_out+a.expense_i+a.expense;
+    const autoEnd=(bal.start||0)+sumInc-sumExp;
+    if(autoEnd!==0||(bal.start||0)!==0){
+      try{
+        await q(
+          `INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4)
+           ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=$3`,
+          [b.id,nextMonth,autoEnd,0]
+        );
+        count++;
+      }catch(e){console.error(e);}
+    }
+  }
+  toast(`✓ Остатки ${curMonth} перенесены в ${nextMonth} (${count} банков)`);
+  renderSverka();
+}
+// Пересчёт остатков по всей цепочке месяцев — вызывается после любого изменения записей
+async function recalcAllBalances(){
+  const allRecs=await loadAllRecords();
+  // Для каждого банка считаем цепочку месяцев последовательно
+  for(const b of banks){
+    // Загружаем начальный остаток января (вводится вручную — не трогаем)
+    const janBal=await loadBalances(MONTHS[0]);
+    let prevEnd=(janBal[b.id]?.start)||0;
+
+    for(let i=0;i<MONTHS.length;i++){
+      const m=MONTHS[i];
+      const mRecs=allRecs.filter(r=>r.month===m&&r.bank_id===b.id);
+      const agg={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
+      mRecs.forEach(r=>agg[r.type]+=parseFloat(r.amount)||0);
+      const sumInc=agg.income+agg.income_i+agg.tr_in;
+      const sumExp=agg.tr_out+agg.expense_i+agg.expense;
+      const autoEnd=prevEnd+sumInc-sumExp;
+
+      try{
+        // Сохраняем конец текущего месяца
+        await q(
+          `INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4)
+           ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=$3, balance_end=$4`,
+          [b.id,m,prevEnd,autoEnd]
+        );
+      }catch(e){console.error('recalc error',b.id,m,e);}
+
+      prevEnd=autoEnd;
+    }
+  }
 }
 
 function fillBankSelects(){
@@ -1529,7 +1583,7 @@ async function saveBalance(bankId,field,el){
   try{
     await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET ${field==='start'?'balance_start':'balance_end'}=EXCLUDED.${field==='start'?'balance_start':'balance_end'}`,
       field==='start'?[bankId,curMonth,val,0]:[bankId,curMonth,0,val]);
-    if(field==='end'){const nextMonth=MONTHS[MONTHS.indexOf(curMonth)+1];if(nextMonth){await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=EXCLUDED.balance_start`,[bankId,nextMonth,val,0]);}}
+    if(field==='start'){await recalcAllBalances();}
     toast('✓ Остаток сохранён');
   }catch(e){toast('Ошибка сохранения');}
 }
