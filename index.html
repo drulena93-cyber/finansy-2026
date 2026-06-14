@@ -831,11 +831,10 @@ async function renderJournal(){
 // ─── SVERKA ─────────────────────────────────────────────────────
 async function renderSverka(){
   document.getElementById('sverka-m-lbl').textContent=curMonth;
-  const [recs,bals,btots,envs]=await Promise.all([
+  const [recs,bals,btots]=await Promise.all([
     loadRecordsMonth(curMonth),
     loadBalances(curMonth),
-    loadBankTotals(curMonth),
-    loadEnvelopes()
+    loadBankTotals(curMonth)
   ]);
 
   const agg={};
@@ -844,9 +843,13 @@ async function renderSverka(){
 
   const active=banks.filter(b=>Object.values(agg[b.id]).some(v=>v>0)||(bals[b.id]&&(bals[b.id].start||bals[b.id].end)));
 
-  // Envelope amounts by bank
-  const envByBank={};
-  envs.forEach(e=>{envByBank[e.bank_id]=(envByBank[e.bank_id]||0)+parseFloat(e.amount)||0;});
+  // Envelope amounts by bank — load separately, don't block if fails
+  let envByBank={};
+  try{
+    const envs=await loadEnvelopes();
+    envs.forEach(e=>{envByBank[e.bank_id]=(envByBank[e.bank_id]||0)+parseFloat(e.amount)||0;});
+    renderEnvelopes(envs,bals,agg,active);
+  }catch(e){console.warn('envelopes not available',e);}
 
   let totTrIn=0,totTrOut=0,totIncI=0,totExpI=0;
   active.forEach(b=>{totTrIn+=agg[b.id].tr_in;totTrOut+=agg[b.id].tr_out;totIncI+=agg[b.id].income_i;totExpI+=agg[b.id].expense_i;});
