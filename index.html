@@ -1,4 +1,4 @@
-ё<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -376,14 +376,17 @@ table.nit td.empty-cell{color:var(--text3);}
     <div class="panel-h">
       <span>Операции · <span id="jrn-m-lbl"></span></span>
       <div class="filters">
+        <input type="text" class="inp w170" id="jf-search" placeholder="🔍 Поиск по описанию…" oninput="renderJournal()">
         <select class="inp w150" id="jf-type" onchange="renderJournal()">
           <option value="">Все типы</option>
-          <option value="income">Приход вне систем</option>
-          <option value="income_i">Приход внутри</option>
-          <option value="tr_in">Приход из др.Б</option>
-          <option value="tr_out">Списание в др.Б</option>
-          <option value="expense_i">Списание внутри</option>
-          <option value="expense">Расход вне систем</option>
+          <option value="income">↑ Приход вне систем</option>
+          <option value="income_i">↑ Приход внутри</option>
+          <option value="tr_in">↑ Приход из др.Б</option>
+          <option value="tr_out">↓ Списание в др.Б</option>
+          <option value="expense_i">↓ Списание внутри</option>
+          <option value="expense">↓ Расход вне систем</option>
+          <option value="__income_all">↑ Все приходы</option>
+          <option value="__expense_all">↓ Все расходы</option>
         </select>
         <select class="inp w130" id="jf-sort" onchange="renderJournal()">
           <option value="date_desc">Дата ↓ (новые)</option>
@@ -489,18 +492,23 @@ table.nit td.empty-cell{color:var(--text3);}
   <div class="panel" id="panel-envelopes" style="margin-top:14px">
     <div class="panel-h">
       <span>🪙 Конверты (резервы)</span>
-      <button class="btn btn-g btn-sm" onclick="toggleEnvelopeForm()">+ Добавить</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-g btn-sm" onclick="toggleEnvelopeForm()">+ Добавить</button>
+        <button id="btn-env-toggle" onclick="toggleEnvelopePanel()" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">Скрыть</button>
+      </div>
     </div>
-    <div id="envelope-form" style="display:none;padding:12px 18px;background:var(--surface2);border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;align-items:flex-end">
-      <div class="fg"><label>Название</label><input class="inp w150" id="env-name" placeholder="Отпуск, Подушка…"></div>
-      <div class="fg"><label>Банк</label><select class="inp w150" id="env-bank"></select></div>
-      <div class="fg"><label>Сумма</label><input type="number" class="inp w110" id="env-amount" placeholder="0"></div>
-      <div class="fg"><label>Дата</label><input type="date" class="inp w130" id="env-date"></div>
-      <button class="btn btn-p btn-sm" onclick="saveEnvelope()" style="margin-top:20px">Сохранить</button>
-      <button class="btn btn-g btn-sm" onclick="toggleEnvelopeForm()" style="margin-top:20px">Отмена</button>
+    <div id="env-panel-body">
+      <div id="envelope-form" style="display:none;padding:12px 18px;background:var(--surface2);border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;align-items:flex-end">
+        <div class="fg"><label>Название</label><input class="inp w150" id="env-name" placeholder="Отпуск, Подушка…"></div>
+        <div class="fg"><label>Банк</label><select class="inp w150" id="env-bank"></select></div>
+        <div class="fg"><label>Сумма</label><input type="number" class="inp w110" id="env-amount" placeholder="0"></div>
+        <div class="fg"><label>Дата</label><input type="date" class="inp w130" id="env-date"></div>
+        <button class="btn btn-p btn-sm" onclick="saveEnvelope()" style="margin-top:20px">Сохранить</button>
+        <button class="btn btn-g btn-sm" onclick="toggleEnvelopeForm()" style="margin-top:20px">Отмена</button>
+      </div>
+      <div id="envelope-list" style="padding:0 18px"></div>
+      <div id="envelope-totals" style="padding:10px 18px;background:var(--surface2);border-top:1px solid var(--border);font-size:13px;display:flex;gap:20px;flex-wrap:wrap"></div>
     </div>
-    <div id="envelope-list" style="padding:0 18px"></div>
-    <div id="envelope-totals" style="padding:10px 18px;background:var(--surface2);border-top:1px solid var(--border);font-size:13px;display:flex;gap:20px;flex-wrap:wrap"></div>
   </div>
 </div>
 
@@ -748,13 +756,19 @@ async function renderJournal(){
   }
 
   const ft=document.getElementById('jf-type').value;
+  const search=(document.getElementById('jf-search')?.value||'').toLowerCase().trim();
   const fs=document.getElementById('jf-sort')||{value:jrnSort};
   jrnSort=fs.value||jrnSort;
   let recs=await loadRecordsMonth(curMonth);
   if(jrnBank)recs=recs.filter(r=>r.bank_id===jrnBank);
   if(jrnCat==='__nocat__')recs=recs.filter(r=>!r.category||r.category==='');
   else if(jrnCat)recs=recs.filter(r=>r.category===jrnCat);
-  if(ft)recs=recs.filter(r=>r.type===ft);
+  // Type filter
+  if(ft==='__income_all')recs=recs.filter(r=>['income','income_i','tr_in'].includes(r.type));
+  else if(ft==='__expense_all')recs=recs.filter(r=>['expense','expense_i','tr_out'].includes(r.type));
+  else if(ft)recs=recs.filter(r=>r.type===ft);
+  // Text search
+  if(search)recs=recs.filter(r=>(r.description||'').toLowerCase().includes(search)||(r.category||'').toLowerCase().includes(search));
 
   // Загружаем какие записи уже в конвертах
   let reservedIds=new Set();
@@ -1048,6 +1062,16 @@ async function loadEnvelopes(){
   try{return await q('SELECT * FROM envelopes ORDER BY id');}catch(e){return[];}
 }
 
+function toggleEnvelopePanel(){
+  const body=document.getElementById('env-panel-body');
+  const btn=document.getElementById('btn-env-toggle');
+  if(!body||!btn)return;
+  const hidden=body.style.display==='none';
+  body.style.display=hidden?'':'none';
+  btn.textContent=hidden?'Скрыть':'Показать';
+  localStorage.setItem('env_hidden',hidden?'0':'1');
+}
+
 function toggleEnvelopeForm(){
   const f=document.getElementById('envelope-form');
   const isHidden=f.style.display==='none'||f.style.display==='';
@@ -1178,6 +1202,20 @@ async function renderDash(){
   });
   deps.forEach(d=>totalDeposit+=parseFloat(d.amount)||0);
   const totalMoney=totalDebit+totalSavings+totalDeposit+totalCash;
+
+  // Load envelopes for reserve display
+  let totalReserved=0;
+  let envDetails=[];
+  try{
+    const envs=await loadEnvelopes();
+    totalReserved=envs.reduce((s,e)=>s+parseFloat(e.amount)||0,0);
+    // Group by name for display
+    const byName={};
+    envs.forEach(e=>{byName[e.name]=(byName[e.name]||0)+parseFloat(e.amount)||0;});
+    envDetails=Object.entries(byName);
+  }catch(e){}
+  const totalFree=totalMoney-totalReserved;
+
   document.getElementById('dash-total-money').textContent=fmtF(totalMoney);
   document.getElementById('dash-breakdown').innerHTML=`
     <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase">Карты</span><span style="font-size:15px;font-weight:700;color:var(--accent);font-family:Manrope,sans-serif">${fmtF(totalDebit)}</span></div>
@@ -1186,7 +1224,19 @@ async function renderDash(){
     <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
     <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase">Вклады</span><span style="font-size:15px;font-weight:700;color:var(--purple);font-family:Manrope,sans-serif">${fmtF(totalDeposit)}</span></div>
     <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
-    <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase">Наличные</span><span style="font-size:15px;font-weight:700;color:var(--amber);font-family:Manrope,sans-serif">${fmtF(totalCash)}</span></div>`;
+    <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase">Наличные</span><span style="font-size:15px;font-weight:700;color:var(--amber);font-family:Manrope,sans-serif">${fmtF(totalCash)}</span></div>
+    ${totalReserved?`
+    <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <span style="font-size:10px;color:var(--purple);font-weight:700;text-transform:uppercase">🪙 Резервы</span>
+      <span style="font-size:15px;font-weight:700;color:var(--purple);font-family:Manrope,sans-serif">−${fmtF(totalReserved)}</span>
+      ${envDetails.map(([n,v])=>`<span style="font-size:10px;color:var(--text3)">${n}: ${fmtF(v)}</span>`).join('')}
+    </div>
+    <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <span style="font-size:10px;color:var(--green);font-weight:700;text-transform:uppercase">✓ Свободно</span>
+      <span style="font-size:18px;font-weight:800;color:var(--green);font-family:Manrope,sans-serif">${fmtF(totalFree)}</span>
+    </div>`:''}`;
 
   // Load all records for year-wide tables
   const allRecs=await loadAllRecords();
