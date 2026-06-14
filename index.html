@@ -489,7 +489,15 @@ table.nit td.empty-cell{color:var(--text3);}
   <div class="panel" id="panel-envelopes" style="margin-top:14px">
     <div class="panel-h">
       <span>🪙 Конверты (резервы)</span>
-      <span style="font-size:11px;color:var(--text3);font-weight:400">Создаются автоматически при добавлении операции с категорией «Резерв»</span>
+      <button class="btn btn-g btn-sm" onclick="toggleEnvelopeForm()">+ Добавить</button>
+    </div>
+    <div id="envelope-form" style="display:none;padding:12px 18px;background:var(--surface2);border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;align-items:flex-end">
+      <div class="fg"><label>Название</label><input class="inp w150" id="env-name" placeholder="Отпуск, Подушка…"></div>
+      <div class="fg"><label>Банк</label><select class="inp w150" id="env-bank"></select></div>
+      <div class="fg"><label>Сумма</label><input type="number" class="inp w110" id="env-amount" placeholder="0"></div>
+      <div class="fg"><label>Дата</label><input type="date" class="inp w130" id="env-date"></div>
+      <button class="btn btn-p btn-sm" onclick="saveEnvelope()" style="margin-top:20px">Сохранить</button>
+      <button class="btn btn-g btn-sm" onclick="toggleEnvelopeForm()" style="margin-top:20px">Отмена</button>
     </div>
     <div id="envelope-list" style="padding:0 18px"></div>
     <div id="envelope-totals" style="padding:10px 18px;background:var(--surface2);border-top:1px solid var(--border);font-size:13px;display:flex;gap:20px;flex-wrap:wrap"></div>
@@ -748,6 +756,13 @@ async function renderJournal(){
   else if(jrnCat)recs=recs.filter(r=>r.category===jrnCat);
   if(ft)recs=recs.filter(r=>r.type===ft);
 
+  // Загружаем какие записи уже в конвертах
+  let reservedIds=new Set();
+  try{
+    const envs=await loadEnvelopes();
+    envs.forEach(e=>{if(e.record_id)reservedIds.add(parseInt(e.record_id));});
+  }catch(e){}
+
   recs.sort((a,b)=>{
     if(jrnSort==='date_desc') return (b.op_date||'')>(a.op_date||'')?1:(b.id-a.id);
     if(jrnSort==='date_asc')  return (a.op_date||'')>(b.op_date||'')?1:-1;
@@ -798,7 +813,12 @@ async function renderJournal(){
           <td class="num ac">${cols.tr_out}</td>
           <td class="num pc">${cols.expense_i}</td>
           <td class="num rc">${cols.expense}</td>
-          <td><button class="del-btn" onclick="delRecord(${r.id})">×</button></td>
+          <td style="white-space:nowrap">
+            <button class="del-btn" onclick="delRecord(${r.id})">×</button>
+            <button onclick="toggleEnvelopeRecord(${r.id},'${(r.description||'Резерв').replace(/'/g,'')}',${ parseFloat(r.amount)},'${r.bank_id}','${r.op_date||''}')" title="${reservedIds.has(r.id)?'Убрать из резерва':'Добавить в резерв'}"
+              style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;opacity:${reservedIds.has(r.id)?'1':'0.3'};transition:opacity .15s"
+              onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='${reservedIds.has(r.id)?'1':'0.3'}'">🪙</button>
+          </td>
         </tr>`;
       }
     }).join('');
@@ -1040,12 +1060,14 @@ async function saveEnvelope(){
   const name=document.getElementById('env-name').value.trim();
   const bankId=document.getElementById('env-bank').value;
   const amount=parseFloat(document.getElementById('env-amount').value)||0;
+  const date=document.getElementById('env-date').value;
   if(!name){toast('Введите название');return;}
   if(!amount){toast('Введите сумму');return;}
   try{
-    await q('INSERT INTO envelopes(name,bank_id,amount) VALUES($1,$2,$3)',[name,bankId,amount]);
+    await q('INSERT INTO envelopes(name,bank_id,amount,op_date) VALUES($1,$2,$3,$4)',[name,bankId,amount,date||null]);
     document.getElementById('env-name').value='';
     document.getElementById('env-amount').value='';
+    document.getElementById('env-date').value='';
     toggleEnvelopeForm();
     toast('✓ Конверт добавлен');
     renderSverka();
@@ -1439,16 +1461,10 @@ async function addRecord(){
     }
   }
   try{
-    const rows=await q('INSERT INTO records(month,bank_id,type,amount,category,description,op_date) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id',[curMonth,bankId,type,amount,cat||null,desc||null,date||null]);
-    const recordId=rows[0]?.id;
-    // Автоматически создаём конверт если категория "Резерв"
-    if(cat==='Резерв'&&recordId){
-      const envName=desc||'Резерв';
-      await q('INSERT INTO envelopes(name,bank_id,amount,record_id,op_date) VALUES($1,$2,$3,$4,$5)',[envName,bankId,amount,recordId,date||null]);
-    }
+    await q('INSERT INTO records(month,bank_id,type,amount,category,description,op_date) VALUES($1,$2,$3,$4,$5,$6,$7)',[curMonth,bankId,type,amount,cat||null,desc||null,date||null]);
     document.getElementById('f-amount').value='';document.getElementById('f-desc').value='';
     await recalcAllBalances();
-    renderJournal();toast('✓ Запись добавлена'+(cat==='Резерв'?' · конверт создан':''));
+    renderJournal();toast('✓ Запись добавлена');
   }catch(e){toast('Ошибка: '+e.message);}
 }
 async function updateRecord(id,field,val){
@@ -1506,11 +1522,24 @@ async function applyMassCategory(){
     toast(`✓ Категория "${cat}" применена к ${ids.length} записям`);cancelMassEdit();renderJournal();
   }catch(e){toast('Ошибка: '+e.message);}
 }
+async function toggleEnvelopeRecord(recordId, name, amount, bankId, date){
+  try{
+    const envs=await loadEnvelopes();
+    const existing=envs.find(e=>e.record_id==recordId);
+    if(existing){
+      await q('DELETE FROM envelopes WHERE id=$1',[existing.id]);
+      toast('🪙 Убрано из резерва');
+    } else {
+      await q('INSERT INTO envelopes(name,bank_id,amount,record_id,op_date) VALUES($1,$2,$3,$4,$5)',[name||'Резерв',bankId,amount,recordId,date||null]);
+      toast('🪙 Добавлено в резерв');
+    }
+    renderJournal();
+  }catch(e){toast('Ошибка: '+e.message);}
+}
+
 async function delRecord(id){
   if(!confirm('Удалить запись?'))return;
   try{
-    // Удаляем связанный конверт если есть
-    await q('DELETE FROM envelopes WHERE record_id=$1',[id]);
     await q('DELETE FROM records WHERE id=$1',[id]);
     await recalcAllBalances();
     renderJournal();toast('Удалено');
