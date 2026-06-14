@@ -476,12 +476,32 @@ table.nit td.empty-cell{color:var(--text3);}
             <th>Нач.</th>
             <th>Кон.</th>
             <th>Δ</th>
+            <th style="background:var(--purple-bg);color:var(--purple)">Свободно</th>
           </tr>
         </thead>
         <tbody id="sverka-body"></tbody>
       </table>
     </div>
     <div id="sverka-checks" style="padding:12px 18px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--border);background:var(--surface2)"></div>
+  </div>
+
+  <!-- ENVELOPES PANEL -->
+  <div class="panel" id="panel-envelopes" style="margin-top:14px">
+    <div class="panel-h">
+      <span>🪙 Конверты (резервы)</span>
+      <button class="btn btn-g btn-sm" onclick="toggleEnvelopeForm()">+ Добавить</button>
+    </div>
+    <!-- Add form (hidden by default) -->
+    <div id="envelope-form" style="display:none;padding:12px 18px;background:var(--surface2);border-bottom:1px solid var(--border);display:none;gap:10px;flex-wrap:wrap;align-items:flex-end">
+      <div class="fg"><label>Название</label><input class="inp w150" id="env-name" placeholder="Отпуск, Подушка…"></div>
+      <div class="fg"><label>Банк</label><select class="inp w150" id="env-bank"></select></div>
+      <div class="fg"><label>Сумма</label><input type="number" class="inp w110" id="env-amount" placeholder="0"></div>
+      <button class="btn btn-p btn-sm" onclick="saveEnvelope()" style="margin-top:20px">Сохранить</button>
+      <button class="btn btn-g btn-sm" onclick="toggleEnvelopeForm()" style="margin-top:20px">Отмена</button>
+    </div>
+    <div id="envelope-list" style="padding:0 18px"></div>
+    <!-- Итог по конвертам -->
+    <div id="envelope-totals" style="padding:10px 18px;background:var(--surface2);border-top:1px solid var(--border);font-size:13px;display:flex;gap:20px;flex-wrap:wrap"></div>
   </div>
 </div>
 
@@ -811,10 +831,11 @@ async function renderJournal(){
 // ─── SVERKA ─────────────────────────────────────────────────────
 async function renderSverka(){
   document.getElementById('sverka-m-lbl').textContent=curMonth;
-  const [recs,bals,btots]=await Promise.all([
+  const [recs,bals,btots,envs]=await Promise.all([
     loadRecordsMonth(curMonth),
     loadBalances(curMonth),
-    loadBankTotals(curMonth)
+    loadBankTotals(curMonth),
+    loadEnvelopes()
   ]);
 
   const agg={};
@@ -822,6 +843,10 @@ async function renderSverka(){
   recs.forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
 
   const active=banks.filter(b=>Object.values(agg[b.id]).some(v=>v>0)||(bals[b.id]&&(bals[b.id].start||bals[b.id].end)));
+
+  // Envelope amounts by bank
+  const envByBank={};
+  envs.forEach(e=>{envByBank[e.bank_id]=(envByBank[e.bank_id]||0)+parseFloat(e.amount)||0;});
 
   let totTrIn=0,totTrOut=0,totIncI=0,totExpI=0;
   active.forEach(b=>{totTrIn+=agg[b.id].tr_in;totTrOut+=agg[b.id].tr_out;totIncI+=agg[b.id].income_i;totExpI+=agg[b.id].expense_i;});
@@ -833,23 +858,24 @@ async function renderSverka(){
   document.getElementById('sverka-status').textContent=allOk?'✅ Всё сходится':'⚠️ Есть расхождения';
   document.getElementById('sverka-status').style.color=allOk?'var(--green)':'var(--red)';
 
-  // TD style helpers — fixed widths to prevent layout shift
   const tdNum='style="text-align:right;padding:6px 10px;font-variant-numeric:tabular-nums;white-space:nowrap;"';
   const tdInp='style="padding:4px 6px;width:110px;"';
 
   // Totals for footer row
-  let totSumInc=0,totSumExp=0,totStart=0,totEnd=0,totDelta=0;
+  let totSumInc=0,totSumExp=0,totStart=0,totEnd=0,totDelta=0,totFree=0;
   active.forEach(b=>{
     const a=agg[b.id];
     const bal=bals[b.id]||{start:0,end:0};
     const sumInc=a.income+a.income_i+a.tr_in;
     const sumExp=a.tr_out+a.expense_i+a.expense;
     const autoEnd=(bal.start||0)+sumInc-sumExp;
+    const reserved=envByBank[b.id]||0;
     totSumInc+=sumInc;
     totSumExp+=sumExp;
     totStart+=bal.start||0;
     totEnd+=autoEnd;
     totDelta+=autoEnd-(bal.start||0);
+    totFree+=autoEnd-reserved;
   });
 
   document.getElementById('sverka-body').innerHTML=active.map(b=>{
@@ -904,6 +930,7 @@ async function renderSverka(){
       </td>
       <td ${tdNum} style="font-weight:600;color:${autoEnd>=0?'var(--green)':'var(--red)'}">${fmtF(autoEnd)}</td>
       <td ${tdNum} style="color:${delta>0?'var(--green)':delta<0?'var(--red)':'var(--text3)'}">${delta?(delta>0?'+':'')+fmtF(delta):'—'}</td>
+      <td ${tdNum} style="color:var(--purple);font-weight:700">${reserved?fmtF(autoEnd-reserved):fmtF(autoEnd)}</td>
     </tr>`;
   }).join('');
 
@@ -924,7 +951,11 @@ async function renderSverka(){
     <td style="text-align:right;padding:8px 10px;color:var(--text2);font-weight:700;white-space:nowrap">${fmtF(totStart)}</td>
     <td style="text-align:right;padding:8px 10px;font-weight:700;color:${totEnd>=0?'var(--green)':'var(--red)'};white-space:nowrap">${fmtF(totEnd)}</td>
     <td style="text-align:right;padding:8px 10px;font-weight:700;color:${totDelta>0?'var(--green)':totDelta<0?'var(--red)':'var(--text3)'};white-space:nowrap">${totDelta?(totDelta>0?'+':'')+fmtF(totDelta):'—'}</td>
+    <td style="text-align:right;padding:8px 10px;font-weight:800;color:var(--purple);white-space:nowrap;font-size:14px">${fmtF(totFree)}</td>
   </tr>`;
+
+  // Render envelopes panel
+  renderEnvelopes(envs,bals,agg,active);
 
   document.getElementById('sverka-checks').innerHTML=`
     <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-sm);background:${trOk?'var(--green-bg)':'var(--red-bg)'};border:1px solid ${trOk?'var(--green-b)':'var(--red-b)'}">
@@ -981,6 +1012,110 @@ async function saveSverka(bankId, field, val, journalVal, inp, chkId){
     );
     toast('✓ Сохранено');
   }catch(e){toast('Ошибка сохранения');}
+}
+
+// ─── ENVELOPES ────────────────────────────────────────────────────
+async function loadEnvelopes(){
+  try{return await q('SELECT * FROM envelopes ORDER BY id');}catch(e){return[];}
+}
+
+function toggleEnvelopeForm(){
+  const f=document.getElementById('envelope-form');
+  const isHidden=f.style.display==='none'||f.style.display==='';
+  f.style.display=isHidden?'flex':'none';
+  if(isHidden){
+    document.getElementById('env-bank').innerHTML=banks.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
+    document.getElementById('env-name').focus();
+  }
+}
+
+async function saveEnvelope(){
+  const name=document.getElementById('env-name').value.trim();
+  const bankId=document.getElementById('env-bank').value;
+  const amount=parseFloat(document.getElementById('env-amount').value)||0;
+  if(!name){toast('Введите название');return;}
+  if(!amount){toast('Введите сумму');return;}
+  try{
+    await q('INSERT INTO envelopes(name,bank_id,amount) VALUES($1,$2,$3)',[name,bankId,amount]);
+    document.getElementById('env-name').value='';
+    document.getElementById('env-amount').value='';
+    toggleEnvelopeForm();
+    toast('✓ Конверт добавлен');
+    renderSverka();
+  }catch(e){toast('Ошибка: '+e.message);}
+}
+
+async function deleteEnvelope(id){
+  if(!confirm('Удалить конверт?'))return;
+  try{await q('DELETE FROM envelopes WHERE id=$1',[id]);toast('Удалено');renderSverka();}
+  catch(e){toast('Ошибка');}
+}
+
+async function moveEnvelope(id,newBankId){
+  try{await q('UPDATE envelopes SET bank_id=$1 WHERE id=$2',[newBankId,id]);toast('✓ Конверт перемещён');renderSverka();}
+  catch(e){toast('Ошибка');}
+}
+
+async function updateEnvelopeAmount(id,val){
+  const amount=parseFloat(val)||0;
+  if(!amount){toast('Введите сумму');return;}
+  try{await q('UPDATE envelopes SET amount=$1 WHERE id=$2',[amount,id]);toast('✓ Сумма обновлена');renderSverka();}
+  catch(e){toast('Ошибка');}
+}
+
+function renderEnvelopes(envs,bals,agg,active){
+  const list=document.getElementById('envelope-list');
+  const totalsEl=document.getElementById('envelope-totals');
+  if(!list||!totalsEl)return;
+
+  if(!envs.length){
+    list.innerHTML='<div class="empty" style="padding:16px">Конвертов нет — нажми «+ Добавить»</div>';
+    totalsEl.innerHTML='';
+    return;
+  }
+
+  list.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:13px;">
+    <thead><tr>
+      <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Конверт</th>
+      <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Банк</th>
+      <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Сумма</th>
+      <th style="padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surface2)"></th>
+    </tr></thead>
+    <tbody>${envs.map(e=>`<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:8px 12px;font-weight:600">
+        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--purple);margin-right:8px;vertical-align:middle"></span>${e.name}
+      </td>
+      <td style="padding:6px 8px">
+        <select onchange="moveEnvelope(${e.id},this.value)" style="border:1px solid var(--border2);border-radius:4px;padding:4px 8px;font-size:12px;font-family:inherit;background:var(--surface)">
+          ${banks.map(b2=>`<option value="${b2.id}"${b2.id===e.bank_id?' selected':''}>${b2.name}</option>`).join('')}
+        </select>
+      </td>
+      <td style="padding:6px 8px;text-align:right">
+        <input type="number" value="${parseFloat(e.amount)}"
+          style="width:110px;height:28px;border:1.5px solid var(--border2);border-radius:4px;padding:0 6px;font-size:13px;font-weight:700;font-family:inherit;text-align:right;outline:none;color:var(--purple)"
+          onblur="updateEnvelopeAmount(${e.id},this.value)">
+      </td>
+      <td style="padding:6px 8px;text-align:center">
+        <button class="del-btn" onclick="deleteEnvelope(${e.id})">×</button>
+      </td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+
+  const totalReserved=envs.reduce((s,e)=>s+parseFloat(e.amount)||0,0);
+  const totalEnd=active.reduce((s,b)=>{
+    const a=agg[b.id]||{income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
+    const bal=bals[b.id]||{start:0};
+    const sumInc=a.income+a.income_i+a.tr_in;
+    const sumExp=a.tr_out+a.expense_i+a.expense;
+    return s+(bal.start||0)+sumInc-sumExp;
+  },0);
+
+  totalsEl.innerHTML=`
+    <div style="display:flex;gap:6px;align-items:center"><span style="font-size:12px;color:var(--text3)">Всего:</span><span style="font-weight:700;font-family:Manrope,sans-serif">${fmtF(totalEnd)}</span></div>
+    <div style="color:var(--text3)">−</div>
+    <div style="display:flex;gap:6px;align-items:center"><span style="font-size:12px;color:var(--text3)">Зарезервировано:</span><span style="font-weight:700;color:var(--purple);font-family:Manrope,sans-serif">${fmtF(totalReserved)}</span></div>
+    <div style="color:var(--text3)">=</div>
+    <div style="display:flex;gap:6px;align-items:center"><span style="font-size:12px;color:var(--text3)">Свободно:</span><span style="font-weight:800;color:var(--green);font-family:Manrope,sans-serif;font-size:16px">${fmtF(totalEnd-totalReserved)}</span></div>`;
 }
 
 // ─── DASHBOARD ──────────────────────────────────────────────────
