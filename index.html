@@ -717,7 +717,10 @@ async function renderJournal(){
 
   const btnContainer=document.getElementById('bank-filter-btns');
   if(btnContainer){
-    btnContainer.innerHTML=[{id:'',name:'Все счета',color:'#8890aa'},...banks].map(b=>`
+    let recs0=await loadRecordsMonth(curMonth);
+    const activeBankIds=new Set(recs0.map(r=>r.bank_id));
+    const visibleBanks=banks.filter(b=>activeBankIds.has(b.id));
+    btnContainer.innerHTML=[{id:'',name:'Все счета',color:'#8890aa'},...visibleBanks].map(b=>`
       <button onclick="setJrnBank('${b.id}')" style="padding:4px 10px;border-radius:20px;border:1.5px solid ${jrnBank===b.id?b.color||'var(--accent)':'var(--border)'};background:${jrnBank===b.id?(b.color||'var(--accent)'):'var(--surface)'};color:${jrnBank===b.id?'#fff':'var(--text2)'};font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .12s">${b.name}</button>
     `).join('');
   }
@@ -831,6 +834,21 @@ async function renderSverka(){
   const tdNum='style="text-align:right;padding:6px 10px;font-variant-numeric:tabular-nums;white-space:nowrap;"';
   const tdInp='style="padding:4px 6px;width:110px;"';
 
+  // Totals for footer row
+  let totSumInc=0,totSumExp=0,totStart=0,totEnd=0,totDelta=0;
+  active.forEach(b=>{
+    const a=agg[b.id];
+    const bal=bals[b.id]||{start:0,end:0};
+    const sumInc=a.income+a.income_i+a.tr_in;
+    const sumExp=a.tr_out+a.expense_i+a.expense;
+    const autoEnd=(bal.start||0)+sumInc-sumExp;
+    totSumInc+=sumInc;
+    totSumExp+=sumExp;
+    totStart+=bal.start||0;
+    totEnd+=autoEnd;
+    totDelta+=autoEnd-(bal.start||0);
+  });
+
   document.getElementById('sverka-body').innerHTML=active.map(b=>{
     const a=agg[b.id];
     const bal=bals[b.id]||{start:0,end:0};
@@ -885,6 +903,26 @@ async function renderSverka(){
       <td ${tdNum} style="color:${delta>0?'var(--green)':delta<0?'var(--red)':'var(--text3)'}">${delta?(delta>0?'+':'')+fmtF(delta):'—'}</td>
     </tr>`;
   }).join('');
+
+  // Add totals footer row
+  const svTbl=document.getElementById('sverka-table');
+  let tfoot=svTbl.querySelector('tfoot');
+  if(!tfoot){tfoot=document.createElement('tfoot');svTbl.appendChild(tfoot);}
+  tfoot.innerHTML=`<tr style="background:var(--surface2);border-top:2px solid var(--border2)">
+    <td style="padding:8px 10px;font-size:12px;font-weight:700;color:var(--text2)">Итого</td>
+    <td style="text-align:right;padding:8px 10px;color:var(--green);font-weight:700;white-space:nowrap">${fmtF(totSumInc)}</td>
+    <td colspan="2"></td>
+    <td style="text-align:right;padding:8px 10px;color:var(--red);font-weight:700;white-space:nowrap">${fmtF(totSumExp)}</td>
+    <td colspan="2"></td>
+    <td style="text-align:right;padding:8px 10px;color:var(--accent);font-weight:700;white-space:nowrap">${fmtF(totTrIn)}</td>
+    <td style="text-align:right;padding:8px 10px;color:var(--accent);font-weight:700;white-space:nowrap">${fmtF(totTrOut)}</td>
+    <td style="text-align:right;padding:8px 10px;color:var(--purple);font-weight:700;white-space:nowrap">${fmtF(totIncI)}</td>
+    <td style="text-align:right;padding:8px 10px;color:var(--purple);font-weight:700;white-space:nowrap">${fmtF(totExpI)}</td>
+    <td></td>
+    <td style="text-align:right;padding:8px 10px;color:var(--text2);font-weight:700;white-space:nowrap">${fmtF(totStart)}</td>
+    <td style="text-align:right;padding:8px 10px;font-weight:700;color:${totEnd>=0?'var(--green)':'var(--red)'};white-space:nowrap">${fmtF(totEnd)}</td>
+    <td style="text-align:right;padding:8px 10px;font-weight:700;color:${totDelta>0?'var(--green)':totDelta<0?'var(--red)':'var(--text3)'};white-space:nowrap">${totDelta?(totDelta>0?'+':'')+fmtF(totDelta):'—'}</td>
+  </tr>`;
 
   document.getElementById('sverka-checks').innerHTML=`
     <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-sm);background:${trOk?'var(--green-bg)':'var(--red-bg)'};border:1px solid ${trOk?'var(--green-b)':'var(--red-b)'}">
@@ -1189,7 +1227,13 @@ async function toggleDashBank(bankId){
   await renderCatMonthTables(allRecs);
 }
 
-function setJrnBank(id){jrnBank=id;renderJournal();}
+function setJrnBank(id){
+  jrnBank=id;
+  // Sync with add form
+  const fBank=document.getElementById('f-bank');
+  if(fBank&&id)fBank.value=id;
+  renderJournal();
+}
 function goToBank(bankId){jrnBank=bankId;jrnCat='';go('journal');}
 function goToCat(cat){jrnCat=cat;jrnBank='';go('journal');}
 function goToCatMonth(cat,month){
