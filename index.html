@@ -345,7 +345,11 @@ table.nit td.empty-cell{color:var(--text3);}
   <div class="panel" style="margin-bottom:14px">
     <div class="panel-h">+ Новая операция</div>
     <div class="add-bar">
-      <div class="fg"><label>Дата</label><input type="date" class="inp w110" id="f-date"></div>
+      <div class="fg">
+        <label>Дата</label>
+        <input type="date" class="inp w110" id="f-date" oninput="checkFormDate(this)">
+        <div id="f-date-warn" style="font-size:10px;color:var(--red);font-weight:700;margin-top:3px;display:none">⚠️ Не совпадает с месяцем!</div>
+      </div>
       <div class="fg"><label>Банк</label><select class="inp w150" id="f-bank"></select></div>
       <div class="fg"><label>Тип</label>
         <select class="inp w170" id="f-type">
@@ -1227,6 +1231,22 @@ async function toggleDashBank(bankId){
   await renderCatMonthTables(allRecs);
 }
 
+function checkFormDate(inp){
+  const val=inp.value;
+  if(!val){
+    inp.style.borderColor='';
+    inp.style.background='';
+    document.getElementById('f-date-warn').style.display='none';
+    return;
+  }
+  const dateMonth=MONTHS[new Date(val).getMonth()];
+  const ok=dateMonth===curMonth;
+  inp.style.borderColor=ok?'var(--border2)':'var(--red)';
+  inp.style.background=ok?'':'var(--red-bg)';
+  document.getElementById('f-date-warn').style.display=ok?'none':'block';
+  document.getElementById('f-date-warn').textContent=ok?'':`⚠️ Дата в ${dateMonth}, а открыт ${curMonth}`;
+}
+
 function setJrnBank(id){
   jrnBank=id;
   // Sync with add form
@@ -1278,6 +1298,12 @@ async function addRecord(){
   const date=document.getElementById('f-date').value;
   if(!bankId){toast('Выберите счёт');return;}
   if(!amount||amount<=0){toast('Введите сумму');return;}
+  if(date){
+    const dateMonth=MONTHS[new Date(date).getMonth()];
+    if(dateMonth!==curMonth){
+      if(!confirm(`Дата ${date.split('-').reverse().join('.')} относится к ${dateMonth}, но открыт ${curMonth}.\n\nВсё равно добавить?`))return;
+    }
+  }
   try{
     await q('INSERT INTO records(month,bank_id,type,amount,category,description,op_date) VALUES($1,$2,$3,$4,$5,$6,$7)',[curMonth,bankId,type,amount,cat||null,desc||null,date||null]);
     document.getElementById('f-amount').value='';document.getElementById('f-desc').value='';
@@ -1472,6 +1498,9 @@ function initTabs(){
 function selMonth(m){
   curMonth=m;
   document.querySelectorAll('.mtab').forEach(t=>t.classList.toggle('active',t.textContent===m.slice(0,3)));
+  // Re-check date field if journal is open
+  const fDate=document.getElementById('f-date');
+  if(fDate&&fDate.value)checkFormDate(fDate);
   const av=document.querySelector('.view.active');if(!av)return;
   const id=av.id.replace('view-','');
   if(id==='dashboard')renderDash();
