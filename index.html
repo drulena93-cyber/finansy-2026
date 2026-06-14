@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ё<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -813,10 +813,13 @@ async function renderJournal(){
           <td class="num ac">${cols.tr_out}</td>
           <td class="num pc">${cols.expense_i}</td>
           <td class="num rc">${cols.expense}</td>
-          <td style="white-space:nowrap;padding:4px 8px">
-            <button onclick="toggleEnvelopeRecord(${r.id},'${(r.description||'Резерв').replace(/'/g,'')}',${ parseFloat(r.amount)},'${r.bank_id}','${r.op_date||''}')" title="${reservedIds.has(r.id)?'Убрать из резерва':'Добавить в резерв'}"
-              style="background:none;border:none;cursor:pointer;font-size:13px;padding:1px 3px;border-radius:4px;opacity:${reservedIds.has(r.id)?'1':'0.25'};transition:opacity .15s;vertical-align:middle"
-              onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='${reservedIds.has(r.id)?'1':'0.25'}'">🪙</button><button class="del-btn" onclick="delRecord(${r.id})" style="vertical-align:middle">×</button>
+          <td style="padding:4px 8px">
+            <div style="display:flex;align-items:center;gap:2px;justify-content:flex-end">
+              <button onclick="toggleEnvelopeRecord(${r.id},'${(r.description||'Резерв').replace(/'/g,'')}',${parseFloat(r.amount)},'${r.bank_id}','${r.op_date||''}')" title="${reservedIds.has(r.id)?'Убрать из резерва':'Добавить в резерв'}"
+                style="background:none;border:none;cursor:pointer;font-size:13px;padding:2px;border-radius:4px;opacity:${reservedIds.has(r.id)?'1':'0.2'};transition:opacity .15s;line-height:1"
+                onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='${reservedIds.has(r.id)?'1':'0.2'}'">🪙</button>
+              <button class="del-btn" onclick="delRecord(${r.id})">×</button>
+            </div>
           </td>
         </tr>`;
       }
@@ -856,14 +859,14 @@ async function renderSverka(){
   // Envelope amounts by bank — load separately, don't block if fails
   let envByBank={};
   let envsByBank={};
+  let envsLoaded=[];
   try{
-    const envs=await loadEnvelopes();
-    envs.forEach(e=>{
+    envsLoaded=await loadEnvelopes();
+    envsLoaded.forEach(e=>{
       envByBank[e.bank_id]=(envByBank[e.bank_id]||0)+parseFloat(e.amount)||0;
       if(!envsByBank[e.bank_id])envsByBank[e.bank_id]=[];
       envsByBank[e.bank_id].push(e);
     });
-    renderEnvelopes(envs,bals,agg,active);
   }catch(e){console.warn('envelopes not available',e);}
 
   let totTrIn=0,totTrOut=0,totIncI=0,totExpI=0;
@@ -981,7 +984,7 @@ async function renderSverka(){
   </tr>`;
 
   // Render envelopes panel
-  renderEnvelopes(envs,bals,agg,active);
+  renderEnvelopes(envsLoaded,bals,agg,active);
 
   document.getElementById('sverka-checks').innerHTML=`
     <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-sm);background:${trOk?'var(--green-bg)':'var(--red-bg)'};border:1px solid ${trOk?'var(--green-b)':'var(--red-b)'}">
