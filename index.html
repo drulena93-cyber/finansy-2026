@@ -889,6 +889,7 @@ async function renderSverka(){
     const sumExp=a.tr_out+a.expense_i+a.expense;
     const autoEnd=(bal.start||0)+sumInc-sumExp;
     const delta=autoEnd-(bal.start||0);
+    const reserved=envByBank[b.id]||0;
 
     // Saved values from bank_totals
     const savedInc=bt.income||0;
