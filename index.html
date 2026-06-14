@@ -348,7 +348,6 @@ table.nit td.empty-cell{color:var(--text3);}
       <div class="fg">
         <label>Дата</label>
         <input type="date" class="inp w110" id="f-date" oninput="checkFormDate(this)">
-        <div id="f-date-warn" style="font-size:10px;color:var(--red);font-weight:700;margin-top:3px;display:none">⚠️ Не совпадает с месяцем!</div>
       </div>
       <div class="fg"><label>Банк</label><select class="inp w150" id="f-bank"></select></div>
       <div class="fg"><label>Тип</label>
@@ -922,7 +921,6 @@ async function renderSverka(){
     <td style="text-align:right;padding:8px 10px;color:var(--accent);font-weight:700;white-space:nowrap">${fmtF(totTrOut)}</td>
     <td style="text-align:right;padding:8px 10px;color:var(--purple);font-weight:700;white-space:nowrap">${fmtF(totIncI)}</td>
     <td style="text-align:right;padding:8px 10px;color:var(--purple);font-weight:700;white-space:nowrap">${fmtF(totExpI)}</td>
-    <td></td>
     <td style="text-align:right;padding:8px 10px;color:var(--text2);font-weight:700;white-space:nowrap">${fmtF(totStart)}</td>
     <td style="text-align:right;padding:8px 10px;font-weight:700;color:${totEnd>=0?'var(--green)':'var(--red)'};white-space:nowrap">${fmtF(totEnd)}</td>
     <td style="text-align:right;padding:8px 10px;font-weight:700;color:${totDelta>0?'var(--green)':totDelta<0?'var(--red)':'var(--text3)'};white-space:nowrap">${totDelta?(totDelta>0?'+':'')+fmtF(totDelta):'—'}</td>
@@ -1233,18 +1231,11 @@ async function toggleDashBank(bankId){
 
 function checkFormDate(inp){
   const val=inp.value;
-  if(!val){
-    inp.style.borderColor='';
-    inp.style.background='';
-    document.getElementById('f-date-warn').style.display='none';
-    return;
-  }
+  if(!val){inp.style.borderColor='';inp.style.background='';return;}
   const dateMonth=MONTHS[new Date(val).getMonth()];
   const ok=dateMonth===curMonth;
-  inp.style.borderColor=ok?'var(--border2)':'var(--red)';
+  inp.style.borderColor=ok?'':'var(--red)';
   inp.style.background=ok?'':'var(--red-bg)';
-  document.getElementById('f-date-warn').style.display=ok?'none':'block';
-  document.getElementById('f-date-warn').textContent=ok?'':`⚠️ Дата в ${dateMonth}, а открыт ${curMonth}`;
 }
 
 function setJrnBank(id){
@@ -1425,12 +1416,12 @@ async function transferBalancesToNextMonth(){
 // Пересчёт остатков по всей цепочке месяцев
 async function recalcAllBalances(){
   const allRecs=await loadAllRecords();
-  // Загружаем начальные остатки января один раз (вводятся вручную)
   const janBals=await loadBalances(MONTHS[0]);
 
+  // Собираем все значения для батч-вставки
+  const rows=[];
   for(const b of banks){
     let prevEnd=(janBals[b.id]?.start)||0;
-
     for(let i=0;i<MONTHS.length;i++){
       const m=MONTHS[i];
       const mRecs=allRecs.filter(r=>r.month===m&&r.bank_id===b.id);
@@ -1439,26 +1430,47 @@ async function recalcAllBalances(){
       const sumInc=agg.income+agg.income_i+agg.tr_in;
       const sumExp=agg.tr_out+agg.expense_i+agg.expense;
       const autoEnd=prevEnd+sumInc-sumExp;
-
-      try{
-        if(i===0){
-          // Январь: начало не трогаем (вручную), только конец
-          await q(
-            `INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4)
-             ON CONFLICT(bank_id,month) DO UPDATE SET balance_end=$4`,
-            [b.id,m,prevEnd,autoEnd]
-          );
-        } else {
-          // Остальные месяцы: обновляем и начало и конец
-          await q(
-            `INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4)
-             ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=$3, balance_end=$4`,
-            [b.id,m,prevEnd,autoEnd]
-          );
-        }
-      }catch(e){console.error('recalc error',b.id,m,e);}
-
+      // Январь: start не трогаем (вручную введён)
+      rows.push({bankId:b.id,month:m,start:i===0?prevEnd:prevEnd,end:autoEnd,isJan:i===0});
       prevEnd=autoEnd;
+    }
+  }
+
+  // Разбиваем на батчи по 20 строк чтобы не перегружать
+  const batchSize=20;
+  for(let i=0;i<rows.length;i+=batchSize){
+    const batch=rows.slice(i,i+batchSize);
+    // Строим один INSERT с множеством значений
+    const vals=batch.map((r,j)=>`($${j*4+1},$${j*4+2},$${j*4+3},$${j*4+4})`).join(',');
+    const params=batch.flatMap(r=>[r.bankId,r.month,r.start,r.end]);
+    try{
+      if(batch.some(r=>r.isJan)){
+        // Для января обновляем только balance_end
+        for(const r of batch){
+          if(r.isJan){
+            await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4)
+               ON CONFLICT(bank_id,month) DO UPDATE SET balance_end=$4`,
+              [r.bankId,r.month,r.start,r.end]);
+          } else {
+            await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4)
+               ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=$3,balance_end=$4`,
+              [r.bankId,r.month,r.start,r.end]);
+          }
+        }
+      } else {
+        await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES ${vals}
+           ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=EXCLUDED.balance_start,balance_end=EXCLUDED.balance_end`,
+          params);
+      }
+    }catch(e){
+      // Если батч не поддерживается — fallback по одному
+      for(const r of batch){
+        try{
+          await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4)
+             ON CONFLICT(bank_id,month) DO UPDATE SET ${r.isJan?'balance_end=$4':'balance_start=$3,balance_end=$4'}`,
+            [r.bankId,r.month,r.start,r.end]);
+        }catch(e2){console.error('recalc error',r.bankId,r.month,e2);}
+      }
     }
   }
 }
@@ -1483,7 +1495,7 @@ async function go(name){
   closeMobMenu();
   localStorage.setItem('last_view',name);
   if(name==='dashboard')renderDash();
-  if(name==='journal'){await recalcAllBalances();renderJournal();}
+  if(name==='journal')renderJournal();
   if(name==='deposits')renderDeposits();
   if(name==='settings')renderSettings();
   if(name==='analytics')renderAnalytics();
