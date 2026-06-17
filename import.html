@@ -2,96 +2,1997 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Импорт данных — Финансы 2026</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Финансы 2026</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+:root{
+  --bg:#f0f2f8;--surface:#ffffff;--surface2:#f7f8fc;--border:#e2e6f0;--border2:#c8cfe0;
+  --text:#1a1d2e;--text2:#4a5270;--text3:#8890aa;
+  --accent:#4f6ef7;--accent-l:#eef1fe;--accent-d:#3b5bd9;
+  --green:#16a34a;--green-bg:#f0fdf4;--green-b:#bbf7d0;
+  --red:#dc2626;--red-bg:#fef2f2;--red-b:#fecaca;
+  --amber:#d97706;--amber-bg:#fffbeb;--amber-b:#fcd34d;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;--purple-b:#ddd6fe;
+  --teal:#0d9488;--teal-bg:#f0fdfa;
+  --radius:16px;--radius-sm:10px;--radius-xs:6px;
+  --shadow:0 1px 4px rgba(0,0,0,0.06),0 0 0 1px rgba(0,0,0,0.03);
+  --shadow-md:0 4px 20px rgba(0,0,0,0.08);
+}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:Inter,sans-serif;background:#f0f2f8;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
-.box{background:#fff;border-radius:16px;padding:36px;max-width:560px;width:100%;box-shadow:0 4px 20px rgba(0,0,0,0.08);}
-h1{font-size:20px;font-weight:700;margin-bottom:6px;color:#1a1d2e;}
-p{color:#5a6180;font-size:14px;margin-bottom:20px;line-height:1.6;}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px;}
-.stat{background:#f7f8fc;border-radius:8px;padding:10px;text-align:center;}
-.stat-n{font-size:18px;font-weight:700;color:#4f6ef7;}
-.stat-l{font-size:11px;color:#8890aa;margin-top:2px;}
-button{width:100%;height:46px;background:#4f6ef7;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;}
-button:hover{background:#3b5bd9;transform:translateY(-1px);}
-button:disabled{background:#aaa;cursor:not-allowed;transform:none;}
-#progress{margin-top:14px;background:#f0f2f8;border-radius:6px;height:8px;overflow:hidden;display:none;}
-#progress-bar{height:100%;background:#4f6ef7;width:0%;transition:width .3s;border-radius:6px;}
-#log{margin-top:14px;font-size:12px;font-family:monospace;background:#f8f9fc;border-radius:8px;padding:14px;max-height:220px;overflow-y:auto;border:1px solid #e4e7ef;display:none;}
-.ok{color:#16a34a;} .err{color:#dc2626;} .info{color:#4f6ef7;font-weight:600;}
-a{color:#4f6ef7;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:15px;min-height:100vh;line-height:1.5;}
+
+/* LOGIN */
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#eef1fe 0%,#f0f2f8 50%,#f0fdf4 100%);display:flex;align-items:center;justify-content:center;z-index:1000;}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:48px 40px;width:360px;text-align:center;box-shadow:var(--shadow-md);}
+.login-logo{font-size:48px;margin-bottom:12px;}
+.login-title{font-family:'Manrope',sans-serif;font-size:24px;font-weight:800;color:var(--accent);margin-bottom:6px;}
+.login-sub{font-size:14px;color:var(--text3);margin-bottom:28px;}
+.login-inp{width:100%;height:52px;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:0 18px;font-size:18px;text-align:center;letter-spacing:8px;outline:none;font-family:inherit;transition:border .15s;background:var(--surface2);}
+.login-inp:focus{border-color:var(--accent);background:#fff;}
+.login-err{font-size:13px;color:var(--red);margin-top:10px;min-height:18px;}
+.login-btn{width:100%;height:52px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-size:16px;font-weight:700;cursor:pointer;margin-top:14px;transition:all .15s;font-family:'Manrope',sans-serif;letter-spacing:.3px;}
+.login-btn:hover{background:var(--accent-d);transform:translateY(-1px);}
+
+/* APP */
+#app{display:none;min-height:100vh;}
+.layout{display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
+.sb-logo{padding:20px 20px 18px;border-bottom:1px solid var(--border);}
+.sb-logo-title{font-family:'Manrope',sans-serif;font-size:17px;font-weight:800;color:var(--accent);letter-spacing:-.3px;}
+.sb-logo-sub{font-size:12px;color:var(--text3);margin-top:3px;}
+.nav{padding:14px 10px;flex:1;overflow-y:auto;}
+.nav-lbl{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding:12px 10px 5px;}
+.nb{display:flex;align-items:center;gap:9px;width:100%;padding:10px 12px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;color:var(--text2);background:none;border:none;cursor:pointer;transition:all .12s;text-align:left;margin-bottom:2px;}
+.nb svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.nb:hover{background:var(--bg);color:var(--text);}
+.nb.active{background:var(--accent-l);color:var(--accent);font-weight:600;}
+.nb-logout{color:var(--red)!important;margin-top:8px;}
+.nb-logout:hover{background:var(--red-bg)!important;}
+
+.main{margin-left:220px;padding:28px 32px;flex:1;min-width:0;}
+.ph{margin-bottom:22px;}
+.ph h1{font-family:'Manrope',sans-serif;font-size:24px;font-weight:800;color:var(--text);letter-spacing:-.4px;}
+.ph p{font-size:14px;color:var(--text2);margin-top:4px;}
+
+/* MONTH BAR */
+.mbar{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:22px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:6px;}
+.mtab{padding:7px 14px;border-radius:var(--radius-xs);font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text2);transition:all .12s;font-family:inherit;}
+.mtab:hover{background:var(--bg);color:var(--text);}
+.mtab.active{background:var(--accent);color:#fff;font-weight:600;}
+
+/* VIEWS */
+.view{display:none;}
+.view.active{display:block;}
+
+/* ALERT BANNER */
+.alert-banner{background:var(--amber-bg);border:1px solid var(--amber-b);border-radius:var(--radius-sm);padding:12px 18px;margin-bottom:18px;display:flex;align-items:center;gap:10px;font-size:14px;color:#92400e;font-weight:500;}
+.alert-banner svg{width:18px;height:18px;flex-shrink:0;stroke:#d97706;fill:none;stroke-width:2;}
+
+/* TOTAL CARD */
+.total-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:18px;box-shadow:var(--shadow);}
+
+/* PANEL */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+.panel-h{padding:14px 18px;border-bottom:1px solid var(--border);font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between;font-family:'Manrope',sans-serif;}
+.panel-b{padding:14px 18px;}
+
+/* BANK ROWS */
+.brow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
+.brow:last-child{border-bottom:none;}
+.brow:hover .bname{color:var(--accent);text-decoration:underline;}
+.bdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.bname{font-size:13px;font-weight:500;flex:1;}
+.binc{font-size:13px;color:var(--green);font-weight:700;}
+.bexp{font-size:13px;color:var(--red);font-weight:700;}
+
+/* CAT BARS */
+.cat-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);}
+.cat-row:last-child{border-bottom:none;}
+.cat-name{font-size:13px;color:var(--text);width:100px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;}
+.cat-track{flex:1;height:8px;background:var(--bg);border-radius:4px;overflow:hidden;}
+.cat-fill{height:8px;border-radius:4px;transition:width .4s ease;}
+.cat-val{font-size:13px;font-weight:700;width:80px;text-align:right;flex-shrink:0;}
+
+/* DEPOSIT ROWS */
+.dep-row{padding:10px 0;border-bottom:1px solid var(--border);}
+.dep-row:last-child{border-bottom:none;}
+.dep-name{font-size:14px;font-weight:700;color:var(--text);}
+.dep-meta{font-size:12px;color:var(--text2);margin-top:3px;}
+.dep-amount{font-family:'Manrope',sans-serif;font-size:16px;font-weight:700;color:var(--purple);margin-top:4px;}
+.dep-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.dep-badge.ok{background:var(--green-bg);color:var(--green);border:1px solid var(--green-b);}
+.dep-badge.warn{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-b);}
+.dep-badge.exp{background:var(--red-bg);color:var(--red);border:1px solid var(--red-b);}
+
+/* JOURNAL */
+.jrn-tabs{display:flex;gap:2px;padding:8px 14px;background:var(--surface2);border-bottom:1px solid var(--border);}
+.jtab{padding:6px 16px;border-radius:var(--radius-xs);font-size:13px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--text2);transition:all .12s;font-family:inherit;}
+.jtab:hover{background:var(--bg);}
+.jtab.active{background:var(--accent);color:#fff;}
+
+.tbl-wrap{overflow-x:auto;}
+table.jt{width:100%;border-collapse:collapse;font-size:13px;min-width:1000px;}
+table.jt th{background:var(--surface2);padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--border);white-space:nowrap;}
+table.jt th.gh{background:var(--green-bg);color:var(--green);}
+table.jt th.rh{background:var(--red-bg);color:var(--red);}
+/* Sticky totals row */
+table.jt tr.tots-row td{background:var(--surface2);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;padding:7px 12px;border-bottom:2px solid var(--border2);position:sticky;top:0;z-index:2;}
+table.jt tr.tots-row td.gc{color:var(--green);}
+table.jt tr.tots-row td.rc{color:var(--red);}
+table.jt tr.tots-row td.ac{color:var(--accent);}
+table.jt tr.tots-row td.pc{color:var(--purple);}
+table.jt tr.tots-row td.meta{color:var(--text3);font-size:11px;}
+table.jt td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px;}
+table.jt tr:last-child td{border-bottom:none;}
+table.jt tr:hover td{background:var(--surface2);}
+table.jt td.num{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;}
+table.jt td.gc{color:var(--green);}
+table.jt td.rc{color:var(--red);}
+table.jt td.ac{color:var(--accent);}
+table.jt td.pc{color:var(--purple);}
+.del-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;transition:all .1s;padding:0;}
+.del-btn:hover{background:var(--red-bg);color:var(--red);}
+
+/* SVERKA TABLE */
+table.svt{width:100%;border-collapse:collapse;font-size:13px;}
+table.svt th{background:var(--surface2);padding:9px 12px;text-align:right;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--border);white-space:nowrap;}
+table.svt th:first-child{text-align:left;}
+table.svt th.gh{background:var(--green-bg);color:var(--green);}
+table.svt th.rh{background:var(--red-bg);color:var(--red);}
+table.svt th.bh{background:var(--accent-l);color:var(--accent);}
+table.svt td{padding:9px 12px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums;font-size:13px;}
+table.svt td:first-child{text-align:left;font-weight:600;}
+table.svt tr:hover td{background:var(--surface2);}
+table.svt td.pos{color:var(--green);font-weight:700;}
+table.svt td.neg{color:var(--red);font-weight:700;}
+table.svt td.neu{color:var(--text3);}
+table.svt tr.check-row td{background:var(--green-bg);font-weight:700;color:var(--green);text-align:left;}
+table.svt tr.check-row.fail td{background:var(--red-bg);color:var(--red);}
+table.svt tr.check-row-warn td{background:var(--amber-bg);font-weight:700;color:var(--amber);text-align:left;}
+.bdot-sm{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle;}
+
+/* SVERKA VERIFY INPUT */
+.ver-inp{width:90px;height:28px;border:1.5px solid var(--border2);border-radius:4px;padding:0 6px;font-size:12px;font-family:inherit;text-align:right;outline:none;background:var(--surface);}
+.ver-inp:focus{border-color:var(--accent);}
+.ver-ok{color:var(--green);font-weight:700;font-size:13px;}
+.ver-fail{color:var(--red);font-weight:700;font-size:13px;}
+
+/* ADD BAR */
+.add-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;padding:14px 18px;background:var(--surface2);border-top:1px solid var(--border);}
+.fg{display:flex;flex-direction:column;gap:5px;}
+.fg label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;}
+.inp{height:36px;padding:0 12px;border:1.5px solid var(--border2);border-radius:var(--radius-xs);font-family:inherit;font-size:13px;color:var(--text);background:var(--surface);outline:none;transition:border .12s;}
+.inp:focus{border-color:var(--accent);}
+select.inp{cursor:pointer;}
+.inp.w70{width:70px;}.inp.w90{width:90px;}.inp.w110{width:110px;}.inp.w130{width:130px;}.inp.w150{width:150px;}.inp.w80{width:80px;}.inp.w170{width:170px;}
+.btn{height:36px;padding:0 18px;border-radius:var(--radius-xs);font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .12s;font-family:inherit;white-space:nowrap;}
+.btn-p{background:var(--accent);color:#fff;}.btn-p:hover{background:var(--accent-d);transform:translateY(-1px);}
+.btn-g{background:var(--surface);color:var(--text2);border:1.5px solid var(--border);}.btn-g:hover{color:var(--text);border-color:var(--border2);}
+.btn-d{background:var(--red-bg);color:var(--red);border:1px solid var(--red-b);}
+.btn-d:hover{background:#fee2e2;}
+.btn-sm{height:32px;padding:0 14px;font-size:12px;}
+
+/* SUMMARY */
+table.st{width:100%;border-collapse:collapse;font-size:13px;}
+table.st th{background:var(--surface2);padding:10px 14px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--border);text-align:right;}
+table.st th:first-child{text-align:left;}
+table.st th.gh{background:var(--green-bg);color:var(--green);}
+table.st th.rh{background:var(--red-bg);color:var(--red);}
+table.st th.bh{background:var(--accent-l);color:var(--accent);}
+table.st td{padding:10px 14px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums;font-size:13px;}
+table.st td:first-child{text-align:left;font-weight:600;}
+table.st tr:last-child td{border-bottom:none;font-weight:700;background:var(--surface2);}
+table.st td.pos{color:var(--green);font-weight:700;}
+table.st td.neg{color:var(--red);font-weight:700;}
+table.st td.neu{color:var(--text3);}
+
+/* ANALYTICS */
+.an-chart{display:flex;align-items:flex-end;gap:6px;height:160px;padding-top:10px;}
+.an-bar{flex:1;border-radius:4px 4px 0 0;min-height:2px;cursor:pointer;transition:opacity .1s;}
+.an-bar:hover{opacity:.75;}
+.an-bar.inc{background:var(--green);}
+.an-bar.exp{background:var(--red);}
+.an-lbl{font-size:11px;color:var(--text3);text-align:center;margin-top:6px;width:100%;}
+
+/* DEPOSITS VIEW */
+.dep-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.dep-form-grid .full{grid-column:1/-1;}
+.dep-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:12px;box-shadow:var(--shadow);}
+.dep-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+
+/* SETTINGS */
+.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.bank-set-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.bank-set-row:last-child{border-bottom:none;}
+.color-sw{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* EMPTY */
+.empty{text-align:center;padding:32px;color:var(--text3);font-size:14px;}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;right:20px;background:var(--text);color:#fff;padding:12px 20px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .2s;z-index:999;box-shadow:var(--shadow-md);}
+#toast.show{opacity:1;}
+.section-div{font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;color:var(--text2);margin:20px 0 10px;padding-bottom:8px;border-bottom:2px solid var(--border);}
+.filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+
+/* NET INCOME TABLE */
+table.nit{width:100%;border-collapse:collapse;font-size:13px;}
+table.nit th{background:var(--surface2);padding:10px 14px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--border);text-align:right;}
+table.nit th:first-child{text-align:left;}
+table.nit td{padding:10px 14px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums;}
+table.nit td:first-child{text-align:left;font-weight:600;color:var(--text2);}
+table.nit tr.cur-month td{background:var(--accent-l);}
+table.nit tr.cur-month td:first-child{color:var(--accent);font-weight:700;}
+table.nit td.pos{color:var(--green);font-weight:700;}
+table.nit td.neg{color:var(--red);font-weight:700;}
+table.nit td.empty-cell{color:var(--text3);}
+
+/* MOBILE NAV */
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:200;padding:6px 0;}
+.mob-nav-items{display:flex;justify-content:space-around;align-items:center;}
+.mob-nb{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px;border:none;background:none;cursor:pointer;color:var(--text3);font-size:10px;font-weight:600;font-family:inherit;}
+.mob-nb svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.mob-nb.active{color:var(--accent);}
+.mob-hamburger{display:none;position:fixed;top:12px;right:12px;z-index:300;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px;cursor:pointer;}
+.mob-hamburger svg{width:20px;height:20px;stroke:var(--text);fill:none;stroke-width:2;}
+
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);transition:transform .25s;width:240px;}
+  .sidebar.mob-open{transform:translateX(0);box-shadow:4px 0 20px rgba(0,0,0,0.15);}
+  .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:99;}
+  .mob-overlay.active{display:block;}
+  .main{margin-left:0;padding:16px;padding-bottom:80px;}
+  .mob-nav{display:block;}
+  .mob-hamburger{display:block;}
+  table.jt{font-size:11px;}
+  table.jt th,table.jt td{padding:6px 8px;}
+  .add-bar{padding:10px 12px;}
+  .inp.w170,.inp.w150,.inp.w130{width:100%;}
+  .ph h1{font-size:18px;}
+  .panel-h{font-size:13px;}
+  .tbl-wrap{-webkit-overflow-scrolling:touch;}
+  .set-grid{grid-template-columns:1fr!important;}
+}
 </style>
 </head>
 <body>
-<div class="box">
-  <h1>📥 Импорт данных из Excel</h1>
-  <p>Загрузка операций за <b>Январь — Апрель 2026</b>.<br>Май в файле пустой — ничего страшного, заполнишь вручную.</p>
-  <div class="stats">
-    <div class="stat"><div class="stat-n">75</div><div class="stat-l">Январь</div></div>
-    <div class="stat"><div class="stat-n">58</div><div class="stat-l">Февраль</div></div>
-    <div class="stat"><div class="stat-n">52</div><div class="stat-l">Март</div></div>
-    <div class="stat"><div class="stat-n">49</div><div class="stat-l">Апрель</div></div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">💳</div>
+    <div class="login-title">Финансы 2026</div>
+    <div class="login-sub">Личный финансовый трекер</div>
+    <input type="password" class="login-inp" id="pwd-inp" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="login-err" id="login-err"></div>
+    <button class="login-btn" onclick="doLogin()">Войти →</button>
   </div>
-  <button onclick="startImport()" id="btn">▶ Начать импорт (234 записи)</button>
-  <div id="progress"><div id="progress-bar"></div></div>
-  <div id="log"></div>
 </div>
+
+<!-- APP -->
+<div id="app">
+<div class="layout">
+<nav class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-title">💳 Финансы</div>
+    <div class="sb-logo-sub">2026 · Личный трекер</div>
+  </div>
+  <div class="nav">
+    <div class="nav-lbl">Обзор</div>
+    <button class="nb active" id="nb-dashboard" onclick="go('dashboard')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Дашборд
+    </button>
+    <div class="nav-lbl">Операции</div>
+    <button class="nb" id="nb-journal" onclick="go('journal')">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Журнал
+    </button>
+    <button class="nb" id="nb-deposits" onclick="go('deposits')">
+      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>Вклады
+    </button>
+    <div class="nav-lbl">Система</div>
+    <button class="nb" id="nb-settings" onclick="go('settings')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Настройки
+    </button>
+    <button class="nb nb-logout" onclick="doLogout()" style="margin-top:auto">
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Выйти
+    </button>
+  </div>
+</nav>
+
+<main class="main">
+
+<!-- DASHBOARD -->
+<div id="view-dashboard" class="view active">
+  <div class="ph"><h1>Дашборд</h1><p id="dash-sub">Общая картина финансов</p></div>
+  <div id="dep-alerts"></div>
+  <div class="mbar" id="mt-dash"></div>
+
+  <!-- TOTAL MONEY -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 22px;margin-bottom:14px;box-shadow:var(--shadow)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em">Всего моих денег</div>
+      <button onclick="toggleTotal()" id="btn-toggle-total" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">Показать</button>
+    </div>
+    <div id="total-content" style="display:none">
+      <div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap">
+        <div id="dash-total-money" style="font-family:Manrope,sans-serif;font-size:34px;font-weight:800;color:var(--text);letter-spacing:-1px;flex-shrink:0">—</div>
+        <div id="dash-breakdown" style="display:flex;gap:24px;flex-wrap:wrap;align-items:center"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NET INCOME BY MONTHS (horizontal compact) -->
+  <div id="dash-net-income"></div>
+
+  <!-- CATEGORIES BY MONTH TABLES -->
+  <div id="dash-cats-panel"></div>
+</div>
+
+<!-- JOURNAL -->
+<div id="view-journal" class="view">
+  <div class="ph"><h1>Журнал операций</h1><p>Все операции строка за строкой — как в Excel</p></div>
+  <div class="mbar" id="mt-journal"></div>
+
+  <!-- ADD FORM TOP -->
+  <div class="panel" style="margin-bottom:14px">
+    <div class="panel-h">+ Новая операция</div>
+    <div class="add-bar">
+      <div class="fg">
+        <label>Дата</label>
+        <input type="date" class="inp w110" id="f-date" oninput="checkFormDate(this)">
+      </div>
+      <div class="fg"><label>Банк</label><select class="inp w150" id="f-bank"></select></div>
+      <div class="fg"><label>Тип</label>
+        <select class="inp w170" id="f-type">
+          <option value="income">Приход вне систем</option>
+          <option value="income_i">Приход внутри</option>
+          <option value="tr_in">Приход+из другого Б</option>
+          <option value="tr_out">Списание в другой Б</option>
+          <option value="expense_i">Списание внутри</option>
+          <option value="expense">Расход вне систем</option>
+        </select>
+      </div>
+      <div class="fg"><label>Сумма</label><input type="number" class="inp w90" id="f-amount" placeholder="0" min="0"></div>
+      <div class="fg"><label>Категория</label>
+        <select class="inp w130" id="f-cat">
+          <option value="">— выбрать —</option>
+        </select>
+      </div>
+      <div class="fg"><label>Описание</label><input type="text" class="inp w170" id="f-desc" placeholder="Пятёрочка, зарплата…"></div>
+      <button class="btn btn-p" onclick="addRecord()" style="margin-top:20px">+ Добавить</button>
+    </div>
+  </div>
+
+  <!-- JOURNAL TABLE PANEL -->
+  <div class="panel" style="margin-bottom:14px">
+    <div class="panel-h">
+      <span>Операции · <span id="jrn-m-lbl"></span></span>
+      <div class="filters">
+        <input type="text" class="inp w170" id="jf-search" placeholder="🔍 Поиск по описанию…" oninput="renderJournal()">
+        <select class="inp w150" id="jf-type" onchange="renderJournal()">
+          <option value="">Все типы</option>
+          <option value="income">↑ Приход вне систем</option>
+          <option value="income_i">↑ Приход внутри</option>
+          <option value="tr_in">↑ Приход из др.Б</option>
+          <option value="tr_out">↓ Списание в др.Б</option>
+          <option value="expense_i">↓ Списание внутри</option>
+          <option value="expense">↓ Расход вне систем</option>
+          <option value="__income_all">↑ Все приходы</option>
+          <option value="__expense_all">↓ Все расходы</option>
+        </select>
+        <select class="inp w130" id="jf-sort" onchange="renderJournal()">
+          <option value="date_desc">Дата ↓ (новые)</option>
+          <option value="date_asc">Дата ↑ (старые)</option>
+          <option value="bank">По банку</option>
+          <option value="amount_desc">Сумма ↓</option>
+          <option value="amount_asc">Сумма ↑</option>
+          <option value="cat_asc">Категория А-Я</option>
+          <option value="cat_desc">Категория Я-А</option>
+        </select>
+        <button class="btn btn-g btn-sm" onclick="toggleEditMode()" id="btn-edit-mode">✏️ Редактировать</button>
+        <button class="btn btn-g btn-sm" onclick="toggleMassEdit()" id="btn-mass-edit">🏷️ Категории</button>
+      </div>
+    </div>
+    <!-- Bank filter buttons -->
+    <div id="bank-filter-btns" style="padding:8px 14px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--surface2)"></div>
+    <!-- Mass edit panel -->
+    <div id="mass-edit-panel" style="padding:10px 18px;background:var(--accent-l);border-bottom:1px solid var(--border);display:none;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="font-size:13px;font-weight:600;color:var(--accent)">Выбрано: <span id="selected-count">0</span> записей</span>
+      <select class="inp w150" id="mass-cat-select"><option value="">— выбрать категорию —</option></select>
+      <button class="btn btn-p btn-sm" onclick="applyMassCategory()">Применить</button>
+      <button class="btn btn-g btn-sm" onclick="cancelMassEdit()">Отмена</button>
+    </div>
+    <div class="tbl-wrap" style="max-height:500px;overflow-y:auto;">
+      <table class="jt">
+        <thead>
+          <tr>
+            <th id="jrn-check-th" style="display:none"><input type="checkbox" onclick="toggleAllRows(this)"></th>
+            <th style="cursor:pointer" onclick="setSortJrn('date')">Дата <span id="sort-date">↓</span></th>
+            <th style="cursor:pointer" onclick="setSortJrn('bank')">Банк и счёт</th>
+            <th class="gh">Приход вне систем</th>
+            <th class="gh">Приход внутри</th>
+            <th class="gh">Приход+из другого Б</th>
+            <th style="cursor:pointer" onclick="setSortJrn('cat')">Категория</th>
+            <th>Описание</th>
+            <th class="rh">Списание в другой Б</th>
+            <th class="rh">Списание внутри</th>
+            <th class="rh">Расход вне систем</th>
+            <th></th>
+          </tr>
+          <!-- STICKY TOTALS ROW -->
+          <tr class="tots-row" id="jrn-tots-row">
+            <td class="meta" id="tots-check-td" style="display:none"></td>
+            <td class="meta" id="tots-count">0 записей</td>
+            <td class="meta">Итого ↓</td>
+            <td class="gc num" id="tots-income">—</td>
+            <td class="pc num" id="tots-income-i">—</td>
+            <td class="ac num" id="tots-tr-in">—</td>
+            <td></td>
+            <td></td>
+            <td class="ac num" id="tots-tr-out">—</td>
+            <td class="pc num" id="tots-expense-i">—</td>
+            <td class="rc num" id="tots-expense">—</td>
+            <td></td>
+          </tr>
+        </thead>
+        <tbody id="jrn-body"></tbody>
+      </table>
+    </div>
+    <div id="jrn-empty" class="empty" style="display:none">Нет операций за этот месяц.</div>
+  </div>
+
+  <!-- SVERKA PANEL -->
+  <div class="panel" id="panel-sverka">
+    <div class="panel-h">
+      <span>Сверка месяца · <span id="sverka-m-lbl"></span></span>
+      <div style="display:flex;gap:10px;align-items:center">
+        <span id="sverka-status" style="font-size:12px;font-weight:600"></span>
+        <button id="btn-hide-envrows" onclick="toggleSverkaEnvRows()" style="font-size:11px;font-weight:600;color:var(--purple);background:var(--purple-bg);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">🪙 Скрыть резервы</button>
+        <button class="btn btn-g btn-sm" onclick="renderSverka()">↻ Обновить</button>
+      </div>
+    </div>
+    <div style="padding:8px 18px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:12px;color:var(--text2)">
+      Данные из журнала считаются автоматически. Введи цифру из приложения банка → сохранится автоматически и будет доступно при следующем открытии.
+    </div>
+    <div class="tbl-wrap">
+      <table class="svt" id="sverka-table">
+        <thead>
+          <tr>
+            <th>Банк</th>
+            <th class="gh">Доход (жур.)</th>
+            <th class="gh" style="background:#fff8e1;color:#b45309">Выписка Д</th>
+            <th class="gh">✓</th>
+            <th class="rh">Расход (жур.)</th>
+            <th class="rh" style="background:#fff8e1;color:#b45309">Выписка Р</th>
+            <th class="rh">✓</th>
+            <th class="bh">Перев. ↑ (tr_in)</th>
+            <th class="bh">Перев. ↓ (tr_out)</th>
+            <th class="bh">Внутр. ↑</th>
+            <th class="bh">Внутр. ↓</th>
+            <th>Нач.</th>
+            <th>Кон.</th>
+            <th>Δ</th>
+            <th style="background:var(--purple-bg);color:var(--purple)">Свободно</th>
+          </tr>
+        </thead>
+        <tbody id="sverka-body"></tbody>
+      </table>
+    </div>
+    <div id="sverka-checks" style="padding:12px 18px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--border);background:var(--surface2)"></div>
+  </div>
+
+  <!-- ENVELOPES PANEL -->
+  <div class="panel" id="panel-envelopes" style="margin-top:14px">
+    <div class="panel-h">
+      <span>🪙 Конверты (резервы)</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-g btn-sm" onclick="toggleEnvelopeForm()">+ Добавить</button>
+        <button id="btn-env-toggle" onclick="toggleEnvelopePanel()" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">Скрыть</button>
+      </div>
+    </div>
+    <div id="env-panel-body">
+      <div id="envelope-form" style="display:none;padding:12px 18px;background:var(--surface2);border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;align-items:flex-end">
+        <div class="fg"><label>Название</label><input class="inp w150" id="env-name" placeholder="Отпуск, Подушка…"></div>
+        <div class="fg"><label>Банк</label><select class="inp w150" id="env-bank"></select></div>
+        <div class="fg"><label>Сумма</label><input type="number" class="inp w110" id="env-amount" placeholder="0"></div>
+        <div class="fg"><label>Дата</label><input type="date" class="inp w130" id="env-date"></div>
+        <button class="btn btn-p btn-sm" onclick="saveEnvelope()" style="margin-top:20px">Сохранить</button>
+        <button class="btn btn-g btn-sm" onclick="toggleEnvelopeForm()" style="margin-top:20px">Отмена</button>
+      </div>
+      <div id="envelope-list" style="padding:0 18px"></div>
+      <div id="envelope-totals" style="padding:10px 18px;background:var(--surface2);border-top:1px solid var(--border);font-size:13px;display:flex;gap:20px;flex-wrap:wrap"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ANALYTICS -->
+<div id="view-analytics" class="view">
+  <div class="ph"><h1>Аналитика</h1><p>Динамика доходов и расходов за 2026</p></div>
+  <div class="mbar" id="mt-analytics"></div>
+  <div style="display:grid;grid-template-columns:1.1fr 1fr 0.9fr;gap:16px;margin-bottom:18px">
+    <div class="panel">
+      <div class="panel-h">По счетам · <span id="an-month-lbl"></span> <span style="font-size:12px;color:var(--text3);font-weight:400">· клик → журнал</span></div>
+      <div class="panel-b" id="an-banks"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h">Расходы по категориям</div>
+      <div class="panel-b" id="an-cats"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h">Вклады</div>
+      <div class="panel-b" id="an-deps"></div>
+    </div>
+  </div>
+  <div class="panel" style="margin-bottom:18px">
+    <div class="panel-h">
+      <span>Чистый доход по месяцам</span>
+      <div style="display:flex;gap:14px;font-size:12px;color:var(--text2)">
+        <span><span style="display:inline-block;width:10px;height:10px;background:var(--green);border-radius:3px;margin-right:5px;vertical-align:middle"></span>Приход вне систем</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:var(--red);border-radius:3px;margin-right:5px;vertical-align:middle"></span>Расход вне систем</span>
+      </div>
+    </div>
+    <div class="panel-b">
+      <div class="an-chart" id="an-chart"></div>
+      <div style="display:flex;gap:6px;margin-top:6px" id="an-labels"></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+    <div class="panel"><div class="panel-h">Топ расходов по счетам (год)</div><div class="panel-b" id="an-exp"></div></div>
+    <div class="panel"><div class="panel-h">Топ доходов по счетам (год)</div><div class="panel-b" id="an-inc"></div></div>
+  </div>
+</div>
+
+<!-- DEPOSITS -->
+<div id="view-deposits" class="view">
+  <div class="ph"><h1>Вклады и накопительные</h1><p>Отслеживание сроков и сумм</p></div>
+  <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:20px">
+    <div class="panel">
+      <div class="panel-h">Добавить вклад</div>
+      <div class="panel-b">
+        <div class="dep-form-grid">
+          <div class="fg full"><label>Название</label><input class="inp" style="width:100%" id="df-name" placeholder="ФинУСЛУГИ ВКЛАД"></div>
+          <div class="fg"><label>Банк</label><input class="inp" style="width:100%" id="df-bank" placeholder="Альфа Банк"></div>
+          <div class="fg"><label>Сумма</label><input type="number" class="inp" style="width:100%" id="df-amount" placeholder="0"></div>
+          <div class="fg"><label>Ставка %</label><input type="number" class="inp" style="width:100%" id="df-rate" placeholder="18.5" step="0.1"></div>
+          <div class="fg"><label>Дата открытия</label><input type="date" class="inp" style="width:100%" id="df-open"></div>
+          <div class="fg"><label>Дата закрытия</label><input type="date" class="inp" style="width:100%" id="df-close"></div>
+          <div class="fg full"><label>Комментарий</label><input class="inp" style="width:100%" id="df-desc" placeholder="Необязательно"></div>
+          <div class="full" style="display:flex;justify-content:flex-end;margin-top:6px">
+            <button class="btn btn-p" onclick="addDeposit()">+ Добавить вклад</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="dep-list"></div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="view-settings" class="view">
+  <div class="ph"><h1>Настройки</h1><p>Счета, пароль и данные</p></div>
+  <div class="section-div" style="display:flex;align-items:center;justify-content:space-between">
+    <span>Банки по месяцам</span>
+    <button onclick="toggleMonthBanksSection()" id="btn-mb-toggle" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:3px 10px;cursor:pointer">Скрыть</button>
+  </div>
+  <div id="month-banks-section" style="margin-bottom:20px">
+  <div class="panel">
+    <div class="panel-h">
+      <span>Активные банки · <span id="month-banks-lbl"></span></span>
+      <select class="inp w130" id="month-banks-sel" onchange="renderMonthBanks()">
+        <option value="">— выбрать месяц —</option>
+      </select>
+    </div>
+    <div class="panel-b" id="month-banks-list"><div class="empty">Выберите месяц</div></div>
+  </div>
+  </div>
+  <div class="section-div">Категории</div>
+  <div class="panel" style="margin-bottom:20px">
+    <div class="panel-h">Категории расходов и доходов</div>
+    <div class="panel-b">
+      <div id="cat-list"></div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:8px">
+        <input class="inp" style="flex:1" id="new-cat-name" placeholder="Новая категория">
+        <button class="btn btn-p btn-sm" onclick="addCategory()">+ Добавить</button>
+      </div>
+    </div>
+  </div>
+  <div class="set-grid">
+    <div>
+      <div class="panel">
+        <div class="panel-h">Счета и карты</div>
+        <div class="panel-b">
+          <div id="bank-list"></div>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+            <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Добавить счёт</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <input class="inp w150" id="nb-name" placeholder="Название счёта">
+              <select class="inp w120" id="nb-type">
+                <option value="debit">Дебетовая</option><option value="credit">Кредитная</option>
+                <option value="savings">Накопительная</option><option value="cash">Наличные</option><option value="deposit">Вклад</option>
+              </select>
+              <input type="color" id="nb-color" value="#4f6ef7" style="width:36px;height:36px;border:1.5px solid var(--border);border-radius:var(--radius-xs);cursor:pointer;padding:2px">
+              <button class="btn btn-p btn-sm" onclick="addBank()">Добавить</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="panel" style="margin-bottom:16px">
+        <div class="panel-h">Сменить пароль</div>
+        <div class="panel-b">
+          <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+            <div class="fg"><label>Новый пароль</label><input type="password" class="inp w150" id="new-pwd" placeholder="Введите пароль"></div>
+            <div class="fg"><label>Повторить</label><input type="password" class="inp w150" id="new-pwd2" placeholder="Повторите пароль"></div>
+            <button class="btn btn-p btn-sm" onclick="changePwd()">Сохранить</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-h">Данные</div>
+        <div class="panel-b">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-g btn-sm" onclick="exportData()">⬇ Экспорт JSON</button>
+            <label class="btn btn-g btn-sm" style="cursor:pointer;display:flex;align-items:center">⬆ Импорт JSON<input type="file" accept=".json" style="display:none" onchange="importData(this)"></label>
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:var(--text3)" id="data-info"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+</div>
+<div id="toast"></div>
+<div class="mob-overlay" id="mob-overlay" onclick="closeMobMenu()"></div>
+<button class="mob-hamburger" onclick="toggleMobMenu()">
+  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</button>
+<nav class="mob-nav">
+  <div class="mob-nav-items">
+    <button class="mob-nb active" id="mob-dashboard" onclick="go('dashboard')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Дашборд
+    </button>
+    <button class="mob-nb" id="mob-analytics" onclick="go('analytics')">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Аналитика
+    </button>
+    <button class="mob-nb" id="mob-journal" onclick="go('journal')">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Журнал
+    </button>
+    <button class="mob-nb" id="mob-deposits" onclick="go('deposits')">
+      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Вклады
+    </button>
+    <button class="mob-nb" id="mob-settings" onclick="go('settings')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Настройки
+    </button>
+  </div>
+</nav>
+
 <script>
-const RECORDS = [{"month": "Январь", "bank_id": "tinkoff_d", "type": "income", "amount": 19.0, "category": "Развлечение", "description": "иви", "op_date": "2026-01-01"}, {"month": "Январь", "bank_id": "alfa_sav", "type": "income", "amount": 2602.17, "category": null, "description": "Процент по накопит счету", "op_date": "2026-01-31"}, {"month": "Январь", "bank_id": "ozon", "type": "expense", "amount": 367.0, "category": null, "description": null, "op_date": "2026-01-05"}, {"month": "Январь", "bank_id": "wb", "type": "tr_in", "amount": 2000.0, "category": null, "description": "Из Тиньков", "op_date": "2026-01-03"}, {"month": "Январь", "bank_id": "cash", "type": "tr_in", "amount": 18000.0, "category": "Аренда", "description": "Аренда константин", "op_date": "2026-01-03"}, {"month": "Январь", "bank_id": "finusl", "type": "tr_in", "amount": 24066.76, "category": null, "description": null, "op_date": "2026-01-31"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 19.0, "category": "Развлечение", "description": "иви", "op_date": "2026-01-01"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 1036.0, "category": "Медицина", "description": "антидепресанты аптека", "op_date": "2026-01-02"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 2149.0, "category": "Подписка", "description": "Яндекс 360(подписка на год)", "op_date": "2026-01-03"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 34.0, "category": "Транспорт", "description": "транспорт", "op_date": "2026-01-03"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "tr_out", "amount": 2000.0, "category": "Перевод в/из друг. банк", "description": "перевод в ваилбериз", "op_date": "2026-01-03"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 5200.0, "category": "Медицина", "description": "Кларте - очки линзы", "op_date": "2026-01-04"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 49.99, "category": "Еда", "description": "Красное и белое", "op_date": "2026-01-04"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 499.72, "category": "Транспорт", "description": "АЗС", "op_date": "2026-01-04"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 99.0, "category": "Услуги банка", "description": "Плата за обслуживание", "op_date": "2026-01-06"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 139.48, "category": "Еда", "description": "Красное и белое", "op_date": "2026-01-06"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 374.0, "category": "Еда", "description": "Малинка", "op_date": "2026-01-06"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 94.5, "category": null, "description": "Литнет", "op_date": "2026-01-06"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 1313.21, "category": null, "description": "Чижик", "op_date": "2026-01-07"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "tr_in", "amount": 20000.0, "category": null, "description": "от Андрея на диван", "op_date": "2026-01-08"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "tr_out", "amount": 1500.0, "category": null, "description": "Перевод в озон", "op_date": "2026-01-08"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "tr_out", "amount": 33000.0, "category": null, "description": "Перевод в Альфу", "op_date": "2026-01-08"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 699.53, "category": null, "description": "Роснефть", "op_date": "2026-01-09"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "tr_in", "amount": 2700.0, "category": null, "description": "от Андрея", "op_date": "2026-01-09"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 2700.0, "category": null, "description": "Михаил Д", "op_date": "2026-01-09"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 48.0, "category": null, "description": "транспорт", "op_date": "2026-01-11"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 48.0, "category": null, "description": "транспорт", "op_date": "2026-01-11"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 200.0, "category": null, "description": "Ямогучи массаж", "op_date": "2026-01-11"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 620.0, "category": null, "description": "Донер еда", "op_date": "2026-01-11"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 228.0, "category": null, "description": "Яндекс Такси", "op_date": "2026-01-13"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 244.0, "category": null, "description": "Яндекс Такси", "op_date": "2026-01-13"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "tr_in", "amount": 10000.0, "category": null, "description": "Виктор М", "op_date": "2026-01-15"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 189.0, "category": null, "description": "Литмакрет", "op_date": "2026-01-17"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 142.38, "category": null, "description": "Красное и белое", "op_date": "2026-01-17"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 1138.0, "category": null, "description": "Фикспрайс", "op_date": "2026-01-17"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 4.0, "category": null, "description": "Фикспрайс", "op_date": "2026-01-17"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 194.0, "category": null, "description": "Яндекс Такси", "op_date": "2026-01-18"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 105.38, "category": null, "description": "Красное и белое", "op_date": "2026-01-19"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 111.75, "category": null, "description": "Литнет", "op_date": "2026-01-20"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 160.65, "category": null, "description": "Литнет", "op_date": "2026-01-20"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 458.0, "category": null, "description": "Фикспрайс", "op_date": "2026-01-21"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 108.0, "category": null, "description": "Яндекс Такси", "op_date": "2026-01-22"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 230.76, "category": null, "description": "Красное и белое", "op_date": "2026-01-22"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 5625.0, "category": null, "description": "Оплата пошлины", "op_date": "2026-01-23"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 120.0, "category": null, "description": "VPN", "op_date": "2026-01-25"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 169.0, "category": null, "description": "Author Today. Книги", "op_date": "2026-01-25"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 189.0, "category": null, "description": "Author Today. Книги", "op_date": "2026-01-25"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 189.0, "category": null, "description": "Author Today. Книги", "op_date": "2026-01-26"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 189.0, "category": null, "description": "Author Today. Книги", "op_date": "2026-01-26"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 297.75, "category": null, "description": "Яблонька", "op_date": "2026-01-27"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 189.0, "category": null, "description": "Author Today. Книги", "op_date": "2026-01-27"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 189.0, "category": null, "description": "Author Today. Книги", "op_date": "2026-01-28"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 519.98, "category": null, "description": "Магнит Косметик", "op_date": "2026-01-28"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 171.47, "category": null, "description": "Красное и белое", "op_date": "2026-01-28"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "tr_in", "amount": 16000.0, "category": null, "description": "Дарья С 25 квартира", "op_date": "2026-01-29"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 189.0, "category": null, "description": "Author Today. Книги", "op_date": "2026-01-29"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 189.0, "category": null, "description": "Author Today. Книги", "op_date": "2026-01-30"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 1756.0, "category": null, "description": "Корм коту", "op_date": "2026-01-31"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 245.0, "category": null, "description": "Аптека", "op_date": "2026-01-31"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 254.98, "category": null, "description": "пятерочка", "op_date": "2026-01-31"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "tr_in", "amount": 2000.0, "category": null, "description": "Андрей Г", "op_date": "2026-01-31"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 189.0, "category": null, "description": "Author Today. Книги", "op_date": "2026-01-31"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 1652.0, "category": null, "description": "Аптека", "op_date": "2026-01-31"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "tr_in", "amount": 25000.0, "category": null, "description": "Виктор М", "op_date": "2026-01-31"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 375.2, "category": null, "description": "Магнит Косметик", "op_date": "2026-01-31"}, {"month": "Январь", "bank_id": "tinkoff_d", "type": "expense", "amount": 713.5, "category": null, "description": "Фикспрайс", "op_date": "2026-01-31"}, {"month": "Январь", "bank_id": "wb", "type": "expense", "amount": 1277.0, "category": null, "description": null, "op_date": "2026-01-03"}, {"month": "Январь", "bank_id": "wb", "type": "tr_in", "amount": 907.0, "category": null, "description": "Возврат", "op_date": "2026-01-04"}, {"month": "Январь", "bank_id": "wb", "type": "expense", "amount": 1423.0, "category": null, "description": null, "op_date": "2026-01-21"}, {"month": "Январь", "bank_id": "ozon", "type": "income", "amount": 1500.0, "category": null, "description": "Перевод с Тинкоф", "op_date": "2026-01-08"}, {"month": "Январь", "bank_id": "ozon", "type": "expense", "amount": 1033.0, "category": null, "description": null, "op_date": "2026-01-08"}, {"month": "Январь", "bank_id": "ozon", "type": "income", "amount": 731.0, "category": null, "description": "Возврат средств", "op_date": "2026-01-08"}, {"month": "Январь", "bank_id": "alfa_debit", "type": "income", "amount": 33000.0, "category": null, "description": null, "op_date": "2026-01-08"}, {"month": "Январь", "bank_id": "alfa_debit", "type": "expense", "amount": 33000.0, "category": null, "description": "На Диван", "op_date": "2026-01-08"}, {"month": "Январь", "bank_id": "cash", "type": "income", "amount": 42500.0, "category": null, "description": "От Мамы за уборки папиных квартир на депозит", "op_date": "2026-01-31"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 189.0, "category": null, "description": "Author Today. Книги", "op_date": "2026-02-01"}, {"month": "Февраль", "bank_id": "alfa_debit", "type": "expense", "amount": 33000.0, "category": null, "description": "Диван покупка", "op_date": "2026-02-08"}, {"month": "Февраль", "bank_id": "ozon", "type": "expense", "amount": 367.0, "category": null, "description": null, "op_date": "2026-02-08"}, {"month": "Февраль", "bank_id": "wb", "type": "tr_in", "amount": 1000.0, "category": null, "description": "Перевод из тинкофф", "op_date": "2026-02-08"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 1080.0, "category": null, "description": "Ресторан", "op_date": "2026-02-01"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "tr_in", "amount": 5000.0, "category": null, "description": "Виктор М", "op_date": "2026-02-01"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 33.0, "category": null, "description": "Транспорт", "op_date": "2026-02-01"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 189.0, "category": null, "description": "Author Today. Книги", "op_date": "2026-02-02"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 189.0, "category": null, "description": "Author Today. Книги", "op_date": "2026-02-03"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 189.0, "category": null, "description": "Author Today. Книги", "op_date": "2026-02-04"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 130.0, "category": null, "description": "Яндекс Такси", "op_date": "2026-02-04"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 136.0, "category": null, "description": "Яндекс Такси", "op_date": "2026-02-04"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 513.58, "category": null, "description": "Продукты Ермолино", "op_date": "2026-02-04"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 189.0, "category": null, "description": "Author Today. Книги", "op_date": "2026-02-05"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "tr_in", "amount": 10000.0, "category": null, "description": "Андрей Г на отпуск", "op_date": "2026-02-05"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "tr_in", "amount": 103.0, "category": null, "description": "Зачисление кешбека", "op_date": "2026-02-05"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "tr_out", "amount": 1000.0, "category": null, "description": "перевод в ваилбериз", "op_date": "2026-02-08"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "tr_in", "amount": 1000.0, "category": null, "description": "Андрей Г на чайник с вб", "op_date": "2026-02-08"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 312.0, "category": null, "description": "Аптека", "op_date": "2026-02-09"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 139.0, "category": null, "description": "Литнет", "op_date": "2026-02-09"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 285.48, "category": null, "description": "Пятерочка", "op_date": "2026-02-10"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 194.98, "category": null, "description": "Красное и белое", "op_date": "2026-02-10"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 64.99, "category": null, "description": "Пятерочка", "op_date": "2026-02-13"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 299.99, "category": null, "description": "Пятерочка", "op_date": "2026-02-13"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 999.76, "category": null, "description": "Роснефть", "op_date": "2026-02-14"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 199.0, "category": null, "description": "Литнет", "op_date": "2026-02-15"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "tr_in", "amount": 25000.0, "category": null, "description": "Виктор М", "op_date": "2026-02-15"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 141.75, "category": null, "description": "Литнет", "op_date": "2026-02-16"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "tr_in", "amount": 18000.0, "category": null, "description": "Михаил д (за квартиру)", "op_date": "2026-02-16"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 199.0, "category": null, "description": "Литнет", "op_date": "2026-02-17"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 432.95, "category": null, "description": "Пятерочка", "op_date": "2026-02-18"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 652.1, "category": null, "description": "Аптека", "op_date": "2026-02-18"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 96.34, "category": null, "description": "Пятерочка", "op_date": "2026-02-19"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 500.0, "category": null, "description": "Cвязь мтс", "op_date": "2026-02-19"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 958.0, "category": null, "description": "Пятерочка", "op_date": "2026-02-20"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 199.0, "category": null, "description": "Литнет", "op_date": "2026-02-22"}, {"month": "Февраль", "bank_id": "sber_d", "type": "tr_in", "amount": 540.0, "category": null, "description": "Аня еда", "op_date": "2026-02-01"}, {"month": "Февраль", "bank_id": "alfa_sav", "type": "tr_in", "amount": 577.76, "category": null, "description": "Процент по накопит счету", "op_date": "2026-02-28"}, {"month": "Февраль", "bank_id": "wb", "type": "expense", "amount": 10006.0, "category": null, "description": null, "op_date": "2026-02-08"}, {"month": "Февраль", "bank_id": "wb", "type": "expense", "amount": 250.0, "category": null, "description": null, "op_date": "2026-02-13"}, {"month": "Февраль", "bank_id": "wb", "type": "tr_in", "amount": 5000.0, "category": null, "description": "Перевод из тинкофф", "op_date": "2026-02-23"}, {"month": "Февраль", "bank_id": "wb", "type": "expense", "amount": 310.0, "category": null, "description": null, "op_date": "2026-02-28"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "tr_out", "amount": 5000.0, "category": null, "description": "Перевод в ваилбериз", "op_date": "2026-02-23"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 1172.0, "category": null, "description": "Аптека", "op_date": "2026-02-23"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 541.95, "category": null, "description": "Пятерочка", "op_date": "2026-02-23"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 189.0, "category": null, "description": "Литнет", "op_date": "2026-02-23"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 1007.91, "category": null, "description": "Аптека", "op_date": "2026-02-23"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 179.0, "category": null, "description": "Литнет", "op_date": "2026-02-24"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 179.0, "category": null, "description": "Литнет", "op_date": "2026-02-27"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 114.0, "category": null, "description": "ВПН", "op_date": "2026-02-27"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "income", "amount": 25000.0, "category": null, "description": "ЗП от Стаса", "op_date": "2026-02-28"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 1050.0, "category": null, "description": "Стрижка", "op_date": "2026-02-28"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 34.0, "category": null, "description": "Транспорт", "op_date": "2026-02-28"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 2507.0, "category": null, "description": "Кари обувь черная осень", "op_date": "2026-02-28"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 1880.0, "category": null, "description": "Одежда - штаны черные", "op_date": "2026-02-28"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 33.0, "category": null, "description": "Транспорт", "op_date": "2026-02-28"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "expense", "amount": 216.01, "category": null, "description": "Чаевые в рестике", "op_date": "2026-02-28"}, {"month": "Февраль", "bank_id": "tinkoff_d", "type": "income", "amount": 16000.0, "category": null, "description": "Аренда", "op_date": "2026-02-28"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 527.74, "category": null, "description": "Пятерочка", "op_date": "2026-03-01"}, {"month": "Март", "bank_id": "ozon", "type": "expense", "amount": 2451.0, "category": null, "description": null, "op_date": "2026-03-02"}, {"month": "Март", "bank_id": "wb", "type": "expense", "amount": 343.0, "category": null, "description": null, "op_date": "2026-03-03"}, {"month": "Март", "bank_id": "ozon", "type": "expense", "amount": 153.0, "category": null, "description": null, "op_date": "2026-03-05"}, {"month": "Март", "bank_id": "ozon", "type": "expense", "amount": 371.0, "category": null, "description": null, "op_date": "2026-03-05"}, {"month": "Март", "bank_id": "ozon", "type": "expense", "amount": 149.0, "category": null, "description": null, "op_date": "2026-03-08"}, {"month": "Март", "bank_id": "ozon", "type": "expense", "amount": 254.0, "category": null, "description": null, "op_date": "2026-03-08"}, {"month": "Март", "bank_id": "ozon", "type": "expense", "amount": 1025.0, "category": null, "description": null, "op_date": "2026-03-15"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 139.0, "category": null, "description": "Литмаркет", "op_date": "2026-03-01"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 111.0, "category": null, "description": "Литмаркет", "op_date": "2026-03-01"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "tr_out", "amount": 2500.0, "category": null, "description": "Перевод в Озон", "op_date": "2026-03-02"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 881.0, "category": null, "description": "Аптека", "op_date": "2026-03-03"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "income", "amount": 2500.0, "category": null, "description": "ЗП от Стаса", "op_date": "2026-03-03"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 2400.0, "category": null, "description": "??? Перевод куда то", "op_date": "2026-03-04"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 267.56, "category": null, "description": "Красное  белое", "op_date": "2026-03-04"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 912.03, "category": null, "description": "Чижик", "op_date": "2026-03-07"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 133.0, "category": null, "description": "Аптека", "op_date": "2026-03-07"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "income", "amount": 2000.0, "category": null, "description": "Виктор", "op_date": "2026-03-08"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 584.0, "category": null, "description": "Еаптека", "op_date": "2026-03-08"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "income", "amount": 4000.0, "category": null, "description": "Андрей  на 8 марта подарок", "op_date": "2026-03-08"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 3751.0, "category": null, "description": "Золотое яблоко", "op_date": "2026-03-08"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 141.0, "category": null, "description": "Яндекс такси", "op_date": "2026-03-09"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 337.0, "category": null, "description": "Яндекс такси", "op_date": "2026-03-09"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 315.0, "category": null, "description": "Яблонька", "op_date": "2026-03-11"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 217.8, "category": null, "description": "Продукты", "op_date": "2026-03-11"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 280.5, "category": null, "description": "Яюлонька", "op_date": "2026-03-13"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 166.0, "category": null, "description": "Яндекс такси", "op_date": "2026-03-13"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 1954.0, "category": null, "description": "Соц суши", "op_date": "2026-03-14"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 149.0, "category": null, "description": "Фикспрайс", "op_date": "2026-03-14"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 76.3, "category": null, "description": "Аптека", "op_date": "2026-03-14"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 358.98, "category": null, "description": "Магнит", "op_date": "2026-03-14"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "tr_out", "amount": 100000.0, "category": null, "description": "Финуслуги", "op_date": "2026-03-15"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "tr_out", "amount": 17278.06, "category": null, "description": "Финуслуги", "op_date": "2026-03-15"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "tr_out", "amount": 1000.0, "category": null, "description": "Перевод в озон банк", "op_date": "2026-03-15"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 49.5, "category": null, "description": "Фикс прайс", "op_date": "2026-03-15"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 559.0, "category": null, "description": "Улыбка - стиральный порошок", "op_date": "2026-03-15"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "income", "amount": 25000.0, "category": null, "description": "ЗП от Стаса", "op_date": "2026-03-15"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 987.79, "category": null, "description": "Чижик", "op_date": "2026-03-15"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "income", "amount": 7500.0, "category": null, "description": "ЗП от Стаса", "op_date": "2026-03-15"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 189.0, "category": null, "description": "Аптка Вита", "op_date": "2026-03-17"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 159.0, "category": null, "description": "Книги Author", "op_date": "2026-03-17"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 2950.0, "category": null, "description": "Кларте очки", "op_date": "2026-03-17"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 150.0, "category": null, "description": "Такси", "op_date": "2026-03-17"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 765.73, "category": null, "description": "Симкарта китайская", "op_date": "2026-03-18"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 1631.0, "category": null, "description": "Алиэкспрес", "op_date": "2026-03-23"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 3299.0, "category": null, "description": "Алиэкспрес", "op_date": "2026-03-23"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 1608.0, "category": null, "description": "Алиэкспрес", "op_date": "2026-03-28"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 1585.0, "category": null, "description": "Алиэкспрес", "op_date": "2026-03-28"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "income", "amount": 16000.0, "category": null, "description": "Дарья за Аренду", "op_date": "2026-03-28"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 200.0, "category": null, "description": "Сотовая связь", "op_date": "2026-03-30"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 225.06, "category": null, "description": "Красное и белое", "op_date": "2026-03-31"}, {"month": "Март", "bank_id": "tinkoff_d", "type": "expense", "amount": 276.35, "category": null, "description": "Продукты (овощи)", "op_date": "2026-03-31"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 200.0, "category": null, "description": "ВПН", "op_date": "2026-04-01"}, {"month": "Апрель", "bank_id": "ozon", "type": "expense", "amount": 1568.0, "category": null, "description": null, "op_date": "2026-04-02"}, {"month": "Апрель", "bank_id": "wb", "type": "tr_in", "amount": 500.0, "category": null, "description": null, "op_date": "2026-04-02"}, {"month": "Апрель", "bank_id": "ozon", "type": "expense", "amount": 354.0, "category": null, "description": null, "op_date": "2026-04-02"}, {"month": "Апрель", "bank_id": "ozon", "type": "tr_out", "amount": 500.0, "category": null, "description": null, "op_date": "2026-04-02"}, {"month": "Апрель", "bank_id": "ozon", "type": "expense", "amount": 922.0, "category": null, "description": null, "op_date": "2026-04-04"}, {"month": "Апрель", "bank_id": "ozon", "type": "expense", "amount": 1052.0, "category": null, "description": null, "op_date": "2026-04-04"}, {"month": "Апрель", "bank_id": "ozon", "type": "expense", "amount": 88.0, "category": null, "description": null, "op_date": "2026-04-04"}, {"month": "Апрель", "bank_id": "ozon", "type": "expense", "amount": 1985.0, "category": null, "description": null, "op_date": "2026-04-09"}, {"month": "Апрель", "bank_id": "wb", "type": "expense", "amount": 4805.0, "category": null, "description": null, "op_date": "2026-04-02"}, {"month": "Апрель", "bank_id": "wb", "type": "expense", "amount": 312.0, "category": null, "description": null, "op_date": "2026-04-04"}, {"month": "Апрель", "bank_id": "wb", "type": "tr_in", "amount": 7000.0, "category": null, "description": null, "op_date": "2026-04-14"}, {"month": "Апрель", "bank_id": "wb", "type": "expense", "amount": 3973.0, "category": null, "description": null, "op_date": "2026-04-14"}, {"month": "Апрель", "bank_id": "wb", "type": "expense", "amount": 2554.0, "category": null, "description": null, "op_date": "2026-04-15"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "tr_out", "amount": 1000.0, "category": null, "description": "Перевод в Озон", "op_date": "2026-04-02"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "tr_out", "amount": 1000.0, "category": null, "description": "Перевод в Озон", "op_date": "2026-04-02"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "income", "amount": 18000.0, "category": null, "description": "От Миши за Аренду", "op_date": "2026-04-03"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "tr_out", "amount": 1000.0, "category": null, "description": "Перевод в Озон", "op_date": "2026-04-04"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "tr_out", "amount": 1000.0, "category": null, "description": "Перевод в Озон", "op_date": "2026-04-04"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 1700.0, "category": null, "description": "????", "op_date": "2026-04-04"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 1006.0, "category": null, "description": "Продукты", "op_date": "2026-04-04"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "tr_out", "amount": 3000.0, "category": null, "description": "Перевод в Озон", "op_date": "2026-04-04"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 516.0, "category": null, "description": "Овощи", "op_date": "2026-04-04"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 8490.0, "category": null, "description": "Абонимент в спортзал", "op_date": "2026-04-04"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 8490.0, "category": null, "description": "Абонимент в спортзал", "op_date": "2026-04-04"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 719.95, "category": null, "description": "Магнит", "op_date": "2026-04-04"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 638.93, "category": null, "description": "Пятерочка", "op_date": "2026-04-05"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 991.0, "category": null, "description": "Магазин продукты", "op_date": "2026-04-07"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 384.0, "category": null, "description": "Рынок", "op_date": "2026-04-07"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 238.0, "category": null, "description": "Рынок", "op_date": "2026-04-07"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 228.0, "category": null, "description": "Рынок", "op_date": "2026-04-07"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 15.0, "category": null, "description": "Юрент - самокат", "op_date": "2026-04-08"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "income", "amount": 15.0, "category": null, "description": "Юрент - самокат", "op_date": "2026-04-08"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 39.0, "category": null, "description": "Юрент - самокат", "op_date": "2026-04-08"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 300.0, "category": null, "description": "Юрент - самокат", "op_date": "2026-04-08"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 52.96, "category": null, "description": "Юрент - самокат", "op_date": "2026-04-08"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "income", "amount": 300.0, "category": null, "description": "Юрент - самокат", "op_date": "2026-04-08"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 184.97, "category": null, "description": "Красное и белое", "op_date": "2026-04-08"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 1787.0, "category": null, "description": "Ваилбериз (пододеяльник и пипидастр)", "op_date": "2026-04-09"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 266.0, "category": null, "description": "Такси", "op_date": "2026-04-09"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 1071.0, "category": null, "description": "Яблонька", "op_date": "2026-04-11"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 200.5, "category": null, "description": "Яблонька", "op_date": "2026-04-11"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 874.0, "category": null, "description": "Яблонька", "op_date": "2026-04-11"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 139.98, "category": null, "description": "Красное и белое", "op_date": "2026-04-11"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "tr_out", "amount": 7000.0, "category": null, "description": "Перевод в Ваилбериз", "op_date": "2026-04-14"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "income", "amount": 30000.0, "category": null, "description": "ЗП от Стаса", "op_date": "2026-04-15"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 149.0, "category": null, "description": "Юрент самокат", "op_date": "2026-04-15"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 525.0, "category": null, "description": "Малинка", "op_date": "2026-04-16"}, {"month": "Апрель", "bank_id": "tinkoff_d", "type": "expense", "amount": 279.0, "category": null, "description": "Магнит", "op_date": "2026-04-16"}];
-const API = '/api/db';
+const API='/api/db';
+const PWD_KEY='fin26_pwd';
+const DEFAULT_PWD='';
+const MONTHS=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const TYPE_LABELS={income:'Приход вне систем',income_i:'Приход внутри',tr_in:'Приход+из другого Б',tr_out:'Списание в другой Б',expense_i:'Списание внутри',expense:'Расход вне систем'};
+const TYPE_SIGN={income:1,income_i:1,tr_in:1,tr_out:-1,expense_i:-1,expense:-1};
+const BTYPE={debit:'Дебетовая',credit:'Кредитная',savings:'Накопит.',cash:'Наличные',deposit:'Вклад'};
 
-function log(msg, cls='') {
-  const d = document.getElementById('log');
-  d.style.display = 'block';
-  d.innerHTML += `<div class="${cls}">${msg}</div>`;
-  d.scrollTop = d.scrollHeight;
-}
+let banks=[],deposits=[],categories=[];
+let curMonth=MONTHS[new Date().getMonth()];
+let jrnSort='date_desc';
+let jrnBank='';
+let jrnCat='';
+let editMode=false;
 
-async function q(sql, params=[]) {
-  const r = await fetch(API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({query:sql, params})});
-  const d = await r.json();
+async function q(sql,params=[]){
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:sql,params})});
+  const d=await r.json();
   if(d.error) throw new Error(d.error);
-  return d;
+  return d.rows||[];
 }
 
-async function startImport() {
-  const btn = document.getElementById('btn');
-  const prog = document.getElementById('progress');
-  const bar = document.getElementById('progress-bar');
-  btn.disabled = true;
-  prog.style.display = 'block';
-  
-  log('🚀 Начинаем загрузку ' + RECORDS.length + ' записей...', 'info');
-  
-  let ok = 0, err = 0;
-  const total = RECORDS.length;
-  
-  for(let i = 0; i < total; i++) {
-    const r = RECORDS[i];
-    try {
-      await q(
-        'INSERT INTO records(month,bank_id,type,amount,category,description,op_date) VALUES($1,$2,$3,$4,$5,$6,$7)',
-        [r.month, r.bank_id, r.type, r.amount, r.category, r.description, r.op_date]
-      );
-      ok++;
-      bar.style.width = Math.round((i+1)/total*100) + '%';
-      if(ok % 30 === 0) log(`✓ Загружено ${ok} из ${total}...`, 'ok');
-    } catch(e) {
-      err++;
-      log(`✗ Ошибка запись ${i}: ${e.message}`, 'err');
+function fmt(n){return Math.abs(n||0).toLocaleString('ru-RU',{minimumFractionDigits:0,maximumFractionDigits:2});}
+function fmtF(n){return (n||0).toLocaleString('ru-RU',{minimumFractionDigits:0,maximumFractionDigits:2});}
+function bank(id){return banks.find(b=>b.id===id)||{name:id,color:'#888',type:'debit'};}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+function doLogin(){
+  const pwd=document.getElementById('pwd-inp').value;
+  const stored=localStorage.getItem(PWD_KEY)||DEFAULT_PWD;
+  if(!stored||pwd===stored){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='block';
+    initApp();
+  } else {
+    document.getElementById('login-err').textContent='Неверный пароль';
+    document.getElementById('pwd-inp').value='';
+  }
+}
+function doLogout(){document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('pwd-inp').value='';document.getElementById('login-err').textContent='';}
+function changePwd(){
+  const p1=document.getElementById('new-pwd').value,p2=document.getElementById('new-pwd2').value;
+  if(!p1){toast('Введите пароль');return;}
+  if(p1!==p2){toast('Пароли не совпадают');return;}
+  localStorage.setItem(PWD_KEY,p1);
+  document.getElementById('new-pwd').value='';document.getElementById('new-pwd2').value='';
+  toast('✓ Пароль сохранён');
+}
+
+function toggleMobMenu(){
+  document.querySelector('.sidebar').classList.toggle('mob-open');
+  document.getElementById('mob-overlay').classList.toggle('active');
+}
+function closeMobMenu(){
+  document.querySelector('.sidebar').classList.remove('mob-open');
+  document.getElementById('mob-overlay').classList.remove('active');
+}
+
+// ─── JOURNAL ────────────────────────────────────────────────────
+async function renderJournal(){
+  const catLabel=jrnCat==='__nocat__'?'Без категории':jrnCat;
+  document.getElementById('jrn-m-lbl').textContent=curMonth+(catLabel?' · '+catLabel:'')+(jrnBank?' · '+bank(jrnBank).name:'');
+  if(jrnCat||jrnBank){
+    const existing=document.getElementById('clear-filter-btn');
+    if(!existing){
+      const btn=document.createElement('button');
+      btn.id='clear-filter-btn';btn.className='btn btn-g btn-sm';btn.textContent='✕ Сбросить фильтр';
+      btn.onclick=()=>{jrnCat='';jrnBank='';document.getElementById('clear-filter-btn')?.remove();renderJournal();};
+      document.querySelector('.filters').appendChild(btn);
+    }
+  } else {document.getElementById('clear-filter-btn')?.remove();}
+
+  const btnContainer=document.getElementById('bank-filter-btns');
+  if(btnContainer){
+    let recs0=await loadRecordsMonth(curMonth);
+    const activeBankIds=new Set(recs0.map(r=>r.bank_id));
+    const visibleBanks=banks.filter(b=>activeBankIds.has(b.id));
+    btnContainer.innerHTML=[{id:'',name:'Все счета',color:'#8890aa'},...visibleBanks].map(b=>`
+      <button onclick="setJrnBank('${b.id}')" style="padding:4px 10px;border-radius:20px;border:1.5px solid ${jrnBank===b.id?b.color||'var(--accent)':'var(--border)'};background:${jrnBank===b.id?(b.color||'var(--accent)'):'var(--surface)'};color:${jrnBank===b.id?'#fff':'var(--text2)'};font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .12s">${b.name}</button>
+    `).join('');
+  }
+
+  const ft=document.getElementById('jf-type').value;
+  const search=(document.getElementById('jf-search')?.value||'').toLowerCase().trim();
+  const fs=document.getElementById('jf-sort')||{value:jrnSort};
+  jrnSort=fs.value||jrnSort;
+  let recs=await loadRecordsMonth(curMonth);
+  if(jrnBank)recs=recs.filter(r=>r.bank_id===jrnBank);
+  if(jrnCat==='__nocat__')recs=recs.filter(r=>!r.category||r.category==='');
+  else if(jrnCat)recs=recs.filter(r=>r.category===jrnCat);
+  // Type filter
+  if(ft==='__income_all')recs=recs.filter(r=>['income','income_i','tr_in'].includes(r.type));
+  else if(ft==='__expense_all')recs=recs.filter(r=>['expense','expense_i','tr_out'].includes(r.type));
+  else if(ft)recs=recs.filter(r=>r.type===ft);
+  // Text search
+  if(search)recs=recs.filter(r=>(r.description||'').toLowerCase().includes(search)||(r.category||'').toLowerCase().includes(search));
+
+  // Загружаем какие записи уже в конвертах
+  let reservedIds=new Set();
+  try{
+    const envs=await loadEnvelopes();
+    envs.forEach(e=>{if(e.record_id)reservedIds.add(parseInt(e.record_id));});
+  }catch(e){}
+
+  recs.sort((a,b)=>{
+    if(jrnSort==='date_desc') return (b.op_date||'')>(a.op_date||'')?1:(b.id-a.id);
+    if(jrnSort==='date_asc')  return (a.op_date||'')>(b.op_date||'')?1:-1;
+    if(jrnSort==='bank')      return (bank(a.bank_id).name).localeCompare(bank(b.bank_id).name);
+    if(jrnSort==='amount_desc') return parseFloat(b.amount)-parseFloat(a.amount);
+    if(jrnSort==='amount_asc')  return parseFloat(a.amount)-parseFloat(b.amount);
+    if(jrnSort==='cat_asc')     return (a.category||'').localeCompare(b.category||'');
+    if(jrnSort==='cat_desc')    return (b.category||'').localeCompare(a.category||'');
+    return b.id-a.id;
+  });
+
+  const tbody=document.getElementById('jrn-body');
+  const empty=document.getElementById('jrn-empty');
+  if(!recs.length){tbody.innerHTML='';empty.style.display='';}
+  else{
+    empty.style.display='none';
+    tbody.innerHTML=recs.map(r=>{
+      const b=bank(r.bank_id);const amt=parseFloat(r.amount)||0;
+      const cols={income:'',income_i:'',tr_in:'',tr_out:'',expense_i:'',expense:''};
+      cols[r.type]=fmt(amt);
+      const dateStr=r.op_date?r.op_date.split('-').reverse().join('.'):'—';
+      const isoDate=r.op_date||'';
+      if(editMode){
+        return `<tr data-id="${r.id}" style="background:#fffef5">
+          <td class="jrn-check-td" style="display:none"><input type="checkbox" class="row-check" data-id="${r.id}" onchange="updateSelectedCount()"></td>
+          <td><input type="date" value="${isoDate}" style="border:1px solid var(--border2);border-radius:4px;padding:2px 6px;font-size:12px;font-family:inherit;background:#fff;width:130px" onchange="updateRecord(${r.id},'op_date',this.value)"></td>
+          <td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${b.color};flex-shrink:0"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100px" title="${b.name}">${b.name}</span></span></td>
+          <td class="num gc">${cols.income}</td>
+          <td class="num pc">${cols.income_i}</td>
+          <td class="num ac">${cols.tr_in}</td>
+          <td><select style="border:1px solid var(--border2);border-radius:4px;padding:2px 4px;font-size:12px;font-family:inherit;background:#fff;width:110px" onchange="updateRecord(${r.id},'category',this.value)">${catOptions(r.category||'')}</select></td>
+          <td><input type="text" value="${(r.description||'').replace(/"/g,'&quot;')}" style="border:1px solid var(--border2);border-radius:4px;padding:2px 6px;font-size:12px;font-family:inherit;background:#fff;width:160px" onblur="updateRecord(${r.id},'description',this.value)"></td>
+          <td class="num ac">${cols.tr_out}</td>
+          <td class="num pc">${cols.expense_i}</td>
+          <td><input type="number" value="${amt}" style="border:1px solid var(--border2);border-radius:4px;padding:2px 6px;font-size:12px;font-family:inherit;background:#fff;width:80px;text-align:right" onblur="updateRecordAmount(${r.id},'${r.type}',this.value)"></td>
+          <td><button class="del-btn" onclick="delRecord(${r.id})">×</button></td>
+        </tr>`;
+      } else {
+        return `<tr data-id="${r.id}">
+          <td class="jrn-check-td" style="display:none"><input type="checkbox" class="row-check" data-id="${r.id}" onchange="updateSelectedCount()"></td>
+          <td style="color:var(--text2);white-space:nowrap">${dateStr}</td>
+          <td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${b.color};flex-shrink:0"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px" title="${b.name}">${b.name}</span></span></td>
+          <td class="num gc">${cols.income}</td>
+          <td class="num pc">${cols.income_i}</td>
+          <td class="num ac">${cols.tr_in}</td>
+          <td style="color:var(--text2);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.category||''}">${r.category||'—'}</td>
+          <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.description||''}">${r.description||''}</td>
+          <td class="num ac">${cols.tr_out}</td>
+          <td class="num pc">${cols.expense_i}</td>
+          <td class="num rc">${cols.expense}</td>
+          <td style="padding:4px 8px">
+            <div style="display:flex;align-items:center;gap:2px;justify-content:flex-end">
+              <button onclick="toggleEnvelopeRecord(${r.id},'${(r.description||'Резерв').replace(/'/g,'')}',${parseFloat(r.amount)},'${r.bank_id}','${r.op_date||''}')" title="${reservedIds.has(r.id)?'Убрать из резерва':'Добавить в резерв'}"
+                style="background:none;border:none;cursor:pointer;font-size:13px;padding:2px;border-radius:4px;opacity:${reservedIds.has(r.id)?'1':'0.2'};transition:opacity .15s;line-height:1"
+                onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='${reservedIds.has(r.id)?'1':'0.2'}'">🪙</button>
+              <button class="del-btn" onclick="delRecord(${r.id})">×</button>
+            </div>
+          </td>
+        </tr>`;
+      }
+    }).join('');
+  }
+
+  // Update sticky totals row
+  const tots={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
+  recs.forEach(r=>tots[r.type]+=parseFloat(r.amount)||0);
+  document.getElementById('tots-count').textContent=recs.length+' зап.';
+  document.getElementById('tots-income').textContent=tots.income?fmtF(tots.income):'—';
+  document.getElementById('tots-income-i').textContent=tots.income_i?fmtF(tots.income_i):'—';
+  document.getElementById('tots-tr-in').textContent=tots.tr_in?fmtF(tots.tr_in):'—';
+  document.getElementById('tots-tr-out').textContent=tots.tr_out?fmtF(tots.tr_out):'—';
+  document.getElementById('tots-expense-i').textContent=tots.expense_i?fmtF(tots.expense_i):'—';
+  document.getElementById('tots-expense').textContent=tots.expense?fmtF(tots.expense):'—';
+
+  // Also update sverka
+  renderSverka();
+}
+
+function toggleSverkaEnvRows(){
+  const hidden=localStorage.getItem('sverka_env_hidden')==='1';
+  localStorage.setItem('sverka_env_hidden',hidden?'0':'1');
+  const btn=document.getElementById('btn-hide-envrows');
+  if(btn)btn.textContent=hidden?'🪙 Скрыть резервы':'🪙 Показать резервы';
+  document.querySelectorAll('.env-subrow').forEach(r=>r.style.display=hidden?'':'none');
+}
+
+function toggleMonthBanksSection(){
+  const el=document.getElementById('month-banks-section');
+  const btn=document.getElementById('btn-mb-toggle');
+  if(!el||!btn)return;
+  const hidden=el.style.display==='none';
+  el.style.display=hidden?'':'none';
+  btn.textContent=hidden?'Скрыть':'Показать';
+}
+
+function renderSverkaRow(b,agg,bals,btots,envByBank,envsByBank,tdNum,tdInp,inactive,envRowsHidden){
+  const a=agg[b.id];
+  const bal=bals[b.id]||{start:0,end:0};
+  const bt=btots[b.id]||{income:0,expense:0};
+  const sumInc=a.income+a.income_i+a.tr_in;
+  const sumExp=a.tr_out+a.expense_i+a.expense;
+  const autoEnd=(bal.start||0)+sumInc-sumExp;
+  const delta=autoEnd-(bal.start||0);
+  const reserved=envByBank[b.id]||0;
+  const bankEnvs=envsByBank[b.id]||[];
+
+  const savedInc=bt.income||0;
+  const savedExp=bt.expense||0;
+  const incOk=savedInc>0&&Math.abs(savedInc-sumInc)<1;
+  const expOk=savedExp>0&&Math.abs(savedExp-sumExp)<1;
+  const incDiff=savedInc>0&&!incOk?savedInc-sumInc:0;
+  const expDiff=savedExp>0&&!expOk?savedExp-sumExp:0;
+
+  const incChk=savedInc>0?(incOk?'<span style="color:var(--green);font-weight:700;font-size:13px">✓</span>':`<span style="color:var(--red);font-weight:700;font-size:11px;white-space:nowrap">${incDiff>0?'+':''}${fmtF(incDiff)}</span>`):'';
+  const expChk=savedExp>0?(expOk?'<span style="color:var(--green);font-weight:700;font-size:13px">✓</span>':`<span style="color:var(--red);font-weight:700;font-size:11px;white-space:nowrap">${expDiff>0?'+':''}${fmtF(expDiff)}</span>`):'';
+
+  const rowStyle=inactive?'opacity:0.55;background:#fafafa;':'';
+
+  const envRows=bankEnvs.map(e=>`<tr class="env-subrow" style="background:#faf5ff;display:${envRowsHidden?'none':''}">
+    <td style="padding:3px 10px 3px 26px;font-size:11px;color:var(--purple);white-space:nowrap"><span style="opacity:.5;margin-right:4px">└</span>🪙 ${e.name}</td>
+    <td colspan="11"></td>
+    <td style="text-align:right;padding:3px 10px;font-size:11px;color:var(--purple);font-weight:600;white-space:nowrap">−${fmtF(parseFloat(e.amount))}</td>
+    <td></td>
+    <td style="text-align:right;padding:3px 10px;font-size:11px;color:var(--purple);font-weight:700;white-space:nowrap">${fmtF(autoEnd-parseFloat(e.amount))}</td>
+  </tr>`).join('');
+
+  return `<tr style="${rowStyle}">
+    <td style="padding:6px 10px;white-space:nowrap"><span class="bdot-sm" style="background:${b.color}"></span>${b.name}${inactive?'<span style="font-size:10px;color:var(--text3);margin-left:6px">нет операций</span>':''}</td>
+    <td ${tdNum} style="text-align:right;padding:6px 10px;color:var(--green);font-weight:700;white-space:nowrap">${sumInc?fmtF(sumInc):'—'}</td>
+    <td ${tdInp}><input class="ver-inp" type="number" value="${savedInc||''}" placeholder="выписка"
+      style="width:100px;height:28px;border:1.5px solid ${savedInc?(incOk?'var(--green)':'var(--red)'):'var(--border2)'};border-radius:4px;padding:0 6px;font-size:12px;font-family:inherit;text-align:right;outline:none;background:var(--surface)"
+      onchange="saveSverka('${b.id}','income',this.value,${sumInc},this,'chk-inc-${b.id}')"></td>
+    <td id="chk-inc-${b.id}" style="text-align:right;padding:4px 6px;width:60px;white-space:nowrap">${incChk}</td>
+    <td ${tdNum} style="text-align:right;padding:6px 10px;color:${sumExp?'var(--red)':'inherit'};font-weight:${sumExp?'700':'400'};white-space:nowrap">${sumExp?fmtF(sumExp):'—'}</td>
+    <td ${tdInp}><input class="ver-inp" type="number" value="${savedExp||''}" placeholder="выписка"
+      style="width:100px;height:28px;border:1.5px solid ${savedExp?(expOk?'var(--green)':'var(--red)'):'var(--border2)'};border-radius:4px;padding:0 6px;font-size:12px;font-family:inherit;text-align:right;outline:none;background:var(--surface)"
+      onchange="saveSverka('${b.id}','expense',this.value,${sumExp},this,'chk-exp-${b.id}')"></td>
+    <td id="chk-exp-${b.id}" style="text-align:right;padding:4px 6px;width:60px;white-space:nowrap">${expChk}</td>
+    <td ${tdNum} style="color:var(--accent)">${a.tr_in?fmtF(a.tr_in):'—'}</td>
+    <td ${tdNum} style="color:var(--accent)">${a.tr_out?fmtF(a.tr_out):'—'}</td>
+    <td ${tdNum} style="color:var(--purple)">${a.income_i?fmtF(a.income_i):'—'}</td>
+    <td ${tdNum} style="color:var(--purple)">${a.expense_i?fmtF(a.expense_i):'—'}</td>
+    <td style="padding:4px 6px;width:110px;">
+      <input type="number" value="${bal.start||''}" placeholder="нач. остаток"
+        style="width:100px;height:28px;border:1.5px solid ${bal.start?'var(--accent)':'var(--border2)'};border-radius:4px;padding:0 6px;font-size:12px;font-family:inherit;text-align:right;outline:none;background:${bal.start?'var(--accent-l)':'var(--surface)'}"
+        onchange="saveStartBalance('${b.id}',this.value,this)">
+    </td>
+    <td ${tdNum} style="font-weight:600;color:${autoEnd>=0?'var(--green)':'var(--red)'}">${fmtF(autoEnd)}</td>
+    <td ${tdNum} style="color:${delta>0?'var(--green)':delta<0?'var(--red)':'var(--text3)'}">${delta?(delta>0?'+':'')+fmtF(delta):'—'}</td>
+    <td ${tdNum} style="color:var(--purple);font-weight:700">${reserved?fmtF(autoEnd-reserved):fmtF(autoEnd)}</td>
+  </tr>${envRows}`;
+}
+
+// ─── SVERKA ─────────────────────────────────────────────────────
+async function renderSverka(){
+  document.getElementById('sverka-m-lbl').textContent=curMonth;
+  const [recs,bals,btots]=await Promise.all([
+    loadRecordsMonth(curMonth),
+    loadBalances(curMonth),
+    loadBankTotals(curMonth)
+  ]);
+
+  const agg={};
+  banks.forEach(b=>agg[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
+  recs.forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
+
+  // Банки с операциями — активные; с остатком но без операций — неактивные
+  const hasOps=b=>Object.values(agg[b.id]).some(v=>v>0);
+  const hasBal=b=>bals[b.id]&&(bals[b.id].start||bals[b.id].end);
+  const activeWithOps=banks.filter(b=>hasOps(b));
+  const activeNoOps=banks.filter(b=>!hasOps(b)&&hasBal(b));
+  const active=[...activeWithOps,...activeNoOps];
+
+  // Envelope amounts by bank — load separately, don't block if fails
+  let envByBank={};
+  let envsByBank={};
+  let envsLoaded=[];
+  try{
+    envsLoaded=await loadEnvelopes();
+    envsLoaded.forEach(e=>{
+      envByBank[e.bank_id]=(envByBank[e.bank_id]||0)+parseFloat(e.amount)||0;
+      if(!envsByBank[e.bank_id])envsByBank[e.bank_id]=[];
+      envsByBank[e.bank_id].push(e);
+    });
+  }catch(e){console.warn('envelopes not available',e);}
+
+  let totTrIn=0,totTrOut=0,totIncI=0,totExpI=0;
+  active.forEach(b=>{totTrIn+=agg[b.id].tr_in;totTrOut+=agg[b.id].tr_out;totIncI+=agg[b.id].income_i;totExpI+=agg[b.id].expense_i;});
+
+  const trOk=Math.abs(totTrIn-totTrOut)<0.01;
+  const intOk=Math.abs(totIncI-totExpI)<0.01;
+  const allOk=trOk&&intOk;
+
+  document.getElementById('sverka-status').textContent=allOk?'✅ Всё сходится':'⚠️ Есть расхождения';
+  document.getElementById('sverka-status').style.color=allOk?'var(--green)':'var(--red)';
+
+  const tdNum='style="text-align:right;padding:6px 10px;font-variant-numeric:tabular-nums;white-space:nowrap;"';
+  const tdInp='style="padding:4px 6px;width:110px;"';
+
+  // Totals for footer row
+  let totSumInc=0,totSumExp=0,totStart=0,totEnd=0,totDelta=0,totFree=0;
+  active.forEach(b=>{
+    const a=agg[b.id];
+    const bal=bals[b.id]||{start:0,end:0};
+    const sumInc=a.income+a.income_i+a.tr_in;
+    const sumExp=a.tr_out+a.expense_i+a.expense;
+    const autoEnd=(bal.start||0)+sumInc-sumExp;
+    const reserved=envByBank[b.id]||0;
+    totSumInc+=sumInc;
+    totSumExp+=sumExp;
+    totStart+=bal.start||0;
+    totEnd+=autoEnd;
+    totDelta+=autoEnd-(bal.start||0);
+    totFree+=autoEnd-reserved;
+  });
+
+  const envRowsHidden=localStorage.getItem('sverka_env_hidden')==='1';
+  document.getElementById('sverka-body').innerHTML=[
+    // Separator before inactive banks if any
+    ...activeWithOps.map(b=>renderSverkaRow(b,agg,bals,btots,envByBank,envsByBank,tdNum,tdInp,false,envRowsHidden)),
+    ...(activeNoOps.length?[`<tr><td colspan="15" style="padding:6px 14px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;background:var(--surface2);border-top:2px solid var(--border2)">Без операций в этом месяце</td></tr>`]:[]),
+    ...activeNoOps.map(b=>renderSverkaRow(b,agg,bals,btots,envByBank,envsByBank,tdNum,tdInp,true,envRowsHidden))
+  ].join('');
+
+  // Add totals footer row
+  const svTbl=document.getElementById('sverka-table');
+  let tfoot=svTbl.querySelector('tfoot');
+  if(!tfoot){tfoot=document.createElement('tfoot');svTbl.appendChild(tfoot);}
+  tfoot.innerHTML=`<tr style="background:var(--surface2);border-top:2px solid var(--border2)">
+    <td style="padding:8px 10px;font-size:12px;font-weight:700;color:var(--text2)">Итого</td>
+    <td style="text-align:right;padding:8px 10px;color:var(--green);font-weight:700;white-space:nowrap">${fmtF(totSumInc)}</td>
+    <td colspan="2"></td>
+    <td style="text-align:right;padding:8px 10px;color:var(--red);font-weight:700;white-space:nowrap">${fmtF(totSumExp)}</td>
+    <td colspan="2"></td>
+    <td style="text-align:right;padding:8px 10px;color:var(--accent);font-weight:700;white-space:nowrap">${fmtF(totTrIn)}</td>
+    <td style="text-align:right;padding:8px 10px;color:var(--accent);font-weight:700;white-space:nowrap">${fmtF(totTrOut)}</td>
+    <td style="text-align:right;padding:8px 10px;color:var(--purple);font-weight:700;white-space:nowrap">${fmtF(totIncI)}</td>
+    <td style="text-align:right;padding:8px 10px;color:var(--purple);font-weight:700;white-space:nowrap">${fmtF(totExpI)}</td>
+    <td style="text-align:right;padding:8px 10px;color:var(--text2);font-weight:700;white-space:nowrap">${fmtF(totStart)}</td>
+    <td style="text-align:right;padding:8px 10px;font-weight:700;color:${totEnd>=0?'var(--green)':'var(--red)'};white-space:nowrap">${fmtF(totEnd)}</td>
+    <td style="text-align:right;padding:8px 10px;font-weight:700;color:${totDelta>0?'var(--green)':totDelta<0?'var(--red)':'var(--text3)'};white-space:nowrap">${totDelta?(totDelta>0?'+':'')+fmtF(totDelta):'—'}</td>
+    <td style="text-align:right;padding:8px 10px;font-weight:800;color:var(--purple);white-space:nowrap;font-size:14px">${fmtF(totFree)}</td>
+  </tr>`;
+
+  // Render envelopes panel
+  renderEnvelopes(envsLoaded,bals,agg,active);
+
+  document.getElementById('sverka-checks').innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-sm);background:${trOk?'var(--green-bg)':'var(--red-bg)'};border:1px solid ${trOk?'var(--green-b)':'var(--red-b)'}">
+      <span style="font-size:18px">${trOk?'✅':'❌'}</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:${trOk?'var(--green)':'var(--red)'}">Переводы между банками (tr_in ↔ tr_out)</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px">∑ Приход из др.Б: <strong>${fmtF(totTrIn)}</strong> ${trOk?'=':'≠'} ∑ Списание в др.Б: <strong>${fmtF(totTrOut)}</strong>${trOk?'':' · Разница: '+fmtF(Math.abs(totTrIn-totTrOut))}</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-sm);background:${intOk?'var(--green-bg)':'var(--red-bg)'};border:1px solid ${intOk?'var(--green-b)':'var(--red-b)'}">
+      <span style="font-size:18px">${intOk?'✅':'❌'}</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:${intOk?'var(--green)':'var(--red)'}">Внутренние операции (income_i ↔ expense_i)</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px">∑ Приход внутри: <strong>${fmtF(totIncI)}</strong> ${intOk?'=':'≠'} ∑ Списание внутри: <strong>${fmtF(totExpI)}</strong>${intOk?'':' · Разница: '+fmtF(Math.abs(totIncI-totExpI))}</div>
+      </div>
+    </div>`;
+}
+
+async function saveStartBalance(bankId, val, inp){
+  const num=parseFloat(val)||0;
+  inp.style.borderColor=num?'var(--accent)':'var(--border2)';
+  inp.style.background=num?'var(--accent-l)':'var(--surface)';
+  try{
+    await q(
+      `INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4)
+       ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=$3`,
+      [bankId,curMonth,num,0]
+    );
+    await recalcAllBalances();
+    toast('✓ Начало сохранено, цепочка пересчитана');
+    renderSverka();
+  }catch(e){toast('Ошибка сохранения');}
+}
+async function saveSverka(bankId, field, val, journalVal, inp, chkId){
+  const num=parseFloat(val)||0;
+  const ok=num>0&&Math.abs(num-journalVal)<1;
+  inp.style.borderColor=num>0?(ok?'var(--green)':'var(--red)'):'var(--border2)';
+  // Update check cell
+  const chkEl=document.getElementById(chkId);
+  if(chkEl){
+    if(!num){chkEl.innerHTML='';}
+    else if(ok){chkEl.innerHTML='<span style="color:var(--green);font-weight:700;font-size:13px">✓</span>';}
+    else{
+      const diff=num-journalVal;
+      chkEl.innerHTML=`<span style="color:var(--red);font-weight:700;font-size:11px;white-space:nowrap">${diff>0?'+':''}${fmtF(diff)}</span>`;
     }
   }
-  
-  bar.style.width = '100%';
-  bar.style.background = err > 0 ? '#dc2626' : '#16a34a';
-  log('', '');
-  log(`✅ Готово! Загружено: ${ok} записей. Ошибок: ${err}.`, 'ok');
-  btn.textContent = '✅ Импорт завершён!';
-  
-  log('', '');
-  log('👉 <a href="/">Перейти на дашборд</a>', 'info');
+  if(!num)return;
+  try{
+    await q(
+      `INSERT INTO bank_totals(bank_id,month,income_bank,expense_bank) VALUES($1,$2,$3,$4)
+       ON CONFLICT(bank_id,month) DO UPDATE SET ${field==='income'?'income_bank':'expense_bank'}=EXCLUDED.${field==='income'?'income_bank':'expense_bank'}`,
+      field==='income'?[bankId,curMonth,num,0]:[bankId,curMonth,0,num]
+    );
+    toast('✓ Сохранено');
+  }catch(e){toast('Ошибка сохранения');}
 }
+
+// ─── ENVELOPES ────────────────────────────────────────────────────
+async function loadEnvelopes(){
+  try{return await q('SELECT * FROM envelopes ORDER BY id');}catch(e){return[];}
+}
+
+function toggleEnvelopePanel(){
+  const body=document.getElementById('env-panel-body');
+  const btn=document.getElementById('btn-env-toggle');
+  if(!body||!btn)return;
+  const hidden=body.style.display==='none';
+  body.style.display=hidden?'':'none';
+  btn.textContent=hidden?'Скрыть':'Показать';
+  localStorage.setItem('env_hidden',hidden?'0':'1');
+}
+
+function toggleEnvelopeForm(){
+  const f=document.getElementById('envelope-form');
+  const isHidden=f.style.display==='none'||f.style.display==='';
+  f.style.display=isHidden?'flex':'none';
+  if(isHidden){
+    document.getElementById('env-bank').innerHTML=banks.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
+    document.getElementById('env-name').focus();
+  }
+}
+
+async function saveEnvelope(){
+  const name=document.getElementById('env-name').value.trim();
+  const bankId=document.getElementById('env-bank').value;
+  const amount=parseFloat(document.getElementById('env-amount').value)||0;
+  const date=document.getElementById('env-date').value;
+  if(!name){toast('Введите название');return;}
+  if(!amount){toast('Введите сумму');return;}
+  try{
+    await q('INSERT INTO envelopes(name,bank_id,amount,op_date) VALUES($1,$2,$3,$4)',[name,bankId,amount,date||null]);
+    document.getElementById('env-name').value='';
+    document.getElementById('env-amount').value='';
+    document.getElementById('env-date').value='';
+    toggleEnvelopeForm();
+    toast('✓ Конверт добавлен');
+    renderSverka();
+  }catch(e){toast('Ошибка: '+e.message);}
+}
+
+async function deleteEnvelope(id){
+  if(!confirm('Удалить конверт?'))return;
+  try{await q('DELETE FROM envelopes WHERE id=$1',[id]);toast('Удалено');renderSverka();}
+  catch(e){toast('Ошибка');}
+}
+
+async function moveEnvelope(id,newBankId){
+  try{await q('UPDATE envelopes SET bank_id=$1 WHERE id=$2',[newBankId,id]);toast('✓ Конверт перемещён');renderSverka();}
+  catch(e){toast('Ошибка');}
+}
+
+async function updateEnvelopeAmount(id,val){
+  const amount=parseFloat(val)||0;
+  if(!amount){toast('Введите сумму');return;}
+  try{await q('UPDATE envelopes SET amount=$1 WHERE id=$2',[amount,id]);toast('✓ Сумма обновлена');renderSverka();}
+  catch(e){toast('Ошибка');}
+}
+
+function renderEnvelopes(envs,bals,agg,active){
+  const list=document.getElementById('envelope-list');
+  const totalsEl=document.getElementById('envelope-totals');
+  if(!list||!totalsEl)return;
+
+  if(!envs.length){
+    list.innerHTML='<div class="empty" style="padding:16px">Конвертов нет — добавь операцию с категорией «Резерв»</div>';
+    totalsEl.innerHTML='';
+    return;
+  }
+
+  list.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:13px;">
+    <thead><tr>
+      <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Конверт</th>
+      <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Дата</th>
+      <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Банк</th>
+      <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Сумма</th>
+      <th style="padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surface2)"></th>
+    </tr></thead>
+    <tbody>${envs.map(e=>{
+      const dateStr=e.op_date?e.op_date.split('T')[0].split('-').reverse().join('.'):'—';
+      return`<tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:8px 12px;font-weight:600">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--purple);margin-right:8px;vertical-align:middle"></span>${e.name}
+        </td>
+        <td style="padding:8px 12px;color:var(--text2);font-size:12px">${dateStr}</td>
+        <td style="padding:6px 8px">
+          <select onchange="moveEnvelope(${e.id},this.value)" style="border:1px solid var(--border2);border-radius:4px;padding:4px 8px;font-size:12px;font-family:inherit;background:var(--surface)">
+            ${banks.map(b2=>`<option value="${b2.id}"${b2.id===e.bank_id?' selected':''}>${b2.name}</option>`).join('')}
+          </select>
+        </td>
+        <td style="padding:8px 12px;text-align:right;font-weight:700;color:var(--purple);font-size:14px;font-family:Manrope,sans-serif">${fmtF(parseFloat(e.amount))}</td>
+        <td style="padding:6px 8px;text-align:center">
+          <button class="del-btn" onclick="deleteEnvelope(${e.id})" title="Удалить конверт">×</button>
+        </td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
+
+  const totalReserved=envs.reduce((s,e)=>s+parseFloat(e.amount)||0,0);
+  const totalEnd=active.reduce((s,b)=>{
+    const a=agg[b.id]||{income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
+    const bal=bals[b.id]||{start:0};
+    const sumInc=a.income+a.income_i+a.tr_in;
+    const sumExp=a.tr_out+a.expense_i+a.expense;
+    return s+(bal.start||0)+sumInc-sumExp;
+  },0);
+
+  totalsEl.innerHTML=`
+    <div style="display:flex;gap:6px;align-items:center"><span style="font-size:12px;color:var(--text3)">Всего:</span><span style="font-weight:700;font-family:Manrope,sans-serif">${fmtF(totalEnd)}</span></div>
+    <div style="color:var(--text3)">−</div>
+    <div style="display:flex;gap:6px;align-items:center"><span style="font-size:12px;color:var(--text3)">Зарезервировано:</span><span style="font-weight:700;color:var(--purple);font-family:Manrope,sans-serif">${fmtF(totalReserved)}</span></div>
+    <div style="color:var(--text3)">=</div>
+    <div style="display:flex;gap:6px;align-items:center"><span style="font-size:12px;color:var(--text3)">Свободно:</span><span style="font-weight:800;color:var(--green);font-family:Manrope,sans-serif;font-size:16px">${fmtF(totalEnd-totalReserved)}</span></div>`;
+}
+
+// ─── DASHBOARD ──────────────────────────────────────────────────
+async function renderDash(){
+  document.getElementById('dash-sub').textContent=curMonth+' 2026';
+  const[recs,bals,deps]=await Promise.all([loadRecordsMonth(curMonth),loadBalances(curMonth),loadDeposits()]);
+  deposits=deps;
+
+  // Alerts
+  const today=new Date();today.setHours(0,0,0,0);
+  const alerts=deps.filter(d=>{const dc=new Date(d.date_close);const diff=Math.floor((dc-today)/(1000*60*60*24));return diff<=14;});
+  document.getElementById('dep-alerts').innerHTML=alerts.map(d=>{
+    const dc=new Date(d.date_close);const diff=Math.floor((dc-today)/(1000*60*60*24));
+    const txt=diff<0?'закончился '+dc.toLocaleDateString('ru-RU'):`заканчивается ${dc.toLocaleDateString('ru-RU')} (через ${diff} дн.)`;
+    return `<div class="alert-banner"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Вклад <strong style="margin:0 4px">${d.name}</strong> ${txt}</div>`;
+  }).join('');
+
+  // Totals
+  const agg={};banks.forEach(b=>agg[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
+  recs.forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
+
+  // Total money
+  let totalDebit=0,totalSavings=0,totalDeposit=0,totalCash=0;
+  banks.forEach(b=>{const bal=bals[b.id];const end=bal?bal.end:0;
+    if(b.type==='debit'||b.type==='credit')totalDebit+=end;
+    else if(b.type==='savings')totalSavings+=end;
+    else if(b.type==='cash')totalCash+=end;
+  });
+  deps.forEach(d=>totalDeposit+=parseFloat(d.amount)||0);
+  const totalMoney=totalDebit+totalSavings+totalDeposit+totalCash;
+
+  // Load envelopes for reserve display
+  let totalReserved=0;
+  let envDetails=[];
+  try{
+    const envs=await loadEnvelopes();
+    totalReserved=envs.reduce((s,e)=>s+parseFloat(e.amount)||0,0);
+    // Group by name for display
+    const byName={};
+    envs.forEach(e=>{byName[e.name]=(byName[e.name]||0)+parseFloat(e.amount)||0;});
+    envDetails=Object.entries(byName);
+  }catch(e){}
+  const totalFree=totalMoney-totalReserved;
+
+  document.getElementById('dash-total-money').textContent=fmtF(totalMoney);
+  document.getElementById('dash-breakdown').innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase">Карты</span><span style="font-size:15px;font-weight:700;color:var(--accent);font-family:Manrope,sans-serif">${fmtF(totalDebit)}</span></div>
+    <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
+    <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase">Накопит.</span><span style="font-size:15px;font-weight:700;color:var(--teal);font-family:Manrope,sans-serif">${fmtF(totalSavings)}</span></div>
+    <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
+    <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase">Вклады</span><span style="font-size:15px;font-weight:700;color:var(--purple);font-family:Manrope,sans-serif">${fmtF(totalDeposit)}</span></div>
+    <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
+    <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase">Наличные</span><span style="font-size:15px;font-weight:700;color:var(--amber);font-family:Manrope,sans-serif">${fmtF(totalCash)}</span></div>
+    ${totalReserved?`
+    <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <span style="font-size:10px;color:var(--purple);font-weight:700;text-transform:uppercase">🪙 Резервы</span>
+      <span style="font-size:15px;font-weight:700;color:var(--purple);font-family:Manrope,sans-serif">−${fmtF(totalReserved)}</span>
+      ${envDetails.map(([n,v])=>`<span style="font-size:10px;color:var(--text3)">${n}: ${fmtF(v)}</span>`).join('')}
+    </div>
+    <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <span style="font-size:10px;color:var(--green);font-weight:700;text-transform:uppercase">✓ Свободно</span>
+      <span style="font-size:18px;font-weight:800;color:var(--green);font-family:Manrope,sans-serif">${fmtF(totalFree)}</span>
+    </div>`:''}`;
+
+  // Load all records for year-wide tables
+  const allRecs=await loadAllRecords();
+
+  // Net income horizontal mini-table
+  await renderNetIncomeTable(allRecs);
+
+  // Category × month tables
+  await renderCatMonthTables(allRecs);
+}
+
+async function renderNetIncomeTable(allRecs){
+  // Load balances for all months that have data
+  const monthsWithData=MONTHS.filter(m=>allRecs.some(r=>r.month===m));
+  const balsByMonth={};
+  for(const m of MONTHS){
+    try{balsByMonth[m]=await loadBalances(m);}catch(e){balsByMonth[m]={};}
+  }
+
+  // Compute per-month: start = sum of all bank balance_start, end = sum of all bank balance_end (auto-computed)
+  // For each month compute agg
+  const aggByMonth={};
+  MONTHS.forEach(m=>{
+    const agg={};banks.forEach(b=>agg[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
+    allRecs.filter(r=>r.month===m).forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
+    aggByMonth[m]=agg;
+  });
+
+  const rows=MONTHS.map(m=>{
+    const bals=balsByMonth[m]||{};
+    const agg=aggByMonth[m]||{};
+    let totStart=0,totEnd=0;
+    banks.forEach(b=>{
+      const bal=bals[b.id]||{start:0,end:0};
+      const a=agg[b.id]||{income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
+      const sumInc=a.income+a.income_i+a.tr_in;
+      const sumExp=a.tr_out+a.expense_i+a.expense;
+      const autoEnd=(bal.start||0)+sumInc-sumExp;
+      totStart+=bal.start||0;
+      totEnd+=autoEnd;
+    });
+    const hasData=allRecs.some(r=>r.month===m)||Object.values(bals).some(b=>b.start||b.end);
+    return{m,totStart,totEnd,delta:totEnd-totStart,hasData};
+  });
+
+  const hasAny=rows.some(r=>r.hasData);
+  if(!hasAny){document.getElementById('dash-net-income').innerHTML='';return;}
+
+  // Horizontal compact: 4 rows × 12 month columns
+  const thCols=MONTHS.map(m=>`<th style="text-align:center;font-size:11px;padding:7px 10px;min-width:80px;${m===curMonth?'background:var(--accent);color:#fff;':''}">${m.slice(0,3)}</th>`).join('');
+
+  const startRow=rows.map(({m,totStart,hasData})=>
+    `<td style="text-align:right;padding:6px 10px;font-size:12px;${m===curMonth?'background:var(--accent-l);':''}">${hasData&&totStart?fmtF(totStart):'<span style="color:var(--text3)">—</span>'}</td>`
+  ).join('');
+
+  const endRow=rows.map(({m,totEnd,hasData})=>
+    `<td style="text-align:right;padding:6px 10px;font-size:12px;font-weight:600;${m===curMonth?'background:var(--accent-l);':''}">${hasData?fmtF(totEnd):'<span style="color:var(--text3)">—</span>'}</td>`
+  ).join('');
+
+  const deltaRow=rows.map(({m,delta,hasData})=>{
+    const col=delta>0?'var(--green)':delta<0?'var(--red)':'var(--text3)';
+    const val=hasData&&delta?(delta>0?'+':'')+fmtF(delta):'—';
+    return`<td style="text-align:right;padding:6px 10px;font-size:12px;font-weight:700;color:${col};${m===curMonth?'background:var(--accent-l);':''}">${val}</td>`;
+  }).join('');
+
+  const niHidden=localStorage.getItem('ni_hidden')==='1';
+  document.getElementById('dash-net-income').innerHTML=`
+    <div class="panel" style="margin-bottom:14px">
+      <div class="panel-h">
+        <span>Чистый доход по месяцам · 2026</span>
+        <button onclick="toggleNetIncome()" id="btn-ni" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">${niHidden?'Показать':'Скрыть'}</button>
+      </div>
+      <div id="ni-body" style="display:${niHidden?'none':'block'}">
+        <div class="tbl-wrap">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead><tr>
+              <th style="text-align:left;padding:7px 12px;background:var(--surface2);border-bottom:2px solid var(--border);font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;white-space:nowrap;min-width:90px"></th>
+              ${thCols}
+            </tr></thead>
+            <tbody>
+              <tr style="border-bottom:1px solid var(--border)">
+                <td style="padding:6px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;background:var(--surface2)">Нач.</td>
+                ${startRow}
+              </tr>
+              <tr style="border-bottom:1px solid var(--border)">
+                <td style="padding:6px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;background:var(--surface2)">Кон.</td>
+                ${endRow}
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;background:var(--surface2)">Δ</td>
+                ${deltaRow}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ─── CATEGORY × MONTH TABLES ──────────────────────────────────────
+async function renderCatMonthTables(allRecs){
+  const NO_CAT='— Не выбрано —';
+  // Filter by selected banks
+  const filteredRecs=dashBankFilter.size>0?allRecs.filter(r=>dashBankFilter.has(r.bank_id)):allRecs;
+
+  const catExp={},catInc={};
+  filteredRecs.forEach(r=>{
+    const cat=r.category||NO_CAT;
+    const amt=parseFloat(r.amount)||0;
+    if(r.type==='expense'){
+      if(!catExp[cat])catExp[cat]={};
+      catExp[cat][r.month]=(catExp[cat][r.month]||0)+amt;
+    }
+    if(r.type==='income'){
+      if(!catInc[cat])catInc[cat]={};
+      catInc[cat][r.month]=(catInc[cat][r.month]||0)+amt;
+    }
+  });
+
+  const activeMonths=MONTHS.filter(m=>filteredRecs.some(r=>r.month===m));
+
+  // Bank filter buttons HTML
+  const filterHTML=`<div style="display:flex;gap:6px;flex-wrap:wrap;padding:10px 18px;border-bottom:1px solid var(--border);background:var(--surface2)">
+    <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;align-self:center;margin-right:4px">Банк:</span>
+    <button onclick="toggleDashBank('')" style="padding:4px 10px;border-radius:20px;border:1.5px solid ${dashBankFilter.size===0?'var(--accent)':'var(--border)'};background:${dashBankFilter.size===0?'var(--accent)':'var(--surface)'};color:${dashBankFilter.size===0?'#fff':'var(--text2)'};font-size:11px;font-weight:600;cursor:pointer">Все</button>
+    ${banks.map(b=>`<button onclick="toggleDashBank('${b.id}')" style="padding:4px 10px;border-radius:20px;border:1.5px solid ${dashBankFilter.has(b.id)?b.color:'var(--border)'};background:${dashBankFilter.has(b.id)?b.color:'var(--surface)'};color:${dashBankFilter.has(b.id)?'#fff':'var(--text2)'};font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap">
+      <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${dashBankFilter.has(b.id)?'#fff':b.color};margin-right:4px;vertical-align:middle"></span>${b.name}
+    </button>`).join('')}
+  </div>`;
+
+  function buildTable(data,type){
+    if(!Object.keys(data).length)return'';
+    const cats=Object.keys(data).sort((a,b)=>{
+      const totA=Object.values(data[a]).reduce((s,v)=>s+v,0);
+      const totB=Object.values(data[b]).reduce((s,v)=>s+v,0);
+      return totB-totA;
+    });
+    const color=type==='exp'?'var(--red)':'var(--green)';
+    const bgH=type==='exp'?'var(--red-bg)':'var(--green-bg)';
+    const borderH=type==='exp'?'var(--red-b)':'var(--green-b)';
+
+    const header=activeMonths.map(m=>
+      `<th style="text-align:right;padding:8px 10px;min-width:80px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-bottom:2px solid ${borderH};background:${bgH};color:${color};white-space:nowrap">${m.slice(0,3)}</th>`
+    ).join('');
+
+    const totalByMonth={};
+    activeMonths.forEach(m=>{totalByMonth[m]=cats.reduce((s,c)=>s+(data[c][m]||0),0);});
+
+    const bodyRows=cats.map(cat=>{
+      const rowTotal=Object.values(data[cat]).reduce((s,v)=>s+v,0);
+      const isNoCat=cat===NO_CAT;
+      const clickArg=isNoCat?'__nocat__':cat;
+      const cells=activeMonths.map(m=>{
+        const val=data[cat][m];
+        return val
+          ?`<td style="text-align:right;padding:6px 10px;font-size:12px;font-weight:600;color:${color};cursor:pointer;transition:background .1s" onclick="goToCatMonth('${clickArg}','${m}')" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">${fmtF(val)}</td>`
+          :`<td style="text-align:right;padding:6px 10px;font-size:12px;color:var(--text3)">—</td>`;
+      }).join('');
+      const catLabel=isNoCat?`<span style="color:var(--text3);font-style:italic">${cat}</span>`:cat;
+      return`<tr style="border-bottom:1px solid var(--border)${isNoCat?';background:#fffbeb':''}">
+        <td style="padding:6px 12px;font-size:13px;font-weight:600;white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis" title="${cat}">${catLabel}</td>
+        ${cells}
+        <td style="text-align:right;padding:6px 10px;font-size:12px;font-weight:700;color:${color};border-left:1px solid var(--border)">${fmtF(rowTotal)}</td>
+      </tr>`;
+    }).join('');
+
+    const totalCells=activeMonths.map(m=>
+      `<td style="text-align:right;padding:7px 10px;font-size:12px;font-weight:700;color:${color};background:var(--surface2)">${totalByMonth[m]?fmtF(totalByMonth[m]):'—'}</td>`
+    ).join('');
+    const grandTotal=Object.values(totalByMonth).reduce((s,v)=>s+v,0);
+
+    return`<div class="panel" style="margin-bottom:14px">
+      <div class="panel-h">${type==='exp'?'↓ Расходы':'↑ Доходы'} по категориям · 2026</div>
+      ${type==='exp'?filterHTML:''}
+      <div class="tbl-wrap">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead><tr>
+            <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--border);background:var(--surface2);white-space:nowrap">Категория</th>
+            ${header}
+            <th style="text-align:right;padding:8px 10px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--border);background:var(--surface2);border-left:1px solid var(--border);white-space:nowrap">Итого</th>
+          </tr></thead>
+          <tbody>${bodyRows}</tbody>
+          <tfoot><tr style="background:var(--surface2)">
+            <td style="padding:7px 12px;font-size:12px;font-weight:700;color:var(--text2)">Итого</td>
+            ${totalCells}
+            <td style="text-align:right;padding:7px 10px;font-size:13px;font-weight:800;color:${color};border-left:1px solid var(--border)">${fmtF(grandTotal)}</td>
+          </tr></tfoot>
+        </table>
+      </div>
+      <div style="padding:6px 14px;font-size:11px;color:var(--text3)">Клик на цифру → открывает журнал с фильтром по категории и месяцу</div>
+    </div>`;
+  }
+
+  document.getElementById('dash-cats-panel').innerHTML=
+    buildTable(catExp,'exp')+
+    buildTable(catInc,'inc');
+}
+
+async function toggleDashBank(bankId){
+  if(bankId===''){
+    dashBankFilter.clear();
+  } else {
+    if(dashBankFilter.has(bankId))dashBankFilter.delete(bankId);
+    else dashBankFilter.add(bankId);
+  }
+  const allRecs=await loadAllRecords();
+  await renderCatMonthTables(allRecs);
+}
+
+function checkFormDate(inp){
+  const val=inp.value;
+  if(!val){inp.style.borderColor='';inp.style.background='';return;}
+  const dateMonth=MONTHS[new Date(val).getMonth()];
+  const ok=dateMonth===curMonth;
+  inp.style.borderColor=ok?'':'var(--red)';
+  inp.style.background=ok?'':'var(--red-bg)';
+}
+
+function setJrnBank(id){
+  jrnBank=id;
+  // Sync with add form
+  const fBank=document.getElementById('f-bank');
+  if(fBank&&id)fBank.value=id;
+  renderJournal();
+}
+function goToBank(bankId){jrnBank=bankId;jrnCat='';go('journal');}
+function goToCat(cat){jrnCat=cat;jrnBank='';go('journal');}
+function goToCatMonth(cat,month){
+  jrnBank='';
+  curMonth=month;
+  document.querySelectorAll('.mtab').forEach(t=>t.classList.toggle('active',t.textContent===month.slice(0,3)));
+  if(cat==='__nocat__'){jrnCat='__nocat__';}else{jrnCat=cat;}
+  go('journal');
+}
+function toggleNetIncome(){
+  const el=document.getElementById('ni-body');
+  const btn=document.getElementById('btn-ni');
+  if(!el||!btn)return;
+  const hidden=el.style.display==='none';
+  el.style.display=hidden?'block':'none';
+  btn.textContent=hidden?'Скрыть':'Показать';
+  localStorage.setItem('ni_hidden',hidden?'0':'1');
+}
+
+let dashBankFilter=new Set(); // empty = all banks
+function toggleTotal(){
+  const el=document.getElementById('total-content');
+  const btn=document.getElementById('btn-toggle-total');
+  const hidden=el.style.display==='none';
+  el.style.display=hidden?'block':'none';
+  btn.textContent=hidden?'Скрыть':'Показать';
+}
+function setSortJrn(col){
+  const sortMap={date:'date_desc',bank:'bank',cat:'cat',amount:'amount_desc'};
+  const sel=document.getElementById('jf-sort');
+  if(sel){sel.value=sortMap[col]||'date_desc';jrnSort=sel.value;}
+  renderJournal();
+}
+
+// ─── RECORDS ─────────────────────────────────────────────────────
+async function addRecord(){
+  const bankId=document.getElementById('f-bank').value;
+  const type=document.getElementById('f-type').value;
+  const amount=parseFloat(document.getElementById('f-amount').value);
+  const cat=document.getElementById('f-cat').value;
+  const desc=document.getElementById('f-desc').value.trim();
+  const date=document.getElementById('f-date').value;
+  if(!bankId){toast('Выберите счёт');return;}
+  if(!amount||amount<=0){toast('Введите сумму');return;}
+  if(date){
+    const dateMonth=MONTHS[new Date(date).getMonth()];
+    if(dateMonth!==curMonth){
+      if(!confirm(`Дата ${date.split('-').reverse().join('.')} относится к ${dateMonth}, но открыт ${curMonth}.\n\nВсё равно добавить?`))return;
+    }
+  }
+  try{
+    await q('INSERT INTO records(month,bank_id,type,amount,category,description,op_date) VALUES($1,$2,$3,$4,$5,$6,$7)',[curMonth,bankId,type,amount,cat||null,desc||null,date||null]);
+    document.getElementById('f-amount').value='';document.getElementById('f-desc').value='';
+    await recalcAllBalances();
+    renderJournal();toast('✓ Запись добавлена');
+  }catch(e){toast('Ошибка: '+e.message);}
+}
+async function updateRecord(id,field,val){
+  try{await q(`UPDATE records SET ${field}=$1 WHERE id=$2`,[val||null,id]);if(field!=='op_date')toast('✓ Сохранено');}
+  catch(e){toast('Ошибка: '+e.message);}
+}
+async function updateRecordAmount(id,type,val){
+  const amt=parseFloat(val)||0;
+  if(amt<=0){toast('Введите сумму больше 0');return;}
+  try{await q('UPDATE records SET amount=$1 WHERE id=$2',[amt,id]);await recalcAllBalances();toast('✓ Сумма обновлена');}
+  catch(e){toast('Ошибка: '+e.message);}
+}
+function toggleEditMode(){
+  editMode=!editMode;
+  const btn=document.getElementById('btn-edit-mode');
+  if(btn){btn.textContent=editMode?'✅ Режим редактирования':'✏️ Редактировать';btn.style.background=editMode?'var(--accent-l)':'';btn.style.color=editMode?'var(--accent)':'';btn.style.borderColor=editMode?'var(--accent)':'';}
+  renderJournal();
+}
+let massEditMode=false;
+function toggleMassEdit(){
+  massEditMode=!massEditMode;
+  const th=document.getElementById('jrn-check-th');
+  const tds=document.querySelectorAll('.jrn-check-td');
+  const panel=document.getElementById('mass-edit-panel');
+  const btn=document.getElementById('btn-mass-edit');
+  const totsTd=document.getElementById('tots-check-td');
+  if(th) th.style.display=massEditMode?'':'none';
+  if(totsTd) totsTd.style.display=massEditMode?'':'none';
+  tds.forEach(td=>td.style.display=massEditMode?'':'none');
+  panel.style.display=massEditMode?'flex':'none';
+  btn.style.background=massEditMode?'var(--accent-l)':'';btn.style.color=massEditMode?'var(--accent)':'';
+  document.getElementById('mass-cat-select').innerHTML=catOptions();
+  updateSelectedCount();
+}
+function updateSelectedCount(){const checked=document.querySelectorAll('.row-check:checked').length;document.getElementById('selected-count').textContent=checked;}
+function toggleAllRows(cb){document.querySelectorAll('.row-check').forEach(c=>c.checked=cb.checked);updateSelectedCount();}
+function cancelMassEdit(){
+  massEditMode=false;
+  const th=document.getElementById('jrn-check-th');
+  const totsTd=document.getElementById('tots-check-td');
+  if(th) th.style.display='none';
+  if(totsTd) totsTd.style.display='none';
+  document.querySelectorAll('.jrn-check-td').forEach(td=>td.style.display='none');
+  document.getElementById('mass-edit-panel').style.display='none';
+  document.getElementById('btn-mass-edit').style.background='';
+  document.getElementById('btn-mass-edit').style.color='';
+}
+async function applyMassCategory(){
+  const cat=document.getElementById('mass-cat-select').value;
+  if(!cat){toast('Выберите категорию');return;}
+  const ids=[...document.querySelectorAll('.row-check:checked')].map(c=>c.dataset.id);
+  if(!ids.length){toast('Выберите записи');return;}
+  try{
+    for(const id of ids){await q('UPDATE records SET category=$1 WHERE id=$2',[cat,id]);}
+    toast(`✓ Категория "${cat}" применена к ${ids.length} записям`);cancelMassEdit();renderJournal();
+  }catch(e){toast('Ошибка: '+e.message);}
+}
+async function toggleEnvelopeRecord(recordId, name, amount, bankId, date){
+  try{
+    const envs=await loadEnvelopes();
+    const existing=envs.find(e=>e.record_id==recordId);
+    if(existing){
+      await q('DELETE FROM envelopes WHERE id=$1',[existing.id]);
+      toast('🪙 Убрано из резерва');
+    } else {
+      await q('INSERT INTO envelopes(name,bank_id,amount,record_id,op_date) VALUES($1,$2,$3,$4,$5)',[name||'Резерв',bankId,amount,recordId,date||null]);
+      toast('🪙 Добавлено в резерв');
+    }
+    renderJournal();
+  }catch(e){toast('Ошибка: '+e.message);}
+}
+
+async function delRecord(id){
+  if(!confirm('Удалить запись?'))return;
+  try{
+    await q('DELETE FROM records WHERE id=$1',[id]);
+    await recalcAllBalances();
+    renderJournal();toast('Удалено');
+  }catch(e){toast('Ошибка');}
+}
+
+// ─── DATA LOADERS ─────────────────────────────────────────────────
+async function loadBanks(){try{banks=await q('SELECT * FROM banks ORDER BY sort_order');}catch(e){console.error(e);}}
+async function loadRecordsMonth(month){try{return await q('SELECT * FROM records WHERE month=$1 ORDER BY op_date,id',[month]);}catch(e){return[];}}
+async function loadAllRecords(){try{return await q('SELECT * FROM records ORDER BY month,op_date,id');}catch(e){return[];}}
+async function loadBalances(month){
+  try{const rows=await q('SELECT * FROM balances WHERE month=$1',[month]);const out={};rows.forEach(r=>out[r.bank_id]={start:parseFloat(r.balance_start)||0,end:parseFloat(r.balance_end)||0});return out;}
+  catch(e){return{};}
+}
+async function loadBankTotals(month){
+  try{const rows=await q('SELECT * FROM bank_totals WHERE month=$1',[month]);const out={};rows.forEach(r=>out[r.bank_id]={income:parseFloat(r.income_bank)||0,expense:parseFloat(r.expense_bank)||0});return out;}
+  catch(e){return{};}
+}
+async function loadCategories(){
+  try{categories=await q('SELECT * FROM categories ORDER BY sort_order');}
+  catch(e){categories=[{name:'Еда'},{name:'Транспорт'},{name:'Медицина'},{name:'Подписка'},{name:'Аренда'},{name:'Развлечение'},{name:'Одежда'},{name:'Услуги банка'},{name:'Зарплата'},{name:'Кэшбэк'},{name:'Перевод'},{name:'Прочее'}];}
+}
+function catOptions(selected=''){
+  return`<option value="">— выбрать —</option>`+categories.map(c=>`<option${c.name===selected?' selected':''}>${c.name}</option>`).join('');
+}
+async function loadDeposits(){try{return await q('SELECT * FROM deposits WHERE is_active=true ORDER BY date_close');}catch(e){return[];}}
+
+async function transferBalancesToNextMonth(){
+  const nextMonth=MONTHS[MONTHS.indexOf(curMonth)+1];
+  if(!nextMonth){toast('Декабрь — следующего месяца нет');return;}
+  if(!confirm(`Перенести конечные остатки ${curMonth} как начальные ${nextMonth}?\n\nЭто перезапишет начальные остатки ${nextMonth}.`))return;
+  const [recs,bals]=await Promise.all([loadRecordsMonth(curMonth),loadBalances(curMonth)]);
+  const agg={};
+  banks.forEach(b=>agg[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
+  recs.forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
+  let count=0;
+  for(const b of banks){
+    const a=agg[b.id];
+    const bal=bals[b.id]||{start:0,end:0};
+    const sumInc=a.income+a.income_i+a.tr_in;
+    const sumExp=a.tr_out+a.expense_i+a.expense;
+    const autoEnd=(bal.start||0)+sumInc-sumExp;
+    if(autoEnd!==0||(bal.start||0)!==0){
+      try{
+        await q(
+          `INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4)
+           ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=$3`,
+          [b.id,nextMonth,autoEnd,0]
+        );
+        count++;
+      }catch(e){console.error(e);}
+    }
+  }
+  toast(`✓ Остатки ${curMonth} перенесены в ${nextMonth} (${count} банков)`);
+  renderSverka();
+}
+// Пересчёт остатков по всей цепочке месяцев
+async function recalcAllBalances(){
+  const allRecs=await loadAllRecords();
+  const janBals=await loadBalances(MONTHS[0]);
+
+  // Собираем все значения для батч-вставки
+  const rows=[];
+  for(const b of banks){
+    let prevEnd=(janBals[b.id]?.start)||0;
+    for(let i=0;i<MONTHS.length;i++){
+      const m=MONTHS[i];
+      const mRecs=allRecs.filter(r=>r.month===m&&r.bank_id===b.id);
+      const agg={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
+      mRecs.forEach(r=>agg[r.type]+=parseFloat(r.amount)||0);
+      const sumInc=agg.income+agg.income_i+agg.tr_in;
+      const sumExp=agg.tr_out+agg.expense_i+agg.expense;
+      const autoEnd=prevEnd+sumInc-sumExp;
+      // Январь: start не трогаем (вручную введён)
+      rows.push({bankId:b.id,month:m,start:i===0?prevEnd:prevEnd,end:autoEnd,isJan:i===0});
+      prevEnd=autoEnd;
+    }
+  }
+
+  // Разбиваем на батчи по 20 строк чтобы не перегружать
+  const batchSize=20;
+  for(let i=0;i<rows.length;i+=batchSize){
+    const batch=rows.slice(i,i+batchSize);
+    // Строим один INSERT с множеством значений
+    const vals=batch.map((r,j)=>`($${j*4+1},$${j*4+2},$${j*4+3},$${j*4+4})`).join(',');
+    const params=batch.flatMap(r=>[r.bankId,r.month,r.start,r.end]);
+    try{
+      if(batch.some(r=>r.isJan)){
+        // Для января обновляем только balance_end
+        for(const r of batch){
+          if(r.isJan){
+            await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4)
+               ON CONFLICT(bank_id,month) DO UPDATE SET balance_end=$4`,
+              [r.bankId,r.month,r.start,r.end]);
+          } else {
+            await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4)
+               ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=$3,balance_end=$4`,
+              [r.bankId,r.month,r.start,r.end]);
+          }
+        }
+      } else {
+        await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES ${vals}
+           ON CONFLICT(bank_id,month) DO UPDATE SET balance_start=EXCLUDED.balance_start,balance_end=EXCLUDED.balance_end`,
+          params);
+      }
+    }catch(e){
+      // Если батч не поддерживается — fallback по одному
+      for(const r of batch){
+        try{
+          await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4)
+             ON CONFLICT(bank_id,month) DO UPDATE SET ${r.isJan?'balance_end=$4':'balance_start=$3,balance_end=$4'}`,
+            [r.bankId,r.month,r.start,r.end]);
+        }catch(e2){console.error('recalc error',r.bankId,r.month,e2);}
+      }
+    }
+  }
+}
+
+function fillBankSelects(){
+  ['f-bank'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const cur=el.value;
+    el.innerHTML=banks.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
+    if(cur)el.value=cur;
+  });
+}
+
+// ─── NAVIGATION ───────────────────────────────────────────────────
+async function go(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.mob-nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  const nb=document.getElementById('nb-'+name);if(nb)nb.classList.add('active');
+  const mob=document.getElementById('mob-'+name);if(mob)mob.classList.add('active');
+  closeMobMenu();
+  localStorage.setItem('last_view',name);
+  if(name==='dashboard')renderDash();
+  if(name==='journal')renderJournal();
+  if(name==='deposits')renderDeposits();
+  if(name==='settings')renderSettings();
+  if(name==='analytics')renderAnalytics();
+}
+
+function initTabs(){
+  ['mt-dash','mt-journal'].forEach(id=>{
+    const c=document.getElementById(id);if(!c)return;
+    c.innerHTML=MONTHS.map(m=>`<button class="mtab${m===curMonth?' active':''}" onclick="selMonth('${m}')">${m.slice(0,3)}</button>`).join('');
+  });
+}
+function selMonth(m){
+  curMonth=m;
+  document.querySelectorAll('.mtab').forEach(t=>t.classList.toggle('active',t.textContent===m.slice(0,3)));
+  // Re-check date field if journal is open
+  const fDate=document.getElementById('f-date');
+  if(fDate&&fDate.value)checkFormDate(fDate);
+  const av=document.querySelector('.view.active');if(!av)return;
+  const id=av.id.replace('view-','');
+  if(id==='dashboard')renderDash();
+  if(id==='journal')renderJournal();
+}
+
+async function initApp(){
+  initTabs();
+  await loadBanks();
+  fillBankSelects();
+  await loadCategories();
+  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('f-cat').innerHTML=catOptions();
+  document.getElementById('df-open').value=new Date().toISOString().split('T')[0];
+  const lastView=localStorage.getItem('last_view')||'dashboard';
+  go(lastView);
+}
+
+// ─── DEPOSITS ─────────────────────────────────────────────────────
+async function renderDeposits(){
+  const deps=await loadDeposits();deposits=deps;
+  const today=new Date();today.setHours(0,0,0,0);
+  document.getElementById('dep-list').innerHTML=deps.length
+    ?deps.map(d=>{const dc=new Date(d.date_close);const diff=Math.floor((dc-today)/(1000*60*60*24));
+      const cls=diff<0?'exp':diff<=14?'warn':'ok';
+      const lbl=diff<0?'Истёк':diff<=14?`⚠️ ${diff} дн.`:dc.toLocaleDateString('ru-RU');
+      return `<div class="dep-card"><div class="dep-card-head"><div><div class="dep-name">${d.name}</div><div class="dep-meta">${d.bank_name}</div></div><div style="display:flex;gap:8px;align-items:center"><span class="dep-badge ${cls}">${lbl}</span><button class="btn btn-d btn-sm" onclick="closeDeposit(${d.id})">Закрыть</button></div></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px"><div><div style="font-size:11px;color:var(--text3);font-weight:600">Сумма</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--purple);margin-top:4px">${fmt(parseFloat(d.amount))}</div></div><div><div style="font-size:11px;color:var(--text3);font-weight:600">Ставка</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--green);margin-top:4px">${d.rate}%</div></div><div><div style="font-size:11px;color:var(--text3);font-weight:600">Открыт</div><div style="font-size:14px;font-weight:500;margin-top:4px">${new Date(d.date_open).toLocaleDateString('ru-RU')}</div></div></div>${d.description?`<div style="font-size:13px;color:var(--text2);margin-top:10px">${d.description}</div>`:''}</div>`;
+    }).join('')
+    :'<div class="empty">Вкладов ещё нет. Добавь первый слева.</div>';
+}
+async function addDeposit(){
+  const name=document.getElementById('df-name').value.trim();
+  const bankName=document.getElementById('df-bank').value.trim();
+  const amount=parseFloat(document.getElementById('df-amount').value);
+  const rate=parseFloat(document.getElementById('df-rate').value);
+  const dateOpen=document.getElementById('df-open').value;
+  const dateClose=document.getElementById('df-close').value;
+  const desc=document.getElementById('df-desc').value.trim();
+  if(!name||!amount||!rate||!dateOpen||!dateClose){toast('Заполни все обязательные поля');return;}
+  try{
+    await q('INSERT INTO deposits(name,bank_name,amount,rate,date_open,date_close,description) VALUES($1,$2,$3,$4,$5,$6,$7)',[name,bankName||'—',amount,rate,dateOpen,dateClose,desc||null]);
+    document.getElementById('df-name').value='';document.getElementById('df-bank').value='';
+    document.getElementById('df-amount').value='';document.getElementById('df-rate').value='';
+    document.getElementById('df-close').value='';document.getElementById('df-desc').value='';
+    renderDeposits();toast('✓ Вклад добавлен');
+  }catch(e){toast('Ошибка: '+e.message);}
+}
+async function closeDeposit(id){
+  if(!confirm('Отметить вклад как закрытый?'))return;
+  try{await q('UPDATE deposits SET is_active=false WHERE id=$1',[id]);renderDeposits();toast('Вклад закрыт');}
+  catch(e){toast('Ошибка');}
+}
+
+// ─── ANALYTICS ───────────────────────────────────────────────────
+async function renderAnalytics(){
+  const mtAn=document.getElementById('mt-analytics');
+  if(mtAn&&!mtAn.innerHTML) mtAn.innerHTML=MONTHS.map(m=>`<button class="mtab${m===curMonth?' active':''}" onclick="selMonth('${m}')">${m.slice(0,3)}</button>`).join('');
+  document.getElementById('an-month-lbl').textContent=curMonth;
+  const recsA=await loadRecordsMonth(curMonth);
+  const balsA=await loadBalances(curMonth);
+  const aggA={};banks.forEach(b=>aggA[b.id]={income:0,expense:0});
+  recsA.forEach(r=>{if(aggA[r.bank_id]){if(r.type==='income')aggA[r.bank_id].income+=parseFloat(r.amount)||0;if(r.type==='expense')aggA[r.bank_id].expense+=parseFloat(r.amount)||0;}});
+  const activeBanksA=banks.filter(b=>Object.values(aggA[b.id]).some(v=>v>0)||(balsA[b.id]&&balsA[b.id].end));
+  document.getElementById('an-banks').innerHTML=activeBanksA.length
+    ?activeBanksA.map(b=>{const bal=balsA[b.id];const net=aggA[b.id].income-aggA[b.id].expense;
+      return`<div class="brow" onclick="goToBank('${b.id}')"><div class="bdot" style="background:${b.color}"></div><div style="flex:1"><div class="bname">${b.name}</div>${bal&&bal.end?`<div style="font-size:12px;color:var(--text3)">остаток: ${fmt(bal.end)}</div>`:''}</div><div class="${net>=0?'binc':'bexp'}">${net>=0?'+':'-'}${fmt(net)}</div></div>`;}).join('')
+    :'<div class="empty">Нет данных</div>';
+  const catExpA={};recsA.filter(r=>r.type==='expense').forEach(r=>{const c=r.category||'Прочее';catExpA[c]=(catExpA[c]||0)+parseFloat(r.amount);});
+  const sortedCatsA=Object.entries(catExpA).sort((a,b)=>b[1]-a[1]);const maxCatA=sortedCatsA[0]?sortedCatsA[0][1]:1;
+  document.getElementById('an-cats').innerHTML=sortedCatsA.length
+    ?sortedCatsA.slice(0,7).map(([c,v])=>`<div class="cat-row"><div class="cat-name">${c}</div><div class="cat-track"><div class="cat-fill" style="width:${Math.round(v/maxCatA*100)}%;background:var(--red)"></div></div><div class="cat-val" style="color:var(--red)">-${fmt(v)}</div></div>`).join('')
+    :'<div class="empty">Нет расходов</div>';
+  const depsA=await loadDeposits();const todayA=new Date();todayA.setHours(0,0,0,0);
+  document.getElementById('an-deps').innerHTML=depsA.length
+    ?depsA.slice(0,5).map(d=>{const dc=new Date(d.date_close);const diff=Math.floor((dc-todayA)/(1000*60*60*24));
+      const cls=diff<0?'exp':diff<=14?'warn':'ok';const lbl=diff<0?'Истёк':diff<=14?diff+' дн.':dc.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'});
+      return`<div class="dep-row"><div style="display:flex;align-items:center;justify-content:space-between"><div class="dep-name">${d.name}</div><span class="dep-badge ${cls}">${lbl}</span></div><div class="dep-meta">${d.bank_name} · ${d.rate}% годовых</div><div class="dep-amount">${fmt(parseFloat(d.amount))}</div></div>`;}).join('')
+    :'<div class="empty">Вкладов нет</div>';
+  const all=await loadAllRecords();
+  const byM={};MONTHS.forEach(m=>byM[m]={inc:0,exp:0});
+  all.forEach(r=>{if(byM[r.month]){if(r.type==='income')byM[r.month].inc+=parseFloat(r.amount)||0;if(r.type==='expense')byM[r.month].exp+=parseFloat(r.amount)||0;}});
+  const maxV=Math.max(...MONTHS.flatMap(m=>[byM[m].inc,byM[m].exp]),1);const H=160;
+  document.getElementById('an-chart').innerHTML=MONTHS.map(m=>{
+    const iH=Math.max((byM[m].inc/maxV)*H,byM[m].inc>0?3:0);
+    const eH=Math.max((byM[m].exp/maxV)*H,byM[m].exp>0?3:0);
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center"><div style="display:flex;gap:3px;align-items:flex-end;height:${H}px;width:100%"><div class="an-bar inc" style="height:${iH}px;flex:1" title="${m}: +${fmtF(byM[m].inc)}"></div><div class="an-bar exp" style="height:${eH}px;flex:1" title="${m}: -${fmtF(byM[m].exp)}"></div></div><div class="an-lbl">${m.slice(0,3)}</div></div>`;
+  }).join('');
+  const bInc={},bExp={};banks.forEach(b=>{bInc[b.id]=0;bExp[b.id]=0;});
+  all.forEach(r=>{if(r.type==='income'&&bInc[r.bank_id]!==undefined)bInc[r.bank_id]+=parseFloat(r.amount)||0;if(r.type==='expense'&&bExp[r.bank_id]!==undefined)bExp[r.bank_id]+=parseFloat(r.amount)||0;});
+  const mI=Math.max(...Object.values(bInc),1),mE=Math.max(...Object.values(bExp),1);
+  const si=banks.filter(b=>bInc[b.id]>0).sort((a,b)=>bInc[b.id]-bInc[a.id]).reverse();
+  const se=banks.filter(b=>bExp[b.id]>0).sort((a,b)=>bExp[b.id]-bExp[a.id]).reverse();
+  document.getElementById('an-inc').innerHTML=si.length?si.slice(0,8).map(b=>`<div class="cat-row"><div class="cat-name">${b.name}</div><div class="cat-track"><div class="cat-fill" style="width:${Math.round(bInc[b.id]/mI*100)}%;background:${b.color}"></div></div><div class="cat-val" style="color:var(--green)">${fmt(bInc[b.id])}</div></div>`).join(''):'<div class="empty">Нет данных</div>';
+  document.getElementById('an-exp').innerHTML=se.length?se.slice(0,8).map(b=>`<div class="cat-row"><div class="cat-name">${b.name}</div><div class="cat-track"><div class="cat-fill" style="width:${Math.round(bExp[b.id]/mE*100)}%;background:${b.color}"></div></div><div class="cat-val" style="color:var(--red)">${fmt(bExp[b.id])}</div></div>`).join(''):'<div class="empty">Нет данных</div>';
+}
+
+// ─── SETTINGS ────────────────────────────────────────────────────
+async function renderSettings(){
+  await loadCategories();
+  document.getElementById('cat-list').innerHTML=categories.length
+    ?categories.map(c=>`<div class="bank-set-row"><div style="flex:1;font-size:13px;font-weight:500">${c.name}</div><button class="btn btn-d btn-sm" onclick="deleteCategory(${c.id},'${c.name}')">✕</button></div>`).join('')
+    :'<div class="empty">Нет категорий</div>';
+  document.getElementById('bank-list').innerHTML=banks.map((b,i)=>`
+    <div class="bank-set-row" draggable="true" data-id="${b.id}" data-idx="${i}"
+      ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropBank(event)" style="cursor:grab">
+      <span style="color:var(--text3);margin-right:4px;cursor:grab">⠿</span>
+      <span class="color-sw" style="background:${b.color}"></span>
+      <div style="flex:1"><div style="font-size:14px;font-weight:600">${b.name}</div><div style="font-size:12px;color:var(--text3)">${BTYPE[b.type]||b.type}</div></div>
+      <button class="btn btn-d btn-sm" onclick="removeBank('${b.id}')">✕</button>
+    </div>`).join('');
+  const mbSel=document.getElementById('month-banks-sel');
+  if(mbSel&&!mbSel.value){mbSel.innerHTML='<option value="">— выбрать месяц —</option>'+MONTHS.map(m=>`<option value="${m}">${m}</option>`).join('');}
+  document.getElementById('data-info').textContent=`Данные хранятся в Supabase (облако)`;
+}
+
+let dragSrcId=null;
+function dragStart(e){dragSrcId=e.currentTarget.dataset.id;e.dataTransfer.effectAllowed='move';}
+function dragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';e.currentTarget.style.background='var(--accent-l)';}
+async function dropBank(e){
+  e.preventDefault();const targetId=e.currentTarget.dataset.id;e.currentTarget.style.background='';
+  if(!dragSrcId||dragSrcId===targetId)return;
+  const srcIdx=banks.findIndex(b=>b.id===dragSrcId);const tgtIdx=banks.findIndex(b=>b.id===targetId);
+  const moved=banks.splice(srcIdx,1)[0];banks.splice(tgtIdx,0,moved);
+  for(let i=0;i<banks.length;i++){await q('UPDATE banks SET sort_order=$1 WHERE id=$2',[i+1,banks[i].id]);}
+  banks.forEach((b,i)=>b.sort_order=i+1);renderSettings();toast('✓ Порядок сохранён');
+}
+
+async function loadMonthBanks(month){
+  try{const rows=await q('SELECT bank_id FROM month_banks WHERE month=$1',[month]);if(rows.length===0)return null;return rows.map(r=>r.bank_id);}
+  catch(e){return null;}
+}
+async function renderMonthBanks(){
+  const month=document.getElementById('month-banks-sel').value;
+  document.getElementById('month-banks-lbl').textContent=month||'';
+  if(!month){document.getElementById('month-banks-list').innerHTML='<div class="empty">Выберите месяц</div>';return;}
+  const active=await loadMonthBanks(month);const activeSet=new Set(active||banks.map(b=>b.id));
+  document.getElementById('month-banks-list').innerHTML=`
+    <div style="margin-bottom:10px;font-size:12px;color:var(--text2)">Отметь банки которые активны в ${month}.</div>
+    ${banks.map(b=>`<div class="bank-set-row"><span class="color-sw" style="background:${b.color}"></span><div style="flex:1"><div style="font-size:14px;font-weight:600">${b.name}</div></div><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" ${activeSet.has(b.id)?'checked':''} onchange="saveMonthBank('${month}','${b.id}',this.checked)" style="width:16px;height:16px;cursor:pointer"><span style="font-size:12px;color:var(--text2)">Активен</span></label></div>`).join('')}
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;gap:8px">
+      <button class="btn btn-g btn-sm" onclick="selectAllMonthBanks('${month}',true)">Выбрать все</button>
+      <button class="btn btn-g btn-sm" onclick="selectAllMonthBanks('${month}',false)">Снять все</button>
+    </div>`;
+}
+async function saveMonthBank(month,bankId,checked){
+  try{
+    if(checked){await q('INSERT INTO month_banks(month,bank_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[month,bankId]);}
+    else{await q('DELETE FROM month_banks WHERE month=$1 AND bank_id=$2',[month,bankId]);}
+  }catch(e){toast('Ошибка: '+e.message);}
+}
+async function selectAllMonthBanks(month,val){
+  for(const b of banks){await saveMonthBank(month,b.id,val);}renderMonthBanks();toast(val?'Все банки выбраны':'Все банки сняты');
+}
+async function addCategory(){
+  const name=document.getElementById('new-cat-name').value.trim();
+  if(!name){toast('Введите название');return;}
+  try{await q('INSERT INTO categories(name,sort_order) VALUES($1,$2)',[name,categories.length+1]);await loadCategories();renderSettings();document.getElementById('new-cat-name').value='';toast('✓ Категория добавлена');}
+  catch(e){toast('Уже существует или ошибка');}
+}
+async function deleteCategory(id,name){
+  if(!confirm(`Удалить категорию "${name}"?`))return;
+  try{await q('DELETE FROM categories WHERE id=$1',[id]);await loadCategories();renderSettings();toast('Категория удалена');}
+  catch(e){toast('Ошибка');}
+}
+async function addBank(){
+  const name=document.getElementById('nb-name').value.trim();
+  if(!name){toast('Введите название');return;}
+  const id='b'+Date.now();
+  try{
+    await q('INSERT INTO banks(id,name,type,color,sort_order) VALUES($1,$2,$3,$4,$5)',[id,name,document.getElementById('nb-type').value,document.getElementById('nb-color').value,banks.length+1]);
+    await loadBanks();fillBankSelects();renderSettings();document.getElementById('nb-name').value='';toast('✓ Счёт добавлен');
+  }catch(e){toast('Ошибка: '+e.message);}
+}
+async function removeBank(id){
+  if(!confirm('Удалить этот счёт?'))return;
+  try{await q('DELETE FROM banks WHERE id=$1',[id]);await loadBanks();fillBankSelects();renderSettings();toast('Удалено');}
+  catch(e){toast('Ошибка');}
+}
+async function saveBalance(bankId,field,el){
+  const val=parseFloat(el.textContent.replace(/\s|₽/g,'').replace(',','.'))||0;
+  el.textContent=val?fmtF(val):'';
+  try{
+    await q(`INSERT INTO balances(bank_id,month,balance_start,balance_end) VALUES($1,$2,$3,$4) ON CONFLICT(bank_id,month) DO UPDATE SET ${field==='start'?'balance_start':'balance_end'}=EXCLUDED.${field==='start'?'balance_start':'balance_end'}`,
+      field==='start'?[bankId,curMonth,val,0]:[bankId,curMonth,0,val]);
+    if(field==='start'){await recalcAllBalances();}
+    toast('✓ Остаток сохранён');
+  }catch(e){toast('Ошибка сохранения');}
+}
+async function exportData(){
+  const[recs,deps]=await Promise.all([loadAllRecords(),loadDeposits()]);
+  const d={banks,records:recs,deposits:deps,exported:new Date().toISOString()};
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));
+  a.download='finansy_2026_backup.json';a.click();toast('✓ Экспорт выполнен');
+}
+async function importData(input){
+  const fr=new FileReader();
+  fr.onload=async e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(d.records)for(const r of d.records){await q('INSERT INTO records(month,bank_id,type,amount,category,description,op_date) VALUES($1,$2,$3,$4,$5,$6,$7)',[r.month,r.bank_id,r.type,r.amount,r.category||null,r.description||null,r.op_date||null]);}
+      toast('✓ Импорт выполнен');renderDash();
+    }catch(e){toast('Ошибка файла');}
+  };
+  fr.readAsText(input.files[0]);input.value='';
+}
+
+window.onload=()=>{
+  const stored=localStorage.getItem(PWD_KEY);
+  if(!stored){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='block';
+    initApp();
+  }
+};
 </script>
 </body>
 </html>
