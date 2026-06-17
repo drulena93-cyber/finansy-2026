@@ -455,12 +455,12 @@ table.nit td.empty-cell{color:var(--text3);}
       <span>Сверка месяца · <span id="sverka-m-lbl"></span></span>
       <div style="display:flex;gap:10px;align-items:center">
         <span id="sverka-status" style="font-size:12px;font-weight:600"></span>
-        <button id="btn-hide-envrows" onclick="toggleSverkaEnvRows()" style="font-size:11px;font-weight:600;color:var(--purple);background:var(--purple-bg);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">🪙 Скрыть резервы</button>
         <button class="btn btn-g btn-sm" onclick="renderSverka()">↻ Обновить</button>
       </div>
     </div>
-    <div style="padding:8px 18px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:12px;color:var(--text2)">
-      Данные из журнала считаются автоматически. Введи цифру из приложения банка → сохранится автоматически и будет доступно при следующем открытии.
+    <div style="padding:8px 18px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);display:flex;justify-content:space-between;align-items:center">
+      <span>Данные из журнала считаются автоматически. Введи цифру из приложения банка → сохранится автоматически и будет доступно при следующем открытии.</span>
+      <button id="btn-hide-envrows" onclick="toggleSverkaEnvRows()" style="flex-shrink:0;margin-left:16px;font-size:11px;font-weight:600;color:var(--purple);background:var(--purple-bg);border:1px solid var(--purple-b);border-radius:6px;padding:4px 12px;cursor:pointer;white-space:nowrap">🪙 Скрыть резервы</button>
     </div>
     <div class="tbl-wrap">
       <table class="svt" id="sverka-table">
@@ -869,6 +869,12 @@ function toggleSverkaEnvRows(){
   document.querySelectorAll('.env-subrow').forEach(r=>r.style.display=hidden?'':'none');
 }
 
+function syncEnvBtn(){
+  const hidden=localStorage.getItem('sverka_env_hidden')==='1';
+  const btn=document.getElementById('btn-hide-envrows');
+  if(btn)btn.textContent=hidden?'🪙 Показать резервы':'🪙 Скрыть резервы';
+}
+
 function toggleMonthBanksSection(){
   const el=document.getElementById('month-banks-section');
   const btn=document.getElementById('btn-mb-toggle');
@@ -951,7 +957,7 @@ async function renderSverka(){
 
   // Банки с операциями — активные; с остатком но без операций — неактивные
   const hasOps=b=>Object.values(agg[b.id]).some(v=>v>0);
-  const hasBal=b=>bals[b.id]&&(bals[b.id].start||bals[b.id].end);
+  const hasBal=b=>bals[b.id]!==undefined;
   const activeWithOps=banks.filter(b=>hasOps(b));
   const activeNoOps=banks.filter(b=>!hasOps(b)&&hasBal(b));
   const active=[...activeWithOps,...activeNoOps];
@@ -1029,6 +1035,7 @@ async function renderSverka(){
 
   // Render envelopes panel
   renderEnvelopes(envsLoaded,bals,agg,active);
+  syncEnvBtn();
 
   document.getElementById('sverka-checks').innerHTML=`
     <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-sm);background:${trOk?'var(--green-bg)':'var(--red-bg)'};border:1px solid ${trOk?'var(--green-b)':'var(--red-b)'}">
