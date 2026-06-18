@@ -856,9 +856,6 @@ async function renderJournal(){
   document.getElementById('tots-tr-out').textContent=tots.tr_out?fmtF(tots.tr_out):'—';
   document.getElementById('tots-expense-i').textContent=tots.expense_i?fmtF(tots.expense_i):'—';
   document.getElementById('tots-expense').textContent=tots.expense?fmtF(tots.expense):'—';
-
-  // Also update sverka
-  renderSverka();
 }
 
 function toggleSverkaEnvRows(){
