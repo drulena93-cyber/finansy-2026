@@ -479,7 +479,6 @@ table.nit td.empty-cell{color:var(--text3);}
             <th>Нач.</th>
             <th>Кон.</th>
             <th>Δ</th>
-            <th style="background:var(--purple-bg);color:var(--purple)">Свободно</th>
           </tr>
         </thead>
         <tbody id="sverka-body"></tbody>
@@ -966,8 +965,8 @@ async function renderSverka(){
       </td>
       <td ${tdNum} style="font-weight:600;color:${autoEnd>=0?'var(--green)':'var(--red)'}">${fmtF(autoEnd)}</td>
       <td ${tdNum} style="color:${delta>0?'var(--green)':delta<0?'var(--red)':'var(--text3)'}">${delta?(delta>0?'+':'')+fmtF(delta):'—'}</td>
-      <td ${tdNum} style="color:var(--purple);font-weight:700">${reserved?fmtF(autoEnd-reserved):fmtF(autoEnd)}</td>
-    </tr>${bankEnvs.map(e=>`<tr style="background:#faf5ff">
+
+    </tr>${bankEnvs.map(e=>`<tr class="env-subrow" style="background:#faf5ff">
       <td style="padding:3px 10px 3px 26px;font-size:11px;color:var(--purple);white-space:nowrap"><span style="opacity:.5;margin-right:4px">└</span>🪙 ${e.name}</td>
       <td colspan="11"></td>
       <td style="text-align:right;padding:3px 10px;font-size:11px;color:var(--purple);font-weight:600;white-space:nowrap">−${fmtF(parseFloat(e.amount))}</td>
@@ -993,7 +992,6 @@ async function renderSverka(){
     <td style="text-align:right;padding:8px 10px;color:var(--text2);font-weight:700;white-space:nowrap">${fmtF(totStart)}</td>
     <td style="text-align:right;padding:8px 10px;font-weight:700;color:${totEnd>=0?'var(--green)':'var(--red)'};white-space:nowrap">${fmtF(totEnd)}</td>
     <td style="text-align:right;padding:8px 10px;font-weight:700;color:${totDelta>0?'var(--green)':totDelta<0?'var(--red)':'var(--text3)'};white-space:nowrap">${totDelta?(totDelta>0?'+':'')+fmtF(totDelta):'—'}</td>
-    <td style="text-align:right;padding:8px 10px;font-weight:800;color:var(--purple);white-space:nowrap;font-size:14px">${fmtF(totFree)}</td>
   </tr>`;
 
   // Render envelopes panel
