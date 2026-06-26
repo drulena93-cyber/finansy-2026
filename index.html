@@ -455,6 +455,7 @@ table.nit td.empty-cell{color:var(--text3);}
       <span>Сверка месяца · <span id="sverka-m-lbl"></span></span>
       <div style="display:flex;gap:10px;align-items:center">
         <span id="sverka-status" style="font-size:12px;font-weight:600"></span>
+        <button id="btn-no-ops" onclick="toggleNoOpsRows()" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:1px solid var(--border);border-radius:6px;padding:4px 12px;cursor:pointer;white-space:nowrap">Скрыть без операций</button>
         <button id="btn-hide-envrows" onclick="toggleSverkaEnvRows()" style="font-size:11px;font-weight:600;color:var(--purple);background:var(--purple-bg);border:1px solid var(--purple-b);border-radius:6px;padding:4px 12px;cursor:pointer;white-space:nowrap">🪙 Скрыть резервы</button>
       </div>
     </div>
@@ -593,8 +594,7 @@ table.nit td.empty-cell{color:var(--text3);}
       <div class="panel">
         <div class="panel-h">Счета и карты</div>
         <div class="panel-b">
-          <div id="bank-list"></div>
-          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+          <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)">
             <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Добавить счёт</div>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
               <input class="inp w150" id="nb-name" placeholder="Название счёта">
@@ -606,6 +606,7 @@ table.nit td.empty-cell{color:var(--text3);}
               <button class="btn btn-p btn-sm" onclick="addBank()">Добавить</button>
             </div>
           </div>
+          <div id="bank-list"></div>
         </div>
       </div>
     </div>
@@ -971,10 +972,7 @@ async function renderSverka(){
   document.getElementById('sverka-body').innerHTML=[
     ...activeWithOps.map(b=>renderSverkaRowFn(b,agg,bals,btots,envByBank,envsByBank,tdNum,tdInp,false)),
     ...(activeNoOps.length?[`<tr><td colspan="14" style="padding:5px 14px;background:var(--surface2);border-top:2px solid var(--border2)">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Без операций в этом месяце</span>
-        <button onclick="toggleNoOpsRows()" id="btn-no-ops" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:2px 10px;cursor:pointer">${localStorage.getItem('no_ops_hidden')==='1'?'Показать':'Скрыть'}</button>
-      </div></td></tr>`]:[]),
+      <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Без операций в этом месяце</span></td></tr>`]:[]),
     ...activeNoOps.map(b=>{const r=renderSverkaRowFn(b,agg,bals,btots,envByBank,envsByBank,tdNum,tdInp,true);return r.replace('<tr style="opacity:0.5','<tr class="no-ops-row" style="'+(localStorage.getItem('no_ops_hidden')==='1'?'display:none;':'')+'opacity:0.5');})
   ].join('');
 
@@ -1114,6 +1112,11 @@ async function moveEnvelope(id,newBankId){
   catch(e){toast('Ошибка');}
 }
 
+async function updateEnvelopeType(id,val){
+  try{await q('UPDATE envelopes SET env_type=$1 WHERE id=$2',[val||null,id]);renderSverka();}
+  catch(e){toast('Ошибка');}
+}
+
 async function updateEnvelopeAmount(id,val){
   const amount=parseFloat(val)||0;
   if(!amount){toast('Введите сумму');return;}
@@ -1147,14 +1150,22 @@ function renderEnvelopes(envs,bals,agg,active){
         <td style="padding:8px 12px;font-weight:600">
           <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--purple);margin-right:8px;vertical-align:middle"></span>${e.name}
         </td>
-        <td style="padding:8px 12px;color:var(--text2);font-size:12px">${e.env_type||'—'}</td>
+        <td style="padding:6px 8px">
+          <select onchange="updateEnvelopeType(${e.id},this.value)" style="border:1px solid var(--border2);border-radius:4px;padding:4px 8px;font-size:12px;font-family:inherit;background:var(--surface)">
+            <option value="">— выбрать —</option>
+            ${['Отпуск','Подушка безопасности','Крупная покупка','Обучение','Здоровье','Прочее'].map(t=>`<option value="${t}"${e.env_type===t?' selected':''}>${t}</option>`).join('')}
+          </select>
+        </td>
         <td style="padding:8px 12px;color:var(--text2);font-size:12px">${dateStr}</td>
         <td style="padding:6px 8px">
           <select onchange="moveEnvelope(${e.id},this.value)" style="border:1px solid var(--border2);border-radius:4px;padding:4px 8px;font-size:12px;font-family:inherit;background:var(--surface)">
             ${banks.map(b2=>`<option value="${b2.id}"${b2.id===e.bank_id?' selected':''}>${b2.name}</option>`).join('')}
           </select>
         </td>
-        <td style="padding:8px 12px;text-align:right;font-weight:700;color:var(--purple);font-size:14px;font-family:Manrope,sans-serif">${fmtF(parseFloat(e.amount))}</td>
+        <td style="padding:6px 8px;text-align:right">
+          <input type="number" value="${parseFloat(e.amount)}" onblur="updateEnvelopeAmount(${e.id},this.value)"
+            style="width:90px;height:28px;border:1px solid var(--border2);border-radius:4px;padding:0 6px;font-size:13px;font-weight:700;color:var(--purple);text-align:right;font-family:inherit;outline:none">
+        </td>
         <td style="padding:6px 8px;text-align:center">
           <button class="del-btn" onclick="deleteEnvelope(${e.id})" title="Удалить конверт">×</button>
         </td>
@@ -1199,12 +1210,23 @@ async function renderDash(){
   recs.forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
 
   // Total money
+  // Считаем на лету через все операции до текущего месяца
+  const allRecsForTotal=await loadAllRecords();
+  const janBalsForTotal=await loadBalances(MONTHS[0]);
   let totalDebit=0,totalSavings=0,totalDeposit=0,totalCash=0;
-  banks.forEach(b=>{const bal=bals[b.id];const end=bal?bal.end:0;
+  const curMonthIdx=MONTHS.indexOf(curMonth);
+  banks.forEach(b=>{
+    let end=(janBalsForTotal[b.id]?.start)||0;
+    for(let i=0;i<=curMonthIdx;i++){
+      const m=MONTHS[i];
+      const mRecs=allRecsForTotal.filter(r=>r.month===m&&r.bank_id===b.id);
+      const agg2={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
+      mRecs.forEach(r=>agg2[r.type]+=parseFloat(r.amount)||0);
+      end+=agg2.income+agg2.income_i+agg2.tr_in-agg2.tr_out-agg2.expense_i-agg2.expense;
+    }
     if(b.type==='debit'||b.type==='credit')totalDebit+=end;
     else if(b.type==='savings')totalSavings+=end;
     else if(b.type==='cash')totalCash+=end;
-    // deposit-type banks не считаем — они идут через вкладку Вклады
   });
   deps.forEach(d=>totalDeposit+=parseFloat(d.amount)||0);
   const totalMoney=totalDebit+totalSavings+totalDeposit+totalCash;
@@ -1977,7 +1999,7 @@ function toggleNoOpsRows(){
   const hidden=localStorage.getItem('no_ops_hidden')==='1';
   localStorage.setItem('no_ops_hidden',hidden?'0':'1');
   const btn=document.getElementById('btn-no-ops');
-  if(btn)btn.textContent=hidden?'Скрыть':'Показать';
+  if(btn)btn.textContent=hidden?'Скрыть без операций':'Показать без операций';
   document.querySelectorAll('.no-ops-row').forEach(r=>r.style.display=hidden?'':'none');
 }
 
