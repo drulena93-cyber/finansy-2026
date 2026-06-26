@@ -455,7 +455,7 @@ table.nit td.empty-cell{color:var(--text3);}
       <span>Сверка месяца · <span id="sverka-m-lbl"></span></span>
       <div style="display:flex;gap:10px;align-items:center">
         <span id="sverka-status" style="font-size:12px;font-weight:600"></span>
-        <button class="btn btn-g btn-sm" onclick="renderSverka()">↻ Обновить</button>
+        <button id="btn-hide-envrows" onclick="toggleSverkaEnvRows()" style="font-size:11px;font-weight:600;color:var(--purple);background:var(--purple-bg);border:1px solid var(--purple-b);border-radius:6px;padding:4px 12px;cursor:pointer;white-space:nowrap">🪙 Скрыть резервы</button>
       </div>
     </div>
     <div style="padding:8px 18px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:12px;color:var(--text2)">
@@ -577,7 +577,8 @@ table.nit td.empty-cell{color:var(--text3);}
 <!-- SETTINGS -->
 <div id="view-settings" class="view">
   <div class="ph"><h1>Настройки</h1><p>Счета, пароль и данные</p></div>
-  <div class="section-div">Банки по месяцам</div>
+  <div class="section-div" style="display:flex;align-items:center;justify-content:space-between"><span>Банки по месяцам</span><button onclick="toggleMonthBanksSection()" id="btn-mb-toggle" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:3px 10px;cursor:pointer">Скрыть</button></div>
+  <div id="month-banks-section">
   <div class="panel" style="margin-bottom:20px">
     <div class="panel-h">
       <span>Активные банки · <span id="month-banks-lbl"></span></span>
@@ -586,6 +587,7 @@ table.nit td.empty-cell{color:var(--text3);}
       </select>
     </div>
     <div class="panel-b" id="month-banks-list"><div class="empty">Выберите месяц</div></div>
+  </div>
   </div>
   <div class="section-div">Категории</div>
   <div class="panel" style="margin-bottom:20px">
@@ -850,9 +852,6 @@ async function renderJournal(){
   document.getElementById('tots-tr-out').textContent=tots.tr_out?fmtF(tots.tr_out):'—';
   document.getElementById('tots-expense-i').textContent=tots.expense_i?fmtF(tots.expense_i):'—';
   document.getElementById('tots-expense').textContent=tots.expense?fmtF(tots.expense):'—';
-
-  // Also update sverka
-  renderSverka();
 }
 
 // ─── SVERKA ─────────────────────────────────────────────────────
@@ -1953,6 +1952,24 @@ async function importData(input){
     }catch(e){toast('Ошибка файла');}
   };
   fr.readAsText(input.files[0]);input.value='';
+}
+
+
+function toggleSverkaEnvRows(){
+  const hidden=localStorage.getItem('sverka_env_hidden')==='1';
+  localStorage.setItem('sverka_env_hidden',hidden?'0':'1');
+  const btn=document.getElementById('btn-hide-envrows');
+  if(btn)btn.textContent=hidden?'🪙 Скрыть резервы':'🪙 Показать резервы';
+  document.querySelectorAll('.env-subrow').forEach(r=>r.style.display=hidden?'':'none');
+}
+
+function toggleMonthBanksSection(){
+  const el=document.getElementById('month-banks-section');
+  const btn=document.getElementById('btn-mb-toggle');
+  if(!el||!btn)return;
+  const hidden=el.style.display==='none';
+  el.style.display=hidden?'':'none';
+  btn.textContent=hidden?'Скрыть':'Показать';
 }
 
 window.onload=()=>{
