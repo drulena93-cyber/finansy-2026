@@ -1729,7 +1729,7 @@ async function go(name){
   closeMobMenu();
   localStorage.setItem('last_view',name);
   if(name==='dashboard')renderDash();
-  if(name==='journal')renderJournal();
+  if(name==='journal'){renderJournal();setTimeout(renderSverka,100);}
   if(name==='deposits')renderDeposits();
   if(name==='settings')renderSettings();
   if(name==='analytics')renderAnalytics();
