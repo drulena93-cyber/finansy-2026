@@ -332,6 +332,9 @@ table.nit td.empty-cell{color:var(--text3);}
   <!-- NET INCOME BY MONTHS (horizontal compact) -->
   <div id="dash-net-income"></div>
 
+  <!-- ENVELOPES ON DASHBOARD -->
+  <div id="dash-envelopes-panel" style="margin-bottom:14px"></div>
+
   <!-- CATEGORIES BY MONTH TABLES -->
   <div id="dash-cats-panel"></div>
 </div>
@@ -1063,6 +1066,11 @@ async function loadEnvelopes(){
   try{return await q('SELECT * FROM envelopes ORDER BY id');}catch(e){return[];}
 }
 
+function setEnvTypeFilter(type){
+  localStorage.setItem('env_type_filter',type);
+  renderSverka();
+}
+
 function toggleEnvelopePanel(){
   const body=document.getElementById('env-panel-body');
   const btn=document.getElementById('btn-env-toggle');
@@ -1126,18 +1134,27 @@ async function updateEnvelopeAmount(id,val){
   catch(e){toast('Ошибка');}
 }
 
-function renderEnvelopes(envs,bals,agg,active){
+function renderEnvelopes(envs,bals,agg,active,envTypeFilter){
   const list=document.getElementById('envelope-list');
   const totalsEl=document.getElementById('envelope-totals');
   if(!list||!totalsEl)return;
 
   if(!envs.length){
-    list.innerHTML='<div class="empty" style="padding:16px">Конвертов нет — добавь операцию с категорией «Резерв»</div>';
+    list.innerHTML='<div class="empty" style="padding:16px">Конвертов нет</div>';
     totalsEl.innerHTML='';
     return;
   }
 
-  list.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:13px;">
+  // Тип-фильтр
+  const allTypes=[...new Set(envs.map(e=>e.env_type||'').filter(t=>t))];
+  const activeFilter=envTypeFilter||localStorage.getItem('env_type_filter')||'';
+  const filteredEnvs=activeFilter?envs.filter(e=>(e.env_type||'')===activeFilter):envs;
+  const typeFilterHTML=`<div style="display:flex;gap:6px;flex-wrap:wrap;padding:8px 18px;border-bottom:1px solid var(--border);background:var(--surface2)">
+    <button onclick="setEnvTypeFilter('')" style="padding:3px 10px;border-radius:20px;border:1.5px solid ${!activeFilter?'var(--purple)':'var(--border)'};background:${!activeFilter?'var(--purple)':'var(--surface)'};color:${!activeFilter?'#fff':'var(--text2)'};font-size:11px;font-weight:600;cursor:pointer">Все</button>
+    ${allTypes.map(t=>`<button onclick="setEnvTypeFilter('${t}')" style="padding:3px 10px;border-radius:20px;border:1.5px solid ${activeFilter===t?'var(--purple)':'var(--border)'};background:${activeFilter===t?'var(--purple)':'var(--surface)'};color:${activeFilter===t?'#fff':'var(--text2)'};font-size:11px;font-weight:600;cursor:pointer">${t}</button>`).join('')}
+  </div>`;
+
+  list.innerHTML=typeFilterHTML+`<table style="width:100%;border-collapse:collapse;font-size:13px;">
     <thead><tr>
       <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Конверт</th>
       <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Тип</th>
@@ -1146,7 +1163,7 @@ function renderEnvelopes(envs,bals,agg,active){
       <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Сумма</th>
       <th style="padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surface2)"></th>
     </tr></thead>
-    <tbody>${envs.map(e=>{
+    <tbody>${filteredEnvs.map(e=>{
       const dateStr=e.op_date?e.op_date.split('T')[0].split('-').reverse().join('.'):'—';
       return`<tr style="border-bottom:1px solid var(--border)">
         <td style="padding:8px 12px;font-weight:600">
@@ -1274,8 +1291,52 @@ async function renderDash(){
   // Net income horizontal mini-table
   await renderNetIncomeTable(allRecs);
 
+  // Envelopes on dashboard
+  await renderDashEnvelopes();
+
   // Category × month tables
   await renderCatMonthTables(allRecs);
+}
+
+async function renderDashEnvelopes(){
+  const el=document.getElementById('dash-envelopes-panel');
+  if(!el)return;
+  const envs=await loadEnvelopes();
+  if(!envs.length){el.innerHTML='';return;}
+  const hidden=localStorage.getItem('dash_env_hidden')==='1';
+  const total=envs.reduce((s,e)=>s+parseFloat(e.amount)||0,0);
+  el.innerHTML=`<div class="panel">
+    <div class="panel-h">
+      <span>🪙 Конверты (резервы) · ${envs.length} шт. · Зарезервировано: <span style="color:var(--purple);font-weight:800">${fmtF(total)}</span></span>
+      <button onclick="toggleDashEnvelopes()" id="btn-dash-env" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">${hidden?'Показать':'Скрыть'}</button>
+    </div>
+    <div id="dash-env-body" style="display:${hidden?'none':'block'}">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead><tr>
+          <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Конверт</th>
+          <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Тип</th>
+          <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Банк</th>
+          <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Сумма</th>
+        </tr></thead>
+        <tbody>${envs.map(e=>`<tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:8px 12px;font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--purple);margin-right:8px;vertical-align:middle"></span>${e.name}</td>
+          <td style="padding:8px 12px;color:var(--text2);font-size:12px">${e.env_type||'—'}</td>
+          <td style="padding:8px 12px;color:var(--text2);font-size:12px">${banks.find(b=>b.id===e.bank_id)?.name||e.bank_id}</td>
+          <td style="padding:8px 12px;text-align:right;font-weight:700;color:var(--purple)">${fmtF(parseFloat(e.amount))}</td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function toggleDashEnvelopes(){
+  const el=document.getElementById('dash-env-body');
+  const btn=document.getElementById('btn-dash-env');
+  if(!el||!btn)return;
+  const hidden=el.style.display==='none';
+  el.style.display=hidden?'block':'none';
+  btn.textContent=hidden?'Скрыть':'Показать';
+  localStorage.setItem('dash_env_hidden',hidden?'0':'1');
 }
 
 async function renderNetIncomeTable(allRecs){
@@ -1373,6 +1434,7 @@ async function renderCatMonthTables(allRecs){
   const filteredRecs=dashBankFilter.size>0?allRecs.filter(r=>dashBankFilter.has(r.bank_id)):allRecs;
 
   const catExp={},catInc={};
+  const TR_IN_LABEL='↑ Переводы из других банков';
   filteredRecs.forEach(r=>{
     const cat=r.category||NO_CAT;
     const amt=parseFloat(r.amount)||0;
@@ -1383,6 +1445,10 @@ async function renderCatMonthTables(allRecs){
     if(r.type==='income'){
       if(!catInc[cat])catInc[cat]={};
       catInc[cat][r.month]=(catInc[cat][r.month]||0)+amt;
+    }
+    if(r.type==='tr_in'){
+      if(!catInc[TR_IN_LABEL])catInc[TR_IN_LABEL]={};
+      catInc[TR_IN_LABEL][r.month]=(catInc[TR_IN_LABEL][r.month]||0)+amt;
     }
   });
 
