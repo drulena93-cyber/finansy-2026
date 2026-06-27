@@ -1298,19 +1298,27 @@ async function renderDash(){
   await renderCatMonthTables(allRecs);
 }
 
-async function renderDashEnvelopes(){
+async function renderDashEnvelopes(filterType){
   const el=document.getElementById('dash-envelopes-panel');
   if(!el)return;
   const envs=await loadEnvelopes();
   if(!envs.length){el.innerHTML='';return;}
   const hidden=localStorage.getItem('dash_env_hidden')==='1';
-  const total=envs.reduce((s,e)=>s+parseFloat(e.amount)||0,0);
+  const activeType=filterType!==undefined?filterType:(localStorage.getItem('dash_env_type')||'');
+  const allTypes=[...new Set(envs.map(e=>e.env_type||'').filter(t=>t))];
+  const filtered=activeType?envs.filter(e=>(e.env_type||'')===activeType):envs;
+  const total=filtered.reduce((s,e)=>s+parseFloat(e.amount)||0,0);
+  const typeButtons=`<div style="display:flex;gap:6px;flex-wrap:wrap;padding:8px 18px;border-bottom:1px solid var(--border);background:var(--surface2)">
+    <button onclick="filterDashEnv('')" style="padding:3px 10px;border-radius:20px;border:1.5px solid ${!activeType?'var(--purple)':'var(--border)'};background:${!activeType?'var(--purple)':'var(--surface)'};color:${!activeType?'#fff':'var(--text2)'};font-size:11px;font-weight:600;cursor:pointer">Все</button>
+    ${allTypes.map(t=>`<button onclick="filterDashEnv('${t}')" style="padding:3px 10px;border-radius:20px;border:1.5px solid ${activeType===t?'var(--purple)':'var(--border)'};background:${activeType===t?'var(--purple)':'var(--surface)'};color:${activeType===t?'#fff':'var(--text2)'};font-size:11px;font-weight:600;cursor:pointer">${t}</button>`).join('')}
+  </div>`;
   el.innerHTML=`<div class="panel">
     <div class="panel-h">
-      <span>🪙 Конверты (резервы) · ${envs.length} шт. · Зарезервировано: <span style="color:var(--purple);font-weight:800">${fmtF(total)}</span></span>
+      <span>🪙 Конверты · ${filtered.length} шт. · Зарезервировано: <span style="color:var(--purple);font-weight:800">${fmtF(total)}</span>${activeType?` · <span style="font-size:12px;color:var(--text3)">${activeType}</span>`:''}</span>
       <button onclick="toggleDashEnvelopes()" id="btn-dash-env" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">${hidden?'Показать':'Скрыть'}</button>
     </div>
     <div id="dash-env-body" style="display:${hidden?'none':'block'}">
+      ${typeButtons}
       <table style="width:100%;border-collapse:collapse;font-size:13px;">
         <thead><tr>
           <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Конверт</th>
@@ -1318,7 +1326,7 @@ async function renderDashEnvelopes(){
           <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Банк</th>
           <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Сумма</th>
         </tr></thead>
-        <tbody>${envs.map(e=>`<tr style="border-bottom:1px solid var(--border)">
+        <tbody>${filtered.map(e=>`<tr style="border-bottom:1px solid var(--border)">
           <td style="padding:8px 12px;font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--purple);margin-right:8px;vertical-align:middle"></span>${e.name}</td>
           <td style="padding:8px 12px;color:var(--text2);font-size:12px">${e.env_type||'—'}</td>
           <td style="padding:8px 12px;color:var(--text2);font-size:12px">${banks.find(b=>b.id===e.bank_id)?.name||e.bank_id}</td>
@@ -1327,6 +1335,11 @@ async function renderDashEnvelopes(){
       </table>
     </div>
   </div>`;
+}
+
+async function filterDashEnv(type){
+  localStorage.setItem('dash_env_type',type);
+  await renderDashEnvelopes(type);
 }
 
 function toggleDashEnvelopes(){
