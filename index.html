@@ -332,9 +332,6 @@ table.nit td.empty-cell{color:var(--text3);}
   <!-- NET INCOME BY MONTHS (horizontal compact) -->
   <div id="dash-net-income"></div>
 
-  <!-- ENVELOPES ON DASHBOARD -->
-  <div id="dash-envelopes-panel" style="margin-bottom:14px"></div>
-
   <!-- CATEGORIES BY MONTH TABLES -->
   <div id="dash-cats-panel"></div>
 </div>
@@ -458,8 +455,7 @@ table.nit td.empty-cell{color:var(--text3);}
       <span>Сверка месяца · <span id="sverka-m-lbl"></span></span>
       <div style="display:flex;gap:10px;align-items:center">
         <span id="sverka-status" style="font-size:12px;font-weight:600"></span>
-        <button id="btn-no-ops" onclick="toggleNoOpsRows()" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:1px solid var(--border);border-radius:6px;padding:4px 12px;cursor:pointer;white-space:nowrap">Скрыть без операций</button>
-        <button id="btn-hide-envrows" onclick="toggleSverkaEnvRows()" style="font-size:11px;font-weight:600;color:var(--purple);background:var(--purple-bg);border:1px solid var(--purple-b);border-radius:6px;padding:4px 12px;cursor:pointer;white-space:nowrap">🪙 Скрыть резервы</button>
+        <button class="btn btn-g btn-sm" onclick="renderSverka()">↻ Обновить</button>
       </div>
     </div>
     <div style="padding:8px 18px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:12px;color:var(--text2)">
@@ -483,6 +479,7 @@ table.nit td.empty-cell{color:var(--text3);}
             <th>Нач.</th>
             <th>Кон.</th>
             <th>Δ</th>
+            <th style="background:var(--purple-bg);color:var(--purple)">Свободно</th>
           </tr>
         </thead>
         <tbody id="sverka-body"></tbody>
@@ -503,7 +500,6 @@ table.nit td.empty-cell{color:var(--text3);}
     <div id="env-panel-body">
       <div id="envelope-form" style="display:none;padding:12px 18px;background:var(--surface2);border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;align-items:flex-end">
         <div class="fg"><label>Название</label><input class="inp w150" id="env-name" placeholder="Отпуск, Подушка…"></div>
-        <div class="fg"><label>Тип</label><select class="inp w130" id="env-type"><option value="">— выбрать —</option><option>Отпуск</option><option>Подушка безопасности</option><option>Крупная покупка</option><option>Обучение</option><option>Здоровье</option><option>Прочее</option></select></div>
         <div class="fg"><label>Банк</label><select class="inp w150" id="env-bank"></select></div>
         <div class="fg"><label>Сумма</label><input type="number" class="inp w110" id="env-amount" placeholder="0"></div>
         <div class="fg"><label>Дата</label><input type="date" class="inp w130" id="env-date"></div>
@@ -581,6 +577,16 @@ table.nit td.empty-cell{color:var(--text3);}
 <!-- SETTINGS -->
 <div id="view-settings" class="view">
   <div class="ph"><h1>Настройки</h1><p>Счета, пароль и данные</p></div>
+  <div class="section-div">Банки по месяцам</div>
+  <div class="panel" style="margin-bottom:20px">
+    <div class="panel-h">
+      <span>Активные банки · <span id="month-banks-lbl"></span></span>
+      <select class="inp w130" id="month-banks-sel" onchange="renderMonthBanks()">
+        <option value="">— выбрать месяц —</option>
+      </select>
+    </div>
+    <div class="panel-b" id="month-banks-list"><div class="empty">Выберите месяц</div></div>
+  </div>
   <div class="section-div">Категории</div>
   <div class="panel" style="margin-bottom:20px">
     <div class="panel-h">Категории расходов и доходов</div>
@@ -597,7 +603,8 @@ table.nit td.empty-cell{color:var(--text3);}
       <div class="panel">
         <div class="panel-h">Счета и карты</div>
         <div class="panel-b">
-          <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+          <div id="bank-list"></div>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
             <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Добавить счёт</div>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
               <input class="inp w150" id="nb-name" placeholder="Название счёта">
@@ -609,7 +616,6 @@ table.nit td.empty-cell{color:var(--text3);}
               <button class="btn btn-p btn-sm" onclick="addBank()">Добавить</button>
             </div>
           </div>
-          <div id="bank-list"></div>
         </div>
       </div>
     </div>
@@ -630,6 +636,7 @@ table.nit td.empty-cell{color:var(--text3);}
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-g btn-sm" onclick="exportData()">⬇ Экспорт JSON</button>
             <label class="btn btn-g btn-sm" style="cursor:pointer;display:flex;align-items:center">⬆ Импорт JSON<input type="file" accept=".json" style="display:none" onchange="importData(this)"></label>
+            <button class="btn btn-g btn-sm" onclick="manualRecalc()" style="color:var(--accent);border-color:var(--accent)">↻ Пересчитать остатки</button>
           </div>
           <div style="margin-top:10px;font-size:12px;color:var(--text3)" id="data-info"></div>
         </div>
@@ -772,8 +779,8 @@ async function renderJournal(){
   }catch(e){}
 
   recs.sort((a,b)=>{
-    if(jrnSort==='date_desc'){if(!a.op_date&&!b.op_date)return b.id-a.id;if(!a.op_date)return 1;if(!b.op_date)return -1;return b.op_date>a.op_date?1:b.op_date<a.op_date?-1:(b.id-a.id);}
-    if(jrnSort==='date_asc'){if(!a.op_date&&!b.op_date)return a.id-b.id;if(!a.op_date)return 1;if(!b.op_date)return -1;return a.op_date>b.op_date?1:a.op_date<b.op_date?-1:(a.id-b.id);}
+    if(jrnSort==='date_desc') return (b.op_date||'')>(a.op_date||'')?1:(b.id-a.id);
+    if(jrnSort==='date_asc')  return (a.op_date||'')>(b.op_date||'')?1:-1;
     if(jrnSort==='bank')      return (bank(a.bank_id).name).localeCompare(bank(b.bank_id).name);
     if(jrnSort==='amount_desc') return parseFloat(b.amount)-parseFloat(a.amount);
     if(jrnSort==='amount_asc')  return parseFloat(a.amount)-parseFloat(b.amount);
@@ -797,7 +804,7 @@ async function renderJournal(){
         return `<tr data-id="${r.id}" style="background:#fffef5">
           <td class="jrn-check-td" style="display:none"><input type="checkbox" class="row-check" data-id="${r.id}" onchange="updateSelectedCount()"></td>
           <td><input type="date" value="${isoDate}" style="border:1px solid var(--border2);border-radius:4px;padding:2px 6px;font-size:12px;font-family:inherit;background:#fff;width:130px" onchange="updateRecord(${r.id},'op_date',this.value)"></td>
-          <td><select style="border:1px solid var(--border2);border-radius:4px;padding:2px 4px;font-size:12px;font-family:inherit;background:#fff;width:130px" onchange="updateRecordBank(${r.id},this.value)">${banks.map(bk=>`<option value="${bk.id}"${bk.id===r.bank_id?' selected':''}><span style="color:${bk.color}">${bk.name}</span></option>`).join('')}</select></td>
+          <td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${b.color};flex-shrink:0"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100px" title="${b.name}">${b.name}</span></span></td>
           <td class="num gc">${cols.income}</td>
           <td class="num pc">${cols.income_i}</td>
           <td class="num ac">${cols.tr_in}</td>
@@ -844,75 +851,12 @@ async function renderJournal(){
   document.getElementById('tots-tr-out').textContent=tots.tr_out?fmtF(tots.tr_out):'—';
   document.getElementById('tots-expense-i').textContent=tots.expense_i?fmtF(tots.expense_i):'—';
   document.getElementById('tots-expense').textContent=tots.expense?fmtF(tots.expense):'—';
+
+  // Also update sverka
+  renderSverka();
 }
 
 // ─── SVERKA ─────────────────────────────────────────────────────
-function renderSverkaRowFn(b,agg,bals,btots,envByBank,envsByBank,tdNum,tdInp,inactive){
-    const a=agg[b.id];
-    const bal=bals[b.id]||{start:0,end:0};
-    const bt=btots[b.id]||{income:0,expense:0};
-    const sumInc=a.income+a.income_i+a.tr_in;
-    const sumExp=a.tr_out+a.expense_i+a.expense;
-    const autoEnd=(bal.start||0)+sumInc-sumExp;
-    const delta=autoEnd-(bal.start||0);
-    const reserved=envByBank[b.id]||0;
-    const bankEnvs=(envsByBank[b.id]||[]);
-
-    const savedInc=bt.income_set?bt.income:null;
-    const savedExp=bt.expense_set?bt.expense:null;
-    const incHasVal=savedInc!==null;
-    const expHasVal=savedExp!==null;
-    const incOk=incHasVal&&Math.abs(savedInc-sumInc)<1;
-    const expOk=expHasVal&&Math.abs(savedExp-sumExp)<1;
-    const incDiff=incHasVal&&!incOk?savedInc-sumInc:0;
-    const expDiff=expHasVal&&!expOk?savedExp-sumExp:0;
-
-    const incChk=incHasVal
-      ?(incOk
-        ?'<span style="color:var(--green);font-weight:700;font-size:13px">✓</span>'
-        :`<span style="color:var(--red);font-weight:700;font-size:11px;white-space:nowrap">${incDiff>0?'+':''}${fmtF(incDiff)}</span>`)
-      :'';
-    const expChk=expHasVal
-      ?(expOk
-        ?'<span style="color:var(--green);font-weight:700;font-size:13px">✓</span>'
-        :`<span style="color:var(--red);font-weight:700;font-size:11px;white-space:nowrap">${expDiff>0?'+':''}${fmtF(expDiff)}</span>`)
-      :'';
-
-    const rowStyle=inactive?'opacity:0.5;background:#fafafa;':'';
-
-    const envRows=bankEnvs.map(e=>`<tr class="env-subrow" style="background:#faf5ff">
-      <td style="padding:3px 10px 3px 26px;font-size:11px;color:var(--purple);white-space:nowrap"><span style="opacity:.5;margin-right:4px">└</span>🪙 ${e.name}</td>
-      <td colspan="11"></td>
-      <td style="text-align:right;padding:3px 10px;font-size:11px;color:var(--purple);font-weight:600;white-space:nowrap">−${fmtF(parseFloat(e.amount))}</td>
-      <td></td>
-    </tr>`).join('');
-
-    return `<tr style="${rowStyle}">
-      <td style="padding:6px 10px;white-space:nowrap"><span class="bdot-sm" style="background:${b.color}"></span>${b.name}${inactive?'<span style="font-size:10px;color:var(--text3);margin-left:6px">нет операций</span>':''}</td>
-      <td ${tdNum} style="text-align:right;padding:6px 10px;color:var(--green);font-weight:700;white-space:nowrap">${sumInc?fmtF(sumInc):'—'}</td>
-      <td ${tdInp}><input class="ver-inp" type="number" value="${incHasVal?savedInc:''}" placeholder="выписка"
-        style="width:100px;height:28px;border:1.5px solid ${incHasVal?(incOk?'var(--green)':'var(--red)'):'var(--border2)'};border-radius:4px;padding:0 6px;font-size:12px;font-family:inherit;text-align:right;outline:none;background:var(--surface)"
-        onchange="saveSverka('${b.id}','income',this.value,${sumInc},this,'chk-inc-${b.id}')"></td>
-      <td id="chk-inc-${b.id}" style="text-align:right;padding:4px 6px;width:60px;white-space:nowrap">${incChk}</td>
-      <td ${tdNum} style="text-align:right;padding:6px 10px;color:${sumExp?'var(--red)':'inherit'};font-weight:${sumExp?'700':'400'};white-space:nowrap">${sumExp?fmtF(sumExp):'—'}</td>
-      <td ${tdInp}><input class="ver-inp" type="number" value="${expHasVal?savedExp:''}" placeholder="выписка"
-        style="width:100px;height:28px;border:1.5px solid ${expHasVal?(expOk?'var(--green)':'var(--red)'):'var(--border2)'};border-radius:4px;padding:0 6px;font-size:12px;font-family:inherit;text-align:right;outline:none;background:var(--surface)"
-        onchange="saveSverka('${b.id}','expense',this.value,${sumExp},this,'chk-exp-${b.id}')"></td>
-      <td id="chk-exp-${b.id}" style="text-align:right;padding:4px 6px;width:60px;white-space:nowrap">${expChk}</td>
-      <td ${tdNum} style="color:var(--accent)">${a.tr_in?fmtF(a.tr_in):'—'}</td>
-      <td ${tdNum} style="color:var(--accent)">${a.tr_out?fmtF(a.tr_out):'—'}</td>
-      <td ${tdNum} style="color:var(--purple)">${a.income_i?fmtF(a.income_i):'—'}</td>
-      <td ${tdNum} style="color:var(--purple)">${a.expense_i?fmtF(a.expense_i):'—'}</td>
-      <td style="padding:4px 6px;width:110px;">
-        <input type="number" value="${bal.start||''}" placeholder="нач. остаток"
-          style="width:100px;height:28px;border:1.5px solid ${bal.start?'var(--accent)':'var(--border2)'};border-radius:4px;padding:0 6px;font-size:12px;font-family:inherit;text-align:right;outline:none;background:${bal.start?'var(--accent-l)':'var(--surface)'}"
-          onchange="saveStartBalance('${b.id}',this.value,this)">
-      </td>
-      <td ${tdNum} style="font-weight:600;color:${autoEnd>=0?'var(--green)':'var(--red)'}">${fmtF(autoEnd)}</td>
-      <td ${tdNum} style="color:${delta>0?'var(--green)':delta<0?'var(--red)':'var(--text3)'}">${delta?(delta>0?'+':'')+fmtF(delta):'—'}</td>
-    </tr>${envRows}`;
-}
-
 async function renderSverka(){
   document.getElementById('sverka-m-lbl').textContent=curMonth;
   const [recs,bals,btots]=await Promise.all([
@@ -925,11 +869,7 @@ async function renderSverka(){
   banks.forEach(b=>agg[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
   recs.forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
 
-  const hasOps=b=>Object.values(agg[b.id]).some(v=>v>0);
-  const hasBal=b=>bals[b.id]!==undefined&&(bals[b.id].start||bals[b.id].end);
-  const activeWithOps=banks.filter(b=>hasOps(b));
-  const activeNoOps=banks.filter(b=>!hasOps(b)&&hasBal(b));
-  const active=[...activeWithOps,...activeNoOps];
+  const active=banks.filter(b=>Object.values(agg[b.id]).some(v=>v>0)||(bals[b.id]&&(bals[b.id].start||bals[b.id].end)));
 
   // Envelope amounts by bank — load separately, don't block if fails
   let envByBank={};
@@ -974,12 +914,69 @@ async function renderSverka(){
     totFree+=autoEnd-reserved;
   });
 
-  document.getElementById('sverka-body').innerHTML=[
-    ...activeWithOps.map(b=>renderSverkaRowFn(b,agg,bals,btots,envByBank,envsByBank,tdNum,tdInp,false)),
-    ...(activeNoOps.length?[`<tr><td colspan="14" style="padding:5px 14px;background:var(--surface2);border-top:2px solid var(--border2)">
-      <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Без операций в этом месяце</span></td></tr>`]:[]),
-    ...activeNoOps.map(b=>{const r=renderSverkaRowFn(b,agg,bals,btots,envByBank,envsByBank,tdNum,tdInp,true);return r.replace('<tr style="opacity:0.5','<tr class="no-ops-row" style="'+(localStorage.getItem('no_ops_hidden')==='1'?'display:none;':'')+'opacity:0.5');})
-  ].join('');
+  document.getElementById('sverka-body').innerHTML=active.map(b=>{
+    const a=agg[b.id];
+    const bal=bals[b.id]||{start:0,end:0};
+    const bt=btots[b.id]||{income:0,expense:0};
+    const sumInc=a.income+a.income_i+a.tr_in;
+    const sumExp=a.tr_out+a.expense_i+a.expense;
+    const autoEnd=(bal.start||0)+sumInc-sumExp;
+    const delta=autoEnd-(bal.start||0);
+    const reserved=envByBank[b.id]||0;
+    const bankEnvs=(envsByBank[b.id]||[]);
+
+    // Saved values from bank_totals
+    const savedInc=bt.income||0;
+    const savedExp=bt.expense||0;
+    const incOk=savedInc>0&&Math.abs(savedInc-sumInc)<1;
+    const expOk=savedExp>0&&Math.abs(savedExp-sumExp)<1;
+    const incDiff=savedInc>0&&!incOk?savedInc-sumInc:0;
+    const expDiff=savedExp>0&&!expOk?savedExp-sumExp:0;
+
+    const incChk=savedInc>0
+      ?(incOk
+        ?'<span style="color:var(--green);font-weight:700;font-size:13px">✓</span>'
+        :`<span style="color:var(--red);font-weight:700;font-size:11px;white-space:nowrap">${incDiff>0?'+':''}${fmtF(incDiff)}</span>`)
+      :'';
+    const expChk=savedExp>0
+      ?(expOk
+        ?'<span style="color:var(--green);font-weight:700;font-size:13px">✓</span>'
+        :`<span style="color:var(--red);font-weight:700;font-size:11px;white-space:nowrap">${expDiff>0?'+':''}${fmtF(expDiff)}</span>`)
+      :'';
+
+    return `<tr>
+      <td style="padding:6px 10px;white-space:nowrap"><span class="bdot-sm" style="background:${b.color}"></span>${b.name}</td>
+      <td ${tdNum} style="text-align:right;padding:6px 10px;color:var(--green);font-weight:700;white-space:nowrap">${sumInc?fmtF(sumInc):'—'}</td>
+      <td ${tdInp}><input class="ver-inp" type="number" value="${savedInc||''}" placeholder="выписка"
+        style="width:100px;height:28px;border:1.5px solid ${savedInc?(incOk?'var(--green)':'var(--red)'):'var(--border2)'};border-radius:4px;padding:0 6px;font-size:12px;font-family:inherit;text-align:right;outline:none;background:var(--surface)"
+        onchange="saveSverka('${b.id}','income',this.value,${sumInc},this,'chk-inc-${b.id}')"></td>
+      <td id="chk-inc-${b.id}" style="text-align:right;padding:4px 6px;width:60px;white-space:nowrap">${incChk}</td>
+      <td ${tdNum} style="text-align:right;padding:6px 10px;color:${sumExp?'var(--red)':'inherit'};font-weight:${sumExp?'700':'400'};white-space:nowrap">${sumExp?fmtF(sumExp):'—'}</td>
+      <td ${tdInp}><input class="ver-inp" type="number" value="${savedExp||''}" placeholder="выписка"
+        style="width:100px;height:28px;border:1.5px solid ${savedExp?(expOk?'var(--green)':'var(--red)'):'var(--border2)'};border-radius:4px;padding:0 6px;font-size:12px;font-family:inherit;text-align:right;outline:none;background:var(--surface)"
+        onchange="saveSverka('${b.id}','expense',this.value,${sumExp},this,'chk-exp-${b.id}')"></td>
+      <td id="chk-exp-${b.id}" style="text-align:right;padding:4px 6px;width:60px;white-space:nowrap">${expChk}</td>
+      <td ${tdNum} style="color:var(--accent)">${a.tr_in?fmtF(a.tr_in):'—'}</td>
+      <td ${tdNum} style="color:var(--accent)">${a.tr_out?fmtF(a.tr_out):'—'}</td>
+      <td ${tdNum} style="color:var(--purple)">${a.income_i?fmtF(a.income_i):'—'}</td>
+      <td ${tdNum} style="color:var(--purple)">${a.expense_i?fmtF(a.expense_i):'—'}</td>
+      <td style="padding:4px 6px;width:110px;">
+        <input type="number" value="${bal.start||''}" placeholder="нач. остаток"
+          style="width:100px;height:28px;border:1.5px solid ${bal.start?'var(--accent)':'var(--border2)'};border-radius:4px;padding:0 6px;font-size:12px;font-family:inherit;text-align:right;outline:none;background:${bal.start?'var(--accent-l)':'var(--surface)'}"
+          onchange="saveStartBalance('${b.id}',this.value,this)"
+          title="Начальный остаток — введи для первого месяца, остальные считаются автоматически">
+      </td>
+      <td ${tdNum} style="font-weight:600;color:${autoEnd>=0?'var(--green)':'var(--red)'}">${fmtF(autoEnd)}</td>
+      <td ${tdNum} style="color:${delta>0?'var(--green)':delta<0?'var(--red)':'var(--text3)'}">${delta?(delta>0?'+':'')+fmtF(delta):'—'}</td>
+      <td ${tdNum} style="color:var(--purple);font-weight:700">${reserved?fmtF(autoEnd-reserved):fmtF(autoEnd)}</td>
+    </tr>${bankEnvs.map(e=>`<tr style="background:#faf5ff">
+      <td style="padding:3px 10px 3px 26px;font-size:11px;color:var(--purple);white-space:nowrap"><span style="opacity:.5;margin-right:4px">└</span>🪙 ${e.name}</td>
+      <td colspan="11"></td>
+      <td style="text-align:right;padding:3px 10px;font-size:11px;color:var(--purple);font-weight:600;white-space:nowrap">−${fmtF(parseFloat(e.amount))}</td>
+      <td></td>
+      <td style="text-align:right;padding:3px 10px;font-size:11px;color:var(--purple);font-weight:700;white-space:nowrap">${fmtF(autoEnd-parseFloat(e.amount))}</td>
+    </tr>`).join('')}`;
+  }).join('');
 
   // Add totals footer row
   const svTbl=document.getElementById('sverka-table');
@@ -998,6 +995,7 @@ async function renderSverka(){
     <td style="text-align:right;padding:8px 10px;color:var(--text2);font-weight:700;white-space:nowrap">${fmtF(totStart)}</td>
     <td style="text-align:right;padding:8px 10px;font-weight:700;color:${totEnd>=0?'var(--green)':'var(--red)'};white-space:nowrap">${fmtF(totEnd)}</td>
     <td style="text-align:right;padding:8px 10px;font-weight:700;color:${totDelta>0?'var(--green)':totDelta<0?'var(--red)':'var(--text3)'};white-space:nowrap">${totDelta?(totDelta>0?'+':'')+fmtF(totDelta):'—'}</td>
+    <td style="text-align:right;padding:8px 10px;font-weight:800;color:var(--purple);white-space:nowrap;font-size:14px">${fmtF(totFree)}</td>
   </tr>`;
 
   // Render envelopes panel
@@ -1036,26 +1034,25 @@ async function saveStartBalance(bankId, val, inp){
   }catch(e){toast('Ошибка сохранения');}
 }
 async function saveSverka(bankId, field, val, journalVal, inp, chkId){
-  const num=val===''?null:parseFloat(val);
-  const hasVal=num!==null&&!isNaN(num);
-  const ok=hasVal&&Math.abs(num-journalVal)<1;
-  inp.style.borderColor=hasVal?(ok?'var(--green)':'var(--red)'):'var(--border2)';
+  const num=parseFloat(val)||0;
+  const ok=num>0&&Math.abs(num-journalVal)<1;
+  inp.style.borderColor=num>0?(ok?'var(--green)':'var(--red)'):'var(--border2)';
+  // Update check cell
   const chkEl=document.getElementById(chkId);
   if(chkEl){
-    if(!hasVal){chkEl.innerHTML='';}
+    if(!num){chkEl.innerHTML='';}
     else if(ok){chkEl.innerHTML='<span style="color:var(--green);font-weight:700;font-size:13px">✓</span>';}
     else{
       const diff=num-journalVal;
       chkEl.innerHTML=`<span style="color:var(--red);font-weight:700;font-size:11px;white-space:nowrap">${diff>0?'+':''}${fmtF(diff)}</span>`;
     }
   }
-  if(!hasVal)return;
-  const numToSave=num;
+  if(!num)return;
   try{
     await q(
       `INSERT INTO bank_totals(bank_id,month,income_bank,expense_bank) VALUES($1,$2,$3,$4)
        ON CONFLICT(bank_id,month) DO UPDATE SET ${field==='income'?'income_bank':'expense_bank'}=EXCLUDED.${field==='income'?'income_bank':'expense_bank'}`,
-      field==='income'?[bankId,curMonth,numToSave,0]:[bankId,curMonth,0,numToSave]
+      field==='income'?[bankId,curMonth,num,0]:[bankId,curMonth,0,num]
     );
     toast('✓ Сохранено');
   }catch(e){toast('Ошибка сохранения');}
@@ -1064,11 +1061,6 @@ async function saveSverka(bankId, field, val, journalVal, inp, chkId){
 // ─── ENVELOPES ────────────────────────────────────────────────────
 async function loadEnvelopes(){
   try{return await q('SELECT * FROM envelopes ORDER BY id');}catch(e){return[];}
-}
-
-function setEnvTypeFilter(type){
-  localStorage.setItem('env_type_filter',type);
-  renderSverka();
 }
 
 function toggleEnvelopePanel(){
@@ -1098,13 +1090,11 @@ async function saveEnvelope(){
   const date=document.getElementById('env-date').value;
   if(!name){toast('Введите название');return;}
   if(!amount){toast('Введите сумму');return;}
-  const envType=document.getElementById('env-type')?.value||'';
   try{
-    await q('INSERT INTO envelopes(name,bank_id,amount,op_date,env_type) VALUES($1,$2,$3,$4,$5)',[name,bankId,amount,date||null,envType||null]);
+    await q('INSERT INTO envelopes(name,bank_id,amount,op_date) VALUES($1,$2,$3,$4)',[name,bankId,amount,date||null]);
     document.getElementById('env-name').value='';
     document.getElementById('env-amount').value='';
     document.getElementById('env-date').value='';
-    if(document.getElementById('env-type'))document.getElementById('env-type').value='';
     toggleEnvelopeForm();
     toast('✓ Конверт добавлен');
     renderSverka();
@@ -1122,11 +1112,6 @@ async function moveEnvelope(id,newBankId){
   catch(e){toast('Ошибка');}
 }
 
-async function updateEnvelopeType(id,val){
-  try{await q('UPDATE envelopes SET env_type=$1 WHERE id=$2',[val||null,id]);renderSverka();}
-  catch(e){toast('Ошибка');}
-}
-
 async function updateEnvelopeAmount(id,val){
   const amount=parseFloat(val)||0;
   if(!amount){toast('Введите сумму');return;}
@@ -1134,46 +1119,30 @@ async function updateEnvelopeAmount(id,val){
   catch(e){toast('Ошибка');}
 }
 
-function renderEnvelopes(envs,bals,agg,active,envTypeFilter){
+function renderEnvelopes(envs,bals,agg,active){
   const list=document.getElementById('envelope-list');
   const totalsEl=document.getElementById('envelope-totals');
   if(!list||!totalsEl)return;
 
   if(!envs.length){
-    list.innerHTML='<div class="empty" style="padding:16px">Конвертов нет</div>';
+    list.innerHTML='<div class="empty" style="padding:16px">Конвертов нет — добавь операцию с категорией «Резерв»</div>';
     totalsEl.innerHTML='';
     return;
   }
 
-  // Тип-фильтр
-  const allTypes=[...new Set(envs.map(e=>e.env_type||'').filter(t=>t))];
-  const activeFilter=envTypeFilter||localStorage.getItem('env_type_filter')||'';
-  const filteredEnvs=activeFilter?envs.filter(e=>(e.env_type||'')===activeFilter):envs;
-  const typeFilterHTML=`<div style="display:flex;gap:6px;flex-wrap:wrap;padding:8px 18px;border-bottom:1px solid var(--border);background:var(--surface2)">
-    <button onclick="setEnvTypeFilter('')" style="padding:3px 10px;border-radius:20px;border:1.5px solid ${!activeFilter?'var(--purple)':'var(--border)'};background:${!activeFilter?'var(--purple)':'var(--surface)'};color:${!activeFilter?'#fff':'var(--text2)'};font-size:11px;font-weight:600;cursor:pointer">Все</button>
-    ${allTypes.map(t=>`<button onclick="setEnvTypeFilter('${t}')" style="padding:3px 10px;border-radius:20px;border:1.5px solid ${activeFilter===t?'var(--purple)':'var(--border)'};background:${activeFilter===t?'var(--purple)':'var(--surface)'};color:${activeFilter===t?'#fff':'var(--text2)'};font-size:11px;font-weight:600;cursor:pointer">${t}</button>`).join('')}
-  </div>`;
-
-  list.innerHTML=typeFilterHTML+`<table style="width:100%;border-collapse:collapse;font-size:13px;">
+  list.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:13px;">
     <thead><tr>
       <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Конверт</th>
-      <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Тип</th>
       <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Дата</th>
       <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Банк</th>
       <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Сумма</th>
       <th style="padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surface2)"></th>
     </tr></thead>
-    <tbody>${filteredEnvs.map(e=>{
+    <tbody>${envs.map(e=>{
       const dateStr=e.op_date?e.op_date.split('T')[0].split('-').reverse().join('.'):'—';
       return`<tr style="border-bottom:1px solid var(--border)">
         <td style="padding:8px 12px;font-weight:600">
           <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--purple);margin-right:8px;vertical-align:middle"></span>${e.name}
-        </td>
-        <td style="padding:6px 8px">
-          <select onchange="updateEnvelopeType(${e.id},this.value)" style="border:1px solid var(--border2);border-radius:4px;padding:4px 8px;font-size:12px;font-family:inherit;background:var(--surface)">
-            <option value="">— выбрать —</option>
-            ${['Отпуск','Подушка безопасности','Крупная покупка','Обучение','Здоровье','Прочее'].map(t=>`<option value="${t}"${e.env_type===t?' selected':''}>${t}</option>`).join('')}
-          </select>
         </td>
         <td style="padding:8px 12px;color:var(--text2);font-size:12px">${dateStr}</td>
         <td style="padding:6px 8px">
@@ -1181,10 +1150,7 @@ function renderEnvelopes(envs,bals,agg,active,envTypeFilter){
             ${banks.map(b2=>`<option value="${b2.id}"${b2.id===e.bank_id?' selected':''}>${b2.name}</option>`).join('')}
           </select>
         </td>
-        <td style="padding:6px 8px;text-align:right">
-          <input type="number" value="${parseFloat(e.amount)}" onblur="updateEnvelopeAmount(${e.id},this.value)"
-            style="width:90px;height:28px;border:1px solid var(--border2);border-radius:4px;padding:0 6px;font-size:13px;font-weight:700;color:var(--purple);text-align:right;font-family:inherit;outline:none">
-        </td>
+        <td style="padding:8px 12px;text-align:right;font-weight:700;color:var(--purple);font-size:14px;font-family:Manrope,sans-serif">${fmtF(parseFloat(e.amount))}</td>
         <td style="padding:6px 8px;text-align:center">
           <button class="del-btn" onclick="deleteEnvelope(${e.id})" title="Удалить конверт">×</button>
         </td>
@@ -1229,20 +1195,8 @@ async function renderDash(){
   recs.forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
 
   // Total money
-  // Считаем на лету через все операции до текущего месяца
-  const allRecsForTotal=await loadAllRecords();
-  const janBalsForTotal=await loadBalances(MONTHS[0]);
   let totalDebit=0,totalSavings=0,totalDeposit=0,totalCash=0;
-  const curMonthIdx=MONTHS.indexOf(curMonth);
-  banks.forEach(b=>{
-    let end=(janBalsForTotal[b.id]?.start)||0;
-    for(let i=0;i<=curMonthIdx;i++){
-      const m=MONTHS[i];
-      const mRecs=allRecsForTotal.filter(r=>r.month===m&&r.bank_id===b.id);
-      const agg2={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
-      mRecs.forEach(r=>agg2[r.type]+=parseFloat(r.amount)||0);
-      end+=agg2.income+agg2.income_i+agg2.tr_in-agg2.tr_out-agg2.expense_i-agg2.expense;
-    }
+  banks.forEach(b=>{const bal=bals[b.id];const end=bal?bal.end:0;
     if(b.type==='debit'||b.type==='credit')totalDebit+=end;
     else if(b.type==='savings')totalSavings+=end;
     else if(b.type==='cash')totalCash+=end;
@@ -1291,65 +1245,8 @@ async function renderDash(){
   // Net income horizontal mini-table
   await renderNetIncomeTable(allRecs);
 
-  // Envelopes on dashboard
-  await renderDashEnvelopes();
-
   // Category × month tables
   await renderCatMonthTables(allRecs);
-}
-
-async function renderDashEnvelopes(filterType){
-  const el=document.getElementById('dash-envelopes-panel');
-  if(!el)return;
-  const envs=await loadEnvelopes();
-  if(!envs.length){el.innerHTML='';return;}
-  const hidden=localStorage.getItem('dash_env_hidden')==='1';
-  const activeType=filterType!==undefined?filterType:(localStorage.getItem('dash_env_type')||'');
-  const allTypes=[...new Set(envs.map(e=>e.env_type||'').filter(t=>t))];
-  const filtered=activeType?envs.filter(e=>(e.env_type||'')===activeType):envs;
-  const total=filtered.reduce((s,e)=>s+parseFloat(e.amount)||0,0);
-  const typeButtons=`<div style="display:flex;gap:6px;flex-wrap:wrap;padding:8px 18px;border-bottom:1px solid var(--border);background:var(--surface2)">
-    <button onclick="filterDashEnv('')" style="padding:3px 10px;border-radius:20px;border:1.5px solid ${!activeType?'var(--purple)':'var(--border)'};background:${!activeType?'var(--purple)':'var(--surface)'};color:${!activeType?'#fff':'var(--text2)'};font-size:11px;font-weight:600;cursor:pointer">Все</button>
-    ${allTypes.map(t=>`<button onclick="filterDashEnv('${t}')" style="padding:3px 10px;border-radius:20px;border:1.5px solid ${activeType===t?'var(--purple)':'var(--border)'};background:${activeType===t?'var(--purple)':'var(--surface)'};color:${activeType===t?'#fff':'var(--text2)'};font-size:11px;font-weight:600;cursor:pointer">${t}</button>`).join('')}
-  </div>`;
-  el.innerHTML=`<div class="panel">
-    <div class="panel-h">
-      <span>🪙 Конверты · ${filtered.length} шт. · Зарезервировано: <span style="color:var(--purple);font-weight:800">${fmtF(total)}</span>${activeType?` · <span style="font-size:12px;color:var(--text3)">${activeType}</span>`:''}</span>
-      <button onclick="toggleDashEnvelopes()" id="btn-dash-env" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">${hidden?'Показать':'Скрыть'}</button>
-    </div>
-    <div id="dash-env-body" style="display:${hidden?'none':'block'}">
-      ${typeButtons}
-      <table style="width:100%;border-collapse:collapse;font-size:13px;">
-        <thead><tr>
-          <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Конверт</th>
-          <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Тип</th>
-          <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Банк</th>
-          <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Сумма</th>
-        </tr></thead>
-        <tbody>${filtered.map(e=>`<tr style="border-bottom:1px solid var(--border)">
-          <td style="padding:8px 12px;font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--purple);margin-right:8px;vertical-align:middle"></span>${e.name}</td>
-          <td style="padding:8px 12px;color:var(--text2);font-size:12px">${e.env_type||'—'}</td>
-          <td style="padding:8px 12px;color:var(--text2);font-size:12px">${banks.find(b=>b.id===e.bank_id)?.name||e.bank_id}</td>
-          <td style="padding:8px 12px;text-align:right;font-weight:700;color:var(--purple)">${fmtF(parseFloat(e.amount))}</td>
-        </tr>`).join('')}</tbody>
-      </table>
-    </div>
-  </div>`;
-}
-
-async function filterDashEnv(type){
-  localStorage.setItem('dash_env_type',type);
-  await renderDashEnvelopes(type);
-}
-
-function toggleDashEnvelopes(){
-  const el=document.getElementById('dash-env-body');
-  const btn=document.getElementById('btn-dash-env');
-  if(!el||!btn)return;
-  const hidden=el.style.display==='none';
-  el.style.display=hidden?'block':'none';
-  btn.textContent=hidden?'Скрыть':'Показать';
-  localStorage.setItem('dash_env_hidden',hidden?'0':'1');
 }
 
 async function renderNetIncomeTable(allRecs){
@@ -1447,7 +1344,6 @@ async function renderCatMonthTables(allRecs){
   const filteredRecs=dashBankFilter.size>0?allRecs.filter(r=>dashBankFilter.has(r.bank_id)):allRecs;
 
   const catExp={},catInc={};
-  const TR_IN_LABEL='↑ Переводы из других банков';
   filteredRecs.forEach(r=>{
     const cat=r.category||NO_CAT;
     const amt=parseFloat(r.amount)||0;
@@ -1459,13 +1355,9 @@ async function renderCatMonthTables(allRecs){
       if(!catInc[cat])catInc[cat]={};
       catInc[cat][r.month]=(catInc[cat][r.month]||0)+amt;
     }
-    if(r.type==='tr_in'){
-      if(!catInc[TR_IN_LABEL])catInc[TR_IN_LABEL]={};
-      catInc[TR_IN_LABEL][r.month]=(catInc[TR_IN_LABEL][r.month]||0)+amt;
-    }
   });
 
-  const activeMonths=MONTHS.filter(m=>allRecs.some(r=>r.month===m));
+  const activeMonths=MONTHS.filter(m=>filteredRecs.some(r=>r.month===m));
 
   // Bank filter buttons HTML
   const filterHTML=`<div style="display:flex;gap:6px;flex-wrap:wrap;padding:10px 18px;border-bottom:1px solid var(--border);background:var(--surface2)">
@@ -1628,14 +1520,6 @@ async function addRecord(){
     renderJournal();toast('✓ Запись добавлена');
   }catch(e){toast('Ошибка: '+e.message);}
 }
-async function updateRecordBank(id,newBankId){
-  try{
-    await q('UPDATE records SET bank_id=$1 WHERE id=$2',[newBankId,id]);
-    await recalcAllBalances();
-    renderJournal();
-  }catch(e){toast('Ошибка: '+e.message);}
-}
-
 async function updateRecord(id,field,val){
   try{await q(`UPDATE records SET ${field}=$1 WHERE id=$2`,[val||null,id]);if(field!=='op_date')toast('✓ Сохранено');}
   catch(e){toast('Ошибка: '+e.message);}
@@ -1724,7 +1608,7 @@ async function loadBalances(month){
   catch(e){return{};}
 }
 async function loadBankTotals(month){
-  try{const rows=await q('SELECT * FROM bank_totals WHERE month=$1',[month]);const out={};rows.forEach(r=>out[r.bank_id]={income:parseFloat(r.income_bank)||0,expense:parseFloat(r.expense_bank)||0,income_set:r.income_bank!==null,expense_set:r.expense_bank!==null});return out;}
+  try{const rows=await q('SELECT * FROM bank_totals WHERE month=$1',[month]);const out={};rows.forEach(r=>out[r.bank_id]={income:parseFloat(r.income_bank)||0,expense:parseFloat(r.expense_bank)||0});return out;}
   catch(e){return{};}
 }
 async function loadCategories(){
@@ -1735,7 +1619,6 @@ function catOptions(selected=''){
   return`<option value="">— выбрать —</option>`+categories.map(c=>`<option${c.name===selected?' selected':''}>${c.name}</option>`).join('');
 }
 async function loadDeposits(){try{return await q('SELECT * FROM deposits WHERE is_active=true ORDER BY date_close');}catch(e){return[];}}
-async function loadAllDeposits(){try{return await q('SELECT * FROM deposits ORDER BY is_active DESC,date_close');}catch(e){return[];}}
 
 async function transferBalancesToNextMonth(){
   const nextMonth=MONTHS[MONTHS.indexOf(curMonth)+1];
@@ -1848,7 +1731,7 @@ async function go(name){
   closeMobMenu();
   localStorage.setItem('last_view',name);
   if(name==='dashboard')renderDash();
-  if(name==='journal'){renderJournal();setTimeout(renderSverka,100);}
+  if(name==='journal')renderJournal();
   if(name==='deposits')renderDeposits();
   if(name==='settings')renderSettings();
   if(name==='analytics')renderAnalytics();
@@ -1869,7 +1752,7 @@ function selMonth(m){
   const av=document.querySelector('.view.active');if(!av)return;
   const id=av.id.replace('view-','');
   if(id==='dashboard')renderDash();
-  if(id==='journal'){renderJournal();setTimeout(renderSverka,100);}
+  if(id==='journal')renderJournal();
 }
 
 async function initApp(){
@@ -1886,43 +1769,15 @@ async function initApp(){
 
 // ─── DEPOSITS ─────────────────────────────────────────────────────
 async function renderDeposits(){
-  const all=await loadAllDeposits();
-  const deps=all.filter(d=>d.is_active);
-  const closed=all.filter(d=>!d.is_active);
-  deposits=deps;
+  const deps=await loadDeposits();deposits=deps;
   const today=new Date();today.setHours(0,0,0,0);
-  const activeHtml=deps.length
+  document.getElementById('dep-list').innerHTML=deps.length
     ?deps.map(d=>{const dc=new Date(d.date_close);const diff=Math.floor((dc-today)/(1000*60*60*24));
       const cls=diff<0?'exp':diff<=14?'warn':'ok';
       const lbl=diff<0?'Истёк':diff<=14?`⚠️ ${diff} дн.`:dc.toLocaleDateString('ru-RU');
       return `<div class="dep-card"><div class="dep-card-head"><div><div class="dep-name">${d.name}</div><div class="dep-meta">${d.bank_name}</div></div><div style="display:flex;gap:8px;align-items:center"><span class="dep-badge ${cls}">${lbl}</span><button class="btn btn-d btn-sm" onclick="closeDeposit(${d.id})">Закрыть</button></div></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px"><div><div style="font-size:11px;color:var(--text3);font-weight:600">Сумма</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--purple);margin-top:4px">${fmt(parseFloat(d.amount))}</div></div><div><div style="font-size:11px;color:var(--text3);font-weight:600">Ставка</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--green);margin-top:4px">${d.rate}%</div></div><div><div style="font-size:11px;color:var(--text3);font-weight:600">Открыт</div><div style="font-size:14px;font-weight:500;margin-top:4px">${new Date(d.date_open).toLocaleDateString('ru-RU')}</div></div></div>${d.description?`<div style="font-size:13px;color:var(--text2);margin-top:10px">${d.description}</div>`:''}</div>`;
     }).join('')
-    :'<div class="empty">Активных вкладов нет.</div>';
-
-  const closedHtml=closed.length?`
-    <div style="margin-top:24px">
-      <div style="font-family:Manrope,sans-serif;font-size:13px;font-weight:700;color:var(--text2);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--border)">История вкладов</div>
-      <table style="width:100%;border-collapse:collapse;font-size:13px;">
-        <thead><tr>
-          <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Название</th>
-          <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Банк</th>
-          <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Сумма</th>
-          <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Ставка</th>
-          <th style="text-align:center;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Открыт</th>
-          <th style="text-align:center;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Закрыт</th>
-        </tr></thead>
-        <tbody>${closed.map(d=>`<tr style="border-bottom:1px solid var(--border);opacity:0.7">
-          <td style="padding:8px 12px;font-weight:600">${d.name}</td>
-          <td style="padding:8px 12px;color:var(--text2)">${d.bank_name}</td>
-          <td style="padding:8px 12px;text-align:right;font-weight:700;color:var(--purple)">${fmt(parseFloat(d.amount))}</td>
-          <td style="padding:8px 12px;text-align:right;color:var(--green)">${d.rate}%</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--text2)">${new Date(d.date_open).toLocaleDateString('ru-RU')}</td>
-          <td style="padding:8px 12px;text-align:center;color:var(--text3)">${new Date(d.date_close).toLocaleDateString('ru-RU')}</td>
-        </tr>`).join('')}</tbody>
-      </table>
-    </div>`:'' ;
-
-  document.getElementById('dep-list').innerHTML=activeHtml+closedHtml;
+    :'<div class="empty">Вкладов ещё нет. Добавь первый слева.</div>';
 }
 async function addDeposit(){
   const name=document.getElementById('df-name').value.trim();
@@ -1994,7 +1849,7 @@ async function renderAnalytics(){
 async function renderSettings(){
   await loadCategories();
   document.getElementById('cat-list').innerHTML=categories.length
-    ?`<div style="display:flex;flex-wrap:wrap;gap:6px;padding:4px 0">${categories.map(c=>`<div style="display:inline-flex;align-items:center;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px 10px 3px 12px;font-size:12px;font-weight:500"><span>${c.name}</span><button onclick="deleteCategory(${c.id},'${c.name}')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;line-height:1;padding:0 0 0 4px" title="Удалить">×</button></div>`).join('')}</div>`
+    ?categories.map(c=>`<div class="bank-set-row"><div style="flex:1;font-size:13px;font-weight:500">${c.name}</div><button class="btn btn-d btn-sm" onclick="deleteCategory(${c.id},'${c.name}')">✕</button></div>`).join('')
     :'<div class="empty">Нет категорий</div>';
   document.getElementById('bank-list').innerHTML=banks.map((b,i)=>`
     <div class="bank-set-row" draggable="true" data-id="${b.id}" data-idx="${i}"
@@ -2021,6 +1876,32 @@ async function dropBank(e){
   banks.forEach((b,i)=>b.sort_order=i+1);renderSettings();toast('✓ Порядок сохранён');
 }
 
+async function loadMonthBanks(month){
+  try{const rows=await q('SELECT bank_id FROM month_banks WHERE month=$1',[month]);if(rows.length===0)return null;return rows.map(r=>r.bank_id);}
+  catch(e){return null;}
+}
+async function renderMonthBanks(){
+  const month=document.getElementById('month-banks-sel').value;
+  document.getElementById('month-banks-lbl').textContent=month||'';
+  if(!month){document.getElementById('month-banks-list').innerHTML='<div class="empty">Выберите месяц</div>';return;}
+  const active=await loadMonthBanks(month);const activeSet=new Set(active||banks.map(b=>b.id));
+  document.getElementById('month-banks-list').innerHTML=`
+    <div style="margin-bottom:10px;font-size:12px;color:var(--text2)">Отметь банки которые активны в ${month}.</div>
+    ${banks.map(b=>`<div class="bank-set-row"><span class="color-sw" style="background:${b.color}"></span><div style="flex:1"><div style="font-size:14px;font-weight:600">${b.name}</div></div><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" ${activeSet.has(b.id)?'checked':''} onchange="saveMonthBank('${month}','${b.id}',this.checked)" style="width:16px;height:16px;cursor:pointer"><span style="font-size:12px;color:var(--text2)">Активен</span></label></div>`).join('')}
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;gap:8px">
+      <button class="btn btn-g btn-sm" onclick="selectAllMonthBanks('${month}',true)">Выбрать все</button>
+      <button class="btn btn-g btn-sm" onclick="selectAllMonthBanks('${month}',false)">Снять все</button>
+    </div>`;
+}
+async function saveMonthBank(month,bankId,checked){
+  try{
+    if(checked){await q('INSERT INTO month_banks(month,bank_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[month,bankId]);}
+    else{await q('DELETE FROM month_banks WHERE month=$1 AND bank_id=$2',[month,bankId]);}
+  }catch(e){toast('Ошибка: '+e.message);}
+}
+async function selectAllMonthBanks(month,val){
+  for(const b of banks){await saveMonthBank(month,b.id,val);}renderMonthBanks();toast(val?'Все банки выбраны':'Все банки сняты');
+}
 async function addCategory(){
   const name=document.getElementById('new-cat-name').value.trim();
   if(!name){toast('Введите название');return;}
@@ -2056,6 +1937,12 @@ async function saveBalance(bankId,field,el){
     toast('✓ Остаток сохранён');
   }catch(e){toast('Ошибка сохранения');}
 }
+async function manualRecalc(){
+  toast('Пересчёт...');
+  await recalcAllBalances();
+  toast('✓ Остатки пересчитаны по всем месяцам');
+}
+
 async function exportData(){
   const[recs,deps]=await Promise.all([loadAllRecords(),loadDeposits()]);
   const d={banks,records:recs,deposits:deps,exported:new Date().toISOString()};
@@ -2073,23 +1960,6 @@ async function importData(input){
     }catch(e){toast('Ошибка файла');}
   };
   fr.readAsText(input.files[0]);input.value='';
-}
-
-
-function toggleNoOpsRows(){
-  const hidden=localStorage.getItem('no_ops_hidden')==='1';
-  localStorage.setItem('no_ops_hidden',hidden?'0':'1');
-  const btn=document.getElementById('btn-no-ops');
-  if(btn)btn.textContent=hidden?'Скрыть без операций':'Показать без операций';
-  document.querySelectorAll('.no-ops-row').forEach(r=>r.style.display=hidden?'':'none');
-}
-
-function toggleSverkaEnvRows(){
-  const hidden=localStorage.getItem('sverka_env_hidden')==='1';
-  localStorage.setItem('sverka_env_hidden',hidden?'0':'1');
-  const btn=document.getElementById('btn-hide-envrows');
-  if(btn)btn.textContent=hidden?'🪙 Скрыть резервы':'🪙 Показать резервы';
-  document.querySelectorAll('.env-subrow').forEach(r=>r.style.display=hidden?'':'none');
 }
 
 window.onload=()=>{
