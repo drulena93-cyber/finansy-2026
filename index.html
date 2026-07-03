@@ -455,7 +455,7 @@ table.nit td.empty-cell{color:var(--text3);}
       <span>Сверка месяца · <span id="sverka-m-lbl"></span></span>
       <div style="display:flex;gap:10px;align-items:center">
         <span id="sverka-status" style="font-size:12px;font-weight:600"></span>
-        <button class="btn btn-g btn-sm" onclick="renderSverka()">↻ Обновить</button>
+        <button id="btn-no-ops" onclick="toggleNoOpsRows()" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:1px solid var(--border);border-radius:6px;padding:4px 12px;cursor:pointer;white-space:nowrap">Скрыть без операций</button>
       </div>
     </div>
     <div style="padding:8px 18px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:12px;color:var(--text2)">
@@ -843,6 +843,68 @@ async function renderJournal(){
   document.getElementById('tots-expense').textContent=tots.expense?fmtF(tots.expense):'—';
 }
 
+function toggleNoOpsRows(){
+  const hidden=localStorage.getItem('no_ops_hidden')==='1';
+  localStorage.setItem('no_ops_hidden',hidden?'0':'1');
+  const btn=document.getElementById('btn-no-ops');
+  if(btn)btn.textContent=hidden?'Скрыть без операций':'Показать без операций';
+  document.querySelectorAll('.no-ops-row').forEach(r=>r.style.display=hidden?'':'none');
+}
+
+function renderSverkaRow(b,agg,bals,btots,envByBank,envsByBank,tdNum,tdInp,inactive){
+  const a=agg[b.id];
+  const bal=bals[b.id]||{start:0,end:0};
+  const bt=btots[b.id]||{income:0,expense:0};
+  const sumInc=a.income+a.income_i+a.tr_in;
+  const sumExp=a.tr_out+a.expense_i+a.expense;
+  const autoEnd=(bal.start||0)+sumInc-sumExp;
+  const delta=autoEnd-(bal.start||0);
+  const reserved=envByBank[b.id]||0;
+  const bankEnvs=(envsByBank[b.id]||[]);
+  const savedInc=bt.income||0;
+  const savedExp=bt.expense||0;
+  const incOk=savedInc>0&&Math.abs(savedInc-sumInc)<1;
+  const expOk=savedExp>0&&Math.abs(savedExp-sumExp)<1;
+  const incDiff=savedInc>0&&!incOk?savedInc-sumInc:0;
+  const expDiff=savedExp>0&&!expOk?savedExp-sumExp:0;
+  const incChk=savedInc>0?(incOk?'<span style="color:var(--green);font-weight:700;font-size:13px">✓</span>':`<span style="color:var(--red);font-weight:700;font-size:11px;white-space:nowrap">${incDiff>0?'+':''}${fmtF(incDiff)}</span>`):'';
+  const expChk=savedExp>0?(expOk?'<span style="color:var(--green);font-weight:700;font-size:13px">✓</span>':`<span style="color:var(--red);font-weight:700;font-size:11px;white-space:nowrap">${expDiff>0?'+':''}${fmtF(expDiff)}</span>`):'';
+  const bankEnvRows=bankEnvs.map(e=>`<tr style="background:#faf5ff">
+    <td style="padding:3px 10px 3px 26px;font-size:11px;color:var(--purple);white-space:nowrap"><span style="opacity:.5;margin-right:4px">└</span>🪙 ${e.name}</td>
+    <td colspan="11"></td>
+    <td style="text-align:right;padding:3px 10px;font-size:11px;color:var(--purple);font-weight:600;white-space:nowrap">−${fmtF(parseFloat(e.amount))}</td>
+    <td></td>
+    <td style="text-align:right;padding:3px 10px;font-size:11px;color:var(--purple);font-weight:700;white-space:nowrap">${fmtF(autoEnd-parseFloat(e.amount))}</td>
+  </tr>`).join('');
+  return `<tr>
+    <td style="padding:6px 10px;white-space:nowrap"><span class="bdot-sm" style="background:${b.color}"></span>${b.name}${inactive?'<span style="font-size:10px;color:var(--text3);margin-left:6px">нет операций</span>':''}</td>
+    <td ${tdNum} style="text-align:right;padding:6px 10px;color:var(--green);font-weight:700;white-space:nowrap">${sumInc?fmtF(sumInc):'—'}</td>
+    <td ${tdInp}><input class="ver-inp" type="number" value="${savedInc||''}" placeholder="выписка"
+      style="width:100px;height:28px;border:1.5px solid ${savedInc?(incOk?'var(--green)':'var(--red)'):'var(--border2)'};border-radius:4px;padding:0 6px;font-size:12px;font-family:inherit;text-align:right;outline:none;background:var(--surface)"
+      onchange="saveSverka('${b.id}','income',this.value,${sumInc},this,'chk-inc-${b.id}')"></td>
+    <td id="chk-inc-${b.id}" style="text-align:right;padding:4px 6px;width:60px;white-space:nowrap">${incChk}</td>
+    <td ${tdNum} style="text-align:right;padding:6px 10px;color:${sumExp?'var(--red)':'inherit'};font-weight:${sumExp?'700':'400'};white-space:nowrap">${sumExp?fmtF(sumExp):'—'}</td>
+    <td ${tdInp}><input class="ver-inp" type="number" value="${savedExp||''}" placeholder="выписка"
+      style="width:100px;height:28px;border:1.5px solid ${savedExp?(expOk?'var(--green)':'var(--red)'):'var(--border2)'};border-radius:4px;padding:0 6px;font-size:12px;font-family:inherit;text-align:right;outline:none;background:var(--surface)"
+      onchange="saveSverka('${b.id}','expense',this.value,${sumExp},this,'chk-exp-${b.id}')"></td>
+    <td id="chk-exp-${b.id}" style="text-align:right;padding:4px 6px;width:60px;white-space:nowrap">${expChk}</td>
+    <td ${tdNum} style="color:var(--accent)">${a.tr_in?fmtF(a.tr_in):'—'}</td>
+    <td ${tdNum} style="color:var(--accent)">${a.tr_out?fmtF(a.tr_out):'—'}</td>
+    <td ${tdNum} style="color:var(--purple)">${a.income_i?fmtF(a.income_i):'—'}</td>
+    <td ${tdNum} style="color:var(--purple)">${a.expense_i?fmtF(a.expense_i):'—'}</td>
+    <td style="padding:4px 6px;width:110px;">
+      ${curMonth===MONTHS[0]
+        ?`<input type="number" value="${bal.start||''}" placeholder="нач. остаток"
+            style="width:100px;height:28px;border:1.5px solid ${bal.start?'var(--accent)':'var(--border2)'};border-radius:4px;padding:0 6px;font-size:12px;font-family:inherit;text-align:right;outline:none;background:${bal.start?'var(--accent-l)':'var(--surface)'}"
+            onchange="saveStartBalance('${b.id}',this.value,this)">`
+        :`<span style="display:block;text-align:right;padding:0 6px;font-size:12px;color:${bal.start?'var(--text2)':'var(--text3)'};font-variant-numeric:tabular-nums">${bal.start?fmtF(bal.start):'—'}</span>`}
+    </td>
+    <td ${tdNum} style="font-weight:600;color:${autoEnd>=0?'var(--green)':'var(--red)'}">${fmtF(autoEnd)}</td>
+    <td ${tdNum} style="color:${delta>0?'var(--green)':delta<0?'var(--red)':'var(--text3)'}">${delta?(delta>0?'+':'')+fmtF(delta):'—'}</td>
+    <td ${tdNum} style="color:var(--purple);font-weight:700">${reserved?fmtF(autoEnd-reserved):fmtF(autoEnd)}</td>
+  </tr>${bankEnvRows}`;
+}
+
 // ─── SVERKA ─────────────────────────────────────────────────────
 async function renderSverka(){
   document.getElementById('sverka-m-lbl').textContent=curMonth;
@@ -856,7 +918,11 @@ async function renderSverka(){
   banks.forEach(b=>agg[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
   recs.forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
 
-  const active=banks.filter(b=>Object.values(agg[b.id]).some(v=>v>0)||(bals[b.id]&&(bals[b.id].start||bals[b.id].end)));
+  const hasOps=b=>Object.values(agg[b.id]).some(v=>v>0);
+  const hasBal=b=>bals[b.id]!==undefined&&(bals[b.id].start||bals[b.id].end);
+  const activeWithOps=banks.filter(b=>hasOps(b));
+  const activeNoOps=banks.filter(b=>!hasOps(b)&&hasBal(b));
+  const active=[...activeWithOps,...activeNoOps];
 
   // Envelope amounts by bank — load separately, don't block if fails
   let envByBank={};
@@ -901,7 +967,17 @@ async function renderSverka(){
     totFree+=autoEnd-reserved;
   });
 
-  document.getElementById('sverka-body').innerHTML=active.map(b=>{
+  const noOpsHidden=localStorage.getItem('no_ops_hidden')==='1';
+  const btnNoOps=document.getElementById('btn-no-ops');
+  if(btnNoOps)btnNoOps.textContent=noOpsHidden?'Показать без операций':'Скрыть без операций';
+
+  document.getElementById('sverka-body').innerHTML=[
+    ...activeWithOps.map(b=>renderSverkaRow(b,agg,bals,btots,envByBank,envsByBank,tdNum,tdInp)),
+    ...(activeNoOps.length?[`<tr><td colspan="14" style="padding:5px 14px;background:var(--surface2);border-top:2px solid var(--border2)"><span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Без операций в этом месяце</span></td></tr>`]:[]),
+    ...activeNoOps.map(b=>`<tr class="no-ops-row" style="${noOpsHidden?'display:none;':''}opacity:0.5;background:#fafafa">${renderSverkaRow(b,agg,bals,btots,envByBank,envsByBank,tdNum,tdInp,true).replace('<tr>','').replace('<tr style="">','')}`)
+  ].join('');
+  // legacy
+  if(false) active.map(b=>{
     const a=agg[b.id];
     const bal=bals[b.id]||{start:0,end:0};
     const bt=btots[b.id]||{income:0,expense:0};
@@ -965,7 +1041,8 @@ async function renderSverka(){
       <td></td>
       <td style="text-align:right;padding:3px 10px;font-size:11px;color:var(--purple);font-weight:700;white-space:nowrap">${fmtF(autoEnd-parseFloat(e.amount))}</td>
     </tr>`).join('')}`;
-  }).join('');
+  });
+  // end legacy
 
   // Add totals footer row
   const svTbl=document.getElementById('sverka-table');
