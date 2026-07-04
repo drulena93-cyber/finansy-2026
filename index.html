@@ -455,7 +455,9 @@ table.nit td.empty-cell{color:var(--text3);}
       <span>Сверка месяца · <span id="sverka-m-lbl"></span></span>
       <div style="display:flex;gap:10px;align-items:center">
         <span id="sverka-status" style="font-size:12px;font-weight:600"></span>
+        <button onclick="manualRecalc()" style="font-size:11px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid var(--green-b);border-radius:6px;padding:4px 12px;cursor:pointer;white-space:nowrap">↻ Пересчитать</button>
         <button id="btn-no-ops" onclick="toggleNoOpsRows()" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:1px solid var(--border);border-radius:6px;padding:4px 12px;cursor:pointer;white-space:nowrap">Скрыть без операций</button>
+        <button id="btn-hide-envrows" onclick="toggleSverkaEnvRows()" style="font-size:11px;font-weight:600;color:var(--purple);background:var(--purple-bg);border:1px solid var(--purple-b);border-radius:6px;padding:4px 12px;cursor:pointer;white-space:nowrap">🪙 Скрыть резервы</button>
       </div>
     </div>
     <div style="padding:8px 18px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:12px;color:var(--text2)">
@@ -626,7 +628,6 @@ table.nit td.empty-cell{color:var(--text3);}
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-g btn-sm" onclick="exportData()">⬇ Экспорт JSON</button>
             <label class="btn btn-g btn-sm" style="cursor:pointer;display:flex;align-items:center">⬆ Импорт JSON<input type="file" accept=".json" style="display:none" onchange="importData(this)"></label>
-            <button class="btn btn-g btn-sm" onclick="manualRecalc()" style="color:var(--accent);border-color:var(--accent)">↻ Пересчитать остатки</button>
           </div>
           <div style="margin-top:10px;font-size:12px;color:var(--text3)" id="data-info"></div>
         </div>
@@ -843,6 +844,14 @@ async function renderJournal(){
   document.getElementById('tots-expense').textContent=tots.expense?fmtF(tots.expense):'—';
 }
 
+function toggleSverkaEnvRows(){
+  const hidden=localStorage.getItem('sverka_env_hidden')==='1';
+  localStorage.setItem('sverka_env_hidden',hidden?'0':'1');
+  const btn=document.getElementById('btn-hide-envrows');
+  if(btn)btn.textContent=hidden?'🪙 Скрыть резервы':'🪙 Показать резервы';
+  document.querySelectorAll('.env-subrow').forEach(r=>r.style.display=hidden?'':'none');
+}
+
 function toggleNoOpsRows(){
   const hidden=localStorage.getItem('no_ops_hidden')==='1';
   localStorage.setItem('no_ops_hidden',hidden?'0':'1');
@@ -869,7 +878,8 @@ function renderSverkaRow(b,agg,bals,btots,envByBank,envsByBank,tdNum,tdInp,inact
   const expDiff=savedExp>0&&!expOk?savedExp-sumExp:0;
   const incChk=savedInc>0?(incOk?'<span style="color:var(--green);font-weight:700;font-size:13px">✓</span>':`<span style="color:var(--red);font-weight:700;font-size:11px;white-space:nowrap">${incDiff>0?'+':''}${fmtF(incDiff)}</span>`):'';
   const expChk=savedExp>0?(expOk?'<span style="color:var(--green);font-weight:700;font-size:13px">✓</span>':`<span style="color:var(--red);font-weight:700;font-size:11px;white-space:nowrap">${expDiff>0?'+':''}${fmtF(expDiff)}</span>`):'';
-  const bankEnvRows=bankEnvs.map(e=>`<tr style="background:#faf5ff">
+  const sverkaEnvHidden=localStorage.getItem('sverka_env_hidden')==='1';
+  const bankEnvRows=bankEnvs.map(e=>`<tr class="env-subrow" style="background:#faf5ff;${sverkaEnvHidden?'display:none;':''}">
     <td style="padding:3px 10px 3px 26px;font-size:11px;color:var(--purple);white-space:nowrap"><span style="opacity:.5;margin-right:4px">└</span>🪙 ${e.name}</td>
     <td colspan="11"></td>
     <td style="text-align:right;padding:3px 10px;font-size:11px;color:var(--purple);font-weight:600;white-space:nowrap">−${fmtF(parseFloat(e.amount))}</td>
@@ -1979,8 +1989,10 @@ async function saveBalance(bankId,field,el){
 }
 async function manualRecalc(){
   toast('Пересчёт...');
+  await loadBanks();
   await recalcAllBalances();
   toast('✓ Остатки пересчитаны по всем месяцам');
+  renderSverka();
 }
 
 async function exportData(){
