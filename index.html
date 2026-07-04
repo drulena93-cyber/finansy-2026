@@ -929,9 +929,24 @@ async function renderSverka(){
   recs.forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
 
   const hasOps=b=>Object.values(agg[b.id]).some(v=>v>0);
-  const hasBal=b=>bals[b.id]!==undefined&&(bals[b.id].start||bals[b.id].end);
-  const activeWithOps=banks.filter(b=>hasOps(b));
-  const activeNoOps=banks.filter(b=>!hasOps(b)&&hasBal(b));
+  const hasBal=b=>bals[b.id]!==undefined||banks.indexOf(b)<banks.length;
+  const activeWithOps=banks.filter(b=>{
+    if(!hasOps(b))return false;
+    // Закрытый банк показываем только если есть операции (они же были)
+    return true;
+  });
+  const activeNoOps=banks.filter(b=>{
+    if(!hasOps(b)){
+      // Скрываем закрытые банки начиная с месяца закрытия
+      if(b.is_closed&&b.closed_from){
+        const closedIdx=MONTHS.indexOf(b.closed_from);
+        const curIdx=MONTHS.indexOf(curMonth);
+        if(curIdx>=closedIdx)return false;
+      }
+      return true;
+    }
+    return false;
+  });
   const active=[...activeWithOps,...activeNoOps];
 
   // Envelope amounts by bank — load separately, don't block if fails
@@ -1791,7 +1806,14 @@ function fillBankSelects(){
   ['f-bank'].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
     const cur=el.value;
-    el.innerHTML=banks.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
+    const curIdx=MONTHS.indexOf(curMonth);
+    el.innerHTML=banks.filter(b=>{
+      if(b.is_closed&&b.closed_from){
+        const closedIdx=MONTHS.indexOf(b.closed_from);
+        if(curIdx>=closedIdx)return false;
+      }
+      return true;
+    }).map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
     if(cur)el.value=cur;
   });
 }
@@ -1932,7 +1954,10 @@ async function renderSettings(){
       ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropBank(event)" style="cursor:grab">
       <span style="color:var(--text3);margin-right:4px;cursor:grab">⠿</span>
       <span class="color-sw" style="background:${b.color}"></span>
-      <div style="flex:1"><div style="font-size:14px;font-weight:600">${b.name}</div><div style="font-size:12px;color:var(--text3)">${BTYPE[b.type]||b.type}</div></div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:600">${b.name}${b.is_closed?'<span style="font-size:10px;color:var(--red);background:var(--red-bg);border-radius:4px;padding:1px 6px;margin-left:8px;font-weight:700">закрыт</span>':''}</div><div style="font-size:12px;color:var(--text3)">${BTYPE[b.type]||b.type}${b.closed_from?' · закрыт с '+b.closed_from:''}</div></div>
+      ${b.is_closed
+        ?`<button class="btn btn-g btn-sm" onclick="reopenBank('${b.id}')" style="color:var(--green);border-color:var(--green)">↺ Открыть</button>`
+        :`<button class="btn btn-g btn-sm" onclick="closeBank('${b.id}')" style="color:var(--amber);border-color:var(--amber)">Закрыть</button>`}
       <button class="btn btn-d btn-sm" onclick="removeBank('${b.id}')">✕</button>
     </div>`).join('');
   const mbSel=document.getElementById('month-banks-sel');
@@ -1972,6 +1997,24 @@ async function addBank(){
     await loadBanks();fillBankSelects();renderSettings();document.getElementById('nb-name').value='';toast('✓ Счёт добавлен');
   }catch(e){toast('Ошибка: '+e.message);}
 }
+async function closeBank(id){
+  const month=prompt('С какого месяца закрыт счёт? (например: Июль)');
+  if(!month||!MONTHS.includes(month)){toast('Укажи корректный месяц');return;}
+  try{
+    await q('UPDATE banks SET is_closed=true,closed_from=$1 WHERE id=$2',[month,id]);
+    await loadBanks();fillBankSelects();renderSettings();
+    toast('✓ Счёт закрыт с '+month);
+  }catch(e){toast('Ошибка: '+e.message);}
+}
+
+async function reopenBank(id){
+  try{
+    await q('UPDATE banks SET is_closed=false,closed_from=null WHERE id=$1',[id]);
+    await loadBanks();fillBankSelects();renderSettings();
+    toast('✓ Счёт открыт');
+  }catch(e){toast('Ошибка: '+e.message);}
+}
+
 async function removeBank(id){
   if(!confirm('Удалить этот счёт?'))return;
   try{await q('DELETE FROM banks WHERE id=$1',[id]);await loadBanks();fillBankSelects();renderSettings();toast('Удалено');}
