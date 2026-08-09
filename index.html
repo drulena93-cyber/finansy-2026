@@ -339,7 +339,7 @@ table.nit td.empty-cell{color:var(--text3);}
 
 <!-- JOURNAL -->
 <div id="view-journal" class="view">
-  <div class="ph"><h1>Журнал операций</h1><p>Все операции строка за строкой — как в Excel</p></div>
+  <div class="ph"><h1>Журнал операций <button onclick="showHelp('journal')" style="background:none;border:1.5px solid var(--border2);border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;cursor:pointer;color:var(--text3);padding:0;line-height:1;vertical-align:middle">?</button></h1><p>Все операции строка за строкой — как в Excel</p></div>
   <div class="mbar" id="mt-journal"></div>
 
   <!-- ADD FORM TOP -->
@@ -453,7 +453,7 @@ table.nit td.empty-cell{color:var(--text3);}
   <!-- SVERKA PANEL -->
   <div class="panel" id="panel-sverka">
     <div class="panel-h">
-      <span>Сверка месяца · <span id="sverka-m-lbl"></span></span>
+      <span>Сверка месяца · <span id="sverka-m-lbl"></span> <button onclick="showHelp('sverka')" style="background:none;border:1.5px solid var(--border2);border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;cursor:pointer;color:var(--text3);padding:0;line-height:1;vertical-align:middle">?</button></span>
       <div style="display:flex;gap:10px;align-items:center">
         <span id="sverka-status" style="font-size:12px;font-weight:600"></span>
         <button onclick="manualRecalc()" style="font-size:11px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid var(--green-b);border-radius:6px;padding:4px 12px;cursor:pointer;white-space:nowrap">↻ Пересчитать</button>
@@ -494,7 +494,7 @@ table.nit td.empty-cell{color:var(--text3);}
   <!-- ENVELOPES PANEL -->
   <div class="panel" id="panel-envelopes" style="margin-top:14px">
     <div class="panel-h">
-      <span>🪙 Конверты (резервы)</span>
+      <span>🪙 Конверты (резервы) <button onclick="showHelp('envelopes')" style="background:none;border:1.5px solid var(--border2);border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;cursor:pointer;color:var(--text3);padding:0;line-height:1;vertical-align:middle">?</button></span>
       <div style="display:flex;gap:8px;align-items:center">
         <button class="btn btn-g btn-sm" onclick="toggleEnvelopeForm()">+ Добавить</button>
         <button id="btn-env-toggle" onclick="toggleEnvelopePanel()" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">Скрыть</button>
@@ -1334,6 +1334,7 @@ async function renderDash(){
   const janBalsForTotal=await loadBalances(MONTHS[0]);
   const lastBalsForTotal=await loadBalances(lastMonthWithData);
   let totalMoney=0;
+  let totalDebit=0,totalSavings=0,totalCash=0,totalDeposit=0;
   banks.forEach(b=>{
     const janBal=janBalsForTotal[b.id]||{start:0};
     let end=janBal.start||0;
@@ -1345,9 +1346,11 @@ async function renderDash(){
       end+=a2.income+a2.income_i+a2.tr_in-a2.tr_out-a2.expense_i-a2.expense;
     }
     totalMoney+=end;
+    if(b.type==='debit'||b.type==='credit')totalDebit+=end;
+    else if(b.type==='savings')totalSavings+=end;
+    else if(b.type==='cash')totalCash+=end;
   });
-  deps.forEach(d=>totalMoney+=parseFloat(d.amount)||0);
-  const totalDebit=0,totalSavings=0,totalDeposit=0,totalCash=0;
+  deps.forEach(d=>{totalDeposit+=parseFloat(d.amount)||0;totalMoney+=parseFloat(d.amount)||0;});
 
   // Load envelopes for reserve display
   let totalReserved=0;
