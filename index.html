@@ -499,9 +499,11 @@ table.nit td.empty-cell{color:var(--text3);}
         <button id="btn-env-toggle" onclick="toggleEnvelopePanel()" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">Скрыть</button>
       </div>
     </div>
+    <div id="env-type-filter" style="display:flex;gap:6px;flex-wrap:wrap;padding:8px 18px;border-bottom:1px solid var(--border);background:var(--surface2)"></div>
     <div id="env-panel-body">
       <div id="envelope-form" style="display:none;padding:12px 18px;background:var(--surface2);border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;align-items:flex-end">
         <div class="fg"><label>Название</label><input class="inp w150" id="env-name" placeholder="Отпуск, Подушка…"></div>
+        <div class="fg"><label>Тип</label><select class="inp w130" id="env-type"><option value="">— выбрать —</option><option>Отпуск</option><option>Подушка безопасности</option><option>Крупная покупка</option><option>Обучение</option><option>Здоровье</option><option>Прочее</option></select></div>
         <div class="fg"><label>Банк</label><select class="inp w150" id="env-bank"></select></div>
         <div class="fg"><label>Сумма</label><input type="number" class="inp w110" id="env-amount" placeholder="0"></div>
         <div class="fg"><label>Дата</label><input type="date" class="inp w130" id="env-date"></div>
@@ -770,8 +772,8 @@ async function renderJournal(){
   }catch(e){}
 
   recs.sort((a,b)=>{
-    if(jrnSort==='date_desc') return (b.op_date||'')>(a.op_date||'')?1:(b.id-a.id);
-    if(jrnSort==='date_asc')  return (a.op_date||'')>(b.op_date||'')?1:-1;
+    if(jrnSort==='date_desc'){if(!a.op_date&&!b.op_date)return b.id-a.id;if(!a.op_date)return 1;if(!b.op_date)return -1;return b.op_date>a.op_date?1:b.op_date<a.op_date?-1:(b.id-a.id);}
+    if(jrnSort==='date_asc'){if(!a.op_date&&!b.op_date)return a.id-b.id;if(!a.op_date)return 1;if(!b.op_date)return -1;return a.op_date>b.op_date?1:a.op_date<b.op_date?-1:(a.id-b.id);}
     if(jrnSort==='bank')      return (bank(a.bank_id).name).localeCompare(bank(b.bank_id).name);
     if(jrnSort==='amount_desc') return parseFloat(b.amount)-parseFloat(a.amount);
     if(jrnSort==='amount_asc')  return parseFloat(a.amount)-parseFloat(b.amount);
@@ -795,10 +797,21 @@ async function renderJournal(){
         return `<tr data-id="${r.id}" style="background:#fffef5">
           <td class="jrn-check-td" style="display:none"><input type="checkbox" class="row-check" data-id="${r.id}" onchange="updateSelectedCount()"></td>
           <td><input type="date" value="${isoDate}" style="border:1px solid var(--border2);border-radius:4px;padding:2px 6px;font-size:12px;font-family:inherit;background:#fff;width:130px" onchange="updateRecord(${r.id},'op_date',this.value)"></td>
-          <td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${b.color};flex-shrink:0"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100px" title="${b.name}">${b.name}</span></span></td>
-          <td class="num gc">${cols.income}</td>
-          <td class="num pc">${cols.income_i}</td>
-          <td class="num ac">${cols.tr_in}</td>
+          <td>
+            <select onchange="updateRecordBank(${r.id},this.value)" style="border:1px solid var(--border2);border-radius:4px;padding:2px 4px;font-size:12px;font-family:inherit;background:#fff;width:120px">
+              ${banks.map(bk=>`<option value="${bk.id}"${bk.id===r.bank_id?' selected':''}>${bk.name}</option>`).join('')}
+            </select>
+          </td>
+          <td colspan="3">
+            <select onchange="updateRecordType(${r.id},this.value,'${r.type}',${amt})" style="border:1px solid var(--border2);border-radius:4px;padding:2px 4px;font-size:12px;font-family:inherit;background:#fff;width:160px">
+              <option value="income"${r.type==='income'?' selected':''}>↑ Приход вне систем</option>
+              <option value="income_i"${r.type==='income_i'?' selected':''}>↑ Приход внутри</option>
+              <option value="tr_in"${r.type==='tr_in'?' selected':''}>↑ Приход из др. банка</option>
+              <option value="tr_out"${r.type==='tr_out'?' selected':''}>↓ Списание в др. банк</option>
+              <option value="expense_i"${r.type==='expense_i'?' selected':''}>↓ Расход внутри</option>
+              <option value="expense"${r.type==='expense'?' selected':''}>↓ Расход вне систем</option>
+            </select>
+          </td>
           <td><select style="border:1px solid var(--border2);border-radius:4px;padding:2px 4px;font-size:12px;font-family:inherit;background:#fff;width:110px" onchange="updateRecord(${r.id},'category',this.value)">${catOptions(r.category||'')}</select></td>
           <td><input type="text" value="${(r.description||'').replace(/"/g,'&quot;')}" style="border:1px solid var(--border2);border-radius:4px;padding:2px 6px;font-size:12px;font-family:inherit;background:#fff;width:160px" onblur="updateRecord(${r.id},'description',this.value)"></td>
           <td class="num ac">${cols.tr_out}</td>
@@ -1154,6 +1167,11 @@ async function loadEnvelopes(){
   try{return await q('SELECT * FROM envelopes ORDER BY id');}catch(e){return[];}
 }
 
+function setEnvTypeFilter(type){
+  localStorage.setItem('env_type_filter',type);
+  renderSverka();
+}
+
 function toggleEnvelopePanel(){
   const body=document.getElementById('env-panel-body');
   const btn=document.getElementById('btn-env-toggle');
@@ -1181,11 +1199,13 @@ async function saveEnvelope(){
   const date=document.getElementById('env-date').value;
   if(!name){toast('Введите название');return;}
   if(!amount){toast('Введите сумму');return;}
+  const envType=document.getElementById('env-type')?.value||'';
   try{
-    await q('INSERT INTO envelopes(name,bank_id,amount,op_date) VALUES($1,$2,$3,$4)',[name,bankId,amount,date||null]);
+    await q('INSERT INTO envelopes(name,bank_id,amount,op_date,env_type) VALUES($1,$2,$3,$4,$5)',[name,bankId,amount,date||null,envType||null]);
     document.getElementById('env-name').value='';
     document.getElementById('env-amount').value='';
     document.getElementById('env-date').value='';
+    if(document.getElementById('env-type'))document.getElementById('env-type').value='';
     toggleEnvelopeForm();
     toast('✓ Конверт добавлен');
     renderSverka();
@@ -1195,6 +1215,11 @@ async function saveEnvelope(){
 async function deleteEnvelope(id){
   if(!confirm('Удалить конверт?'))return;
   try{await q('DELETE FROM envelopes WHERE id=$1',[id]);toast('Удалено');renderSverka();}
+  catch(e){toast('Ошибка');}
+}
+
+async function updateEnvelopeType(id,val){
+  try{await q('UPDATE envelopes SET env_type=$1 WHERE id=$2',[val||null,id]);}
   catch(e){toast('Ошибка');}
 }
 
@@ -1214,6 +1239,15 @@ function renderEnvelopes(envs,bals,agg,active){
   const list=document.getElementById('envelope-list');
   const totalsEl=document.getElementById('envelope-totals');
   if(!list||!totalsEl)return;
+  // Фильтр по типу
+  const allTypes=[...new Set(envs.map(e=>e.env_type||'').filter(t=>t))];
+  const activeEnvType=localStorage.getItem('env_type_filter')||'';
+  const filterEl=document.getElementById('env-type-filter');
+  if(filterEl&&allTypes.length){
+    filterEl.style.display='flex';
+    filterEl.innerHTML=[{v:'',l:'Все'},...allTypes.map(t=>({v:t,l:t}))].map(({v,l})=>`<button onclick="setEnvTypeFilter('${v}')" style="padding:3px 10px;border-radius:20px;border:1.5px solid ${activeEnvType===v?'var(--purple)':'var(--border)'};background:${activeEnvType===v?'var(--purple)':'var(--surface)'};color:${activeEnvType===v?'#fff':'var(--text2)'};font-size:11px;font-weight:600;cursor:pointer">${l}</button>`).join('');
+  } else if(filterEl){filterEl.style.display='none';}
+  const filteredEnvs=activeEnvType?envs.filter(e=>(e.env_type||'')===activeEnvType):envs;
 
   if(!envs.length){
     list.innerHTML='<div class="empty" style="padding:16px">Конвертов нет — добавь операцию с категорией «Резерв»</div>';
@@ -1224,16 +1258,23 @@ function renderEnvelopes(envs,bals,agg,active){
   list.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:13px;">
     <thead><tr>
       <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Конверт</th>
+      <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Тип</th>
       <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Дата</th>
       <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Банк</th>
       <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Сумма</th>
       <th style="padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surface2)"></th>
     </tr></thead>
-    <tbody>${envs.map(e=>{
+    <tbody>${filteredEnvs.map(e=>{
       const dateStr=e.op_date?e.op_date.split('T')[0].split('-').reverse().join('.'):'—';
       return`<tr style="border-bottom:1px solid var(--border)">
         <td style="padding:8px 12px;font-weight:600">
           <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--purple);margin-right:8px;vertical-align:middle"></span>${e.name}
+        </td>
+        <td style="padding:6px 8px">
+          <select onchange="updateEnvelopeType(${e.id},this.value)" style="border:1px solid var(--border2);border-radius:4px;padding:3px 6px;font-size:12px;font-family:inherit;background:var(--surface)">
+            <option value="">—</option>
+            ${['Отпуск','Подушка безопасности','Крупная покупка','Обучение','Здоровье','Прочее'].map(t=>`<option value="${t}"${(e.env_type||'')===t?' selected':''}>${t}</option>`).join('')}
+          </select>
         </td>
         <td style="padding:8px 12px;color:var(--text2);font-size:12px">${dateStr}</td>
         <td style="padding:6px 8px">
@@ -1285,9 +1326,21 @@ async function renderDash(){
   const agg={};banks.forEach(b=>agg[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
   recs.forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
 
-  // Total money
+  // Total money — всегда считаем до последнего месяца с данными (статично)
+  const allRecsForTotal=await loadAllRecords();
+  const janBalsForTotal=await loadBalances(MONTHS[0]);
   let totalDebit=0,totalSavings=0,totalDeposit=0,totalCash=0;
-  banks.forEach(b=>{const bal=bals[b.id];const end=bal?bal.end:0;
+  const lastMonthWithData=MONTHS.reduce((last,m)=>allRecsForTotal.some(r=>r.month===m)?m:last,MONTHS[0]);
+  const lastMonthIdx=MONTHS.indexOf(lastMonthWithData);
+  banks.forEach(b=>{
+    let end=(janBalsForTotal[b.id]?.start)||0;
+    for(let i=0;i<=lastMonthIdx;i++){
+      const m=MONTHS[i];
+      const mRecs=allRecsForTotal.filter(r=>r.month===m&&r.bank_id===b.id);
+      const agg2={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
+      mRecs.forEach(r=>agg2[r.type]+=parseFloat(r.amount)||0);
+      end+=agg2.income+agg2.income_i+agg2.tr_in-agg2.tr_out-agg2.expense_i-agg2.expense;
+    }
     if(b.type==='debit'||b.type==='credit')totalDebit+=end;
     else if(b.type==='savings')totalSavings+=end;
     else if(b.type==='cash')totalCash+=end;
@@ -1611,6 +1664,19 @@ async function addRecord(){
     renderJournal();toast('✓ Запись добавлена');
   }catch(e){toast('Ошибка: '+e.message);}
 }
+async function updateRecordBank(id,newBankId){
+  try{await q('UPDATE records SET bank_id=$1 WHERE id=$2',[newBankId,id]);await recalcAllBalances();renderJournal();}
+  catch(e){toast('Ошибка: '+e.message);}
+}
+
+async function updateRecordType(id,newType,oldType,amt){
+  try{
+    await q('UPDATE records SET type=$1 WHERE id=$2',[newType,id]);
+    await recalcAllBalances();renderJournal();setTimeout(renderSverka,100);
+    toast('✓ Тип операции изменён');
+  }catch(e){toast('Ошибка: '+e.message);}
+}
+
 async function updateRecord(id,field,val){
   try{await q(`UPDATE records SET ${field}=$1 WHERE id=$2`,[val||null,id]);if(field!=='op_date')toast('✓ Сохранено');}
   catch(e){toast('Ошибка: '+e.message);}
@@ -1873,7 +1939,14 @@ async function renderDeposits(){
     ?deps.map(d=>{const dc=new Date(d.date_close);const diff=Math.floor((dc-today)/(1000*60*60*24));
       const cls=diff<0?'exp':diff<=14?'warn':'ok';
       const lbl=diff<0?'Истёк':diff<=14?`⚠️ ${diff} дн.`:dc.toLocaleDateString('ru-RU');
-      return `<div class="dep-card"><div class="dep-card-head"><div><div class="dep-name">${d.name}</div><div class="dep-meta">${d.bank_name}</div></div><div style="display:flex;gap:8px;align-items:center"><span class="dep-badge ${cls}">${lbl}</span><button class="btn btn-d btn-sm" onclick="closeDeposit(${d.id})">Закрыть</button></div></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px"><div><div style="font-size:11px;color:var(--text3);font-weight:600">Сумма</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--purple);margin-top:4px">${fmt(parseFloat(d.amount))}</div></div><div><div style="font-size:11px;color:var(--text3);font-weight:600">Ставка</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--green);margin-top:4px">${d.rate}%</div></div><div><div style="font-size:11px;color:var(--text3);font-weight:600">Открыт</div><div style="font-size:14px;font-weight:500;margin-top:4px">${new Date(d.date_open).toLocaleDateString('ru-RU')}</div></div></div>${d.description?`<div style="font-size:13px;color:var(--text2);margin-top:10px">${d.description}</div>`:''}</div>`;
+      const depAmount=parseFloat(d.amount)||0;
+      const depRate=parseFloat(d.rate)||0;
+      const depOpen=new Date(d.date_open);
+      const depClose=new Date(d.date_close);
+      const depDays=Math.max(0,Math.round((depClose-depOpen)/(1000*60*60*24)));
+      const depIncome=depAmount*(depRate/100)*(depDays/365);
+      const depTotal=depAmount+depIncome;
+      return `<div class="dep-card"><div class="dep-card-head"><div><div class="dep-name">${d.name}</div><div class="dep-meta">${d.bank_name}</div></div><div style="display:flex;gap:8px;align-items:center"><span class="dep-badge ${cls}">${lbl}</span><button class="btn btn-d btn-sm" onclick="closeDeposit(${d.id})">Закрыть</button></div></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px"><div><div style="font-size:11px;color:var(--text3);font-weight:600">Сумма</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--purple);margin-top:4px">${fmt(depAmount)}</div></div><div><div style="font-size:11px;color:var(--text3);font-weight:600">Ставка · ${depDays} дн.</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--green);margin-top:4px">${d.rate}%</div></div><div><div style="font-size:11px;color:var(--text3);font-weight:600">Доход</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--green);margin-top:4px">+${fmt(depIncome)}</div></div><div><div style="font-size:11px;color:var(--text3);font-weight:600">К получению</div><div style="font-family:Manrope,sans-serif;font-size:16px;font-weight:700;color:var(--accent);margin-top:4px">${fmt(depTotal)}</div></div></div>${d.description?`<div style="font-size:13px;color:var(--text2);margin-top:10px">${d.description}</div>`:''}</div>`;
     }).join('')
     :'<div class="empty">Вкладов ещё нет. Добавь первый слева.</div>';
 }
@@ -2057,6 +2130,26 @@ async function importData(input){
   fr.readAsText(input.files[0]);input.value='';
 }
 
+
+function showHelp(topic){
+  const tips={
+    'total': '<b>Всего моих денег</b><br>Считается нарастающим итогом от начального остатка января по всем операциям до последнего месяца с данными. Не зависит от выбранного месяца — всегда показывает текущее состояние.<br><br><b>Карты</b> — дебетовые и кредитные счета<br><b>Накопит.</b> — накопительные счета<br><b>Вклады</b> — активные вклады из раздела «Вклады»<br><b>Наличные</b> — наличные деньги',
+    'income': '<b>Чистый доход по месяцам</b><br>НАЧ. — остаток на начало месяца<br>КОН. — остаток на конец месяца<br>Δ — разница (доход или расход за месяц)<br><br>Считается через все операции нарастающим итогом от январского начального остатка.',
+    'cats': '<b>Расходы по категориям</b><br>Суммирует все расходы (тип «expense») по категориям за каждый месяц. Можно фильтровать по банку. Клик на цифру открывает журнал с фильтром.',
+    'journal': '<b>Журнал операций</b><br>Все операции месяца. Типы:<br>• Приход вне систем — деньги пришли извне (зарплата, продажа)<br>• Приход из др. банка — перевод со своего счёта<br>• Расход вне систем — деньги ушли (покупки)<br>• Списание в др. банк — перевод на свой счёт<br><br>Кнопка 🪙 добавляет операцию в резервы.',
+    'sverka': '<b>Сверка месяца</b><br>Сравнивает данные из журнала с выписками банков. Введи сумму из приложения банка — система покажет совпадает ли она с журналом (✓ зелёный) или есть расхождение (красное число).<br><br>НАЧ. — начальный остаток (вводится вручную только для января)<br>КОН. — конечный остаток (считается автоматически)',
+    'envelopes': '<b>Конверты (резервы)</b><br>Деньги которые ты отложила на конкретные цели. Резервы уменьшают «свободную» сумму но физически остаются на счетах.<br><br>Фильтр по типу позволяет видеть только отпускные, подушку и т.д.',
+  };
+  const el=document.getElementById('help-popup');
+  const content=tips[topic]||'Нет описания';
+  el.innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:9999;display:flex;align-items:center;justify-content:center" onclick="this.parentElement.style.display='none'">
+    <div style="background:#fff;border-radius:16px;padding:24px;max-width:400px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.15);position:relative" onclick="event.stopPropagation()">
+      <button onclick="document.getElementById('help-popup').style.display='none'" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)">×</button>
+      <div style="font-size:14px;line-height:1.6;color:var(--text)">${content}</div>
+    </div>
+  </div>`;
+  el.style.display='block';
+}
 window.onload=()=>{
   const stored=localStorage.getItem(PWD_KEY);
   if(!stored){
@@ -2066,5 +2159,6 @@ window.onload=()=>{
   }
 };
 </script>
+<div id="help-popup" style="display:none"></div>
 </body>
 </html>
