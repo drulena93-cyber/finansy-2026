@@ -318,7 +318,8 @@ table.nit td.empty-cell{color:var(--text3);}
   <!-- TOTAL MONEY -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 22px;margin-bottom:14px;box-shadow:var(--shadow)">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em">Всего моих денег</div>
+      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em">Всего моих денег <button onclick="showHelp('total')" style="background:none;border:1.5px solid var(--border2);border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;cursor:pointer;color:var(--text3);padding:0;line-height:1;vertical-align:middle">?</button></div>
+      <div id="total-subtitle" style="font-size:11px;color:var(--text3)">актуально на последний месяц</div>
       <button onclick="toggleTotal()" id="btn-toggle-total" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">Показать</button>
     </div>
     <div id="total-content" style="display:none">
@@ -536,7 +537,7 @@ table.nit td.empty-cell{color:var(--text3);}
   </div>
   <div class="panel" style="margin-bottom:18px">
     <div class="panel-h">
-      <span>Чистый доход по месяцам</span>
+      <span>Чистый доход по месяцам <button onclick="showHelp('income')" style="background:none;border:1.5px solid var(--border2);border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;cursor:pointer;color:var(--text3);padding:0;line-height:1;vertical-align:middle">?</button></span>
       <div style="display:flex;gap:14px;font-size:12px;color:var(--text2)">
         <span><span style="display:inline-block;width:10px;height:10px;background:var(--green);border-radius:3px;margin-right:5px;vertical-align:middle"></span>Приход вне систем</span>
         <span><span style="display:inline-block;width:10px;height:10px;background:var(--red);border-radius:3px;margin-right:5px;vertical-align:middle"></span>Расход вне систем</span>
@@ -1326,27 +1327,27 @@ async function renderDash(){
   const agg={};banks.forEach(b=>agg[b.id]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0});
   recs.forEach(r=>{if(agg[r.bank_id])agg[r.bank_id][r.type]+=parseFloat(r.amount)||0;});
 
-  // Total money — всегда считаем до последнего месяца с данными (статично)
+  // Total money — берём КОН. последнего месяца из таблицы чистого дохода
   const allRecsForTotal=await loadAllRecords();
-  const janBalsForTotal=await loadBalances(MONTHS[0]);
-  let totalDebit=0,totalSavings=0,totalDeposit=0,totalCash=0;
   const lastMonthWithData=MONTHS.reduce((last,m)=>allRecsForTotal.some(r=>r.month===m)?m:last,MONTHS[0]);
-  const lastMonthIdx=MONTHS.indexOf(lastMonthWithData);
+  // Считаем КОН. последнего месяца — сумма по всем банкам
+  const janBalsForTotal=await loadBalances(MONTHS[0]);
+  const lastBalsForTotal=await loadBalances(lastMonthWithData);
+  let totalMoney=0;
   banks.forEach(b=>{
-    let end=(janBalsForTotal[b.id]?.start)||0;
-    for(let i=0;i<=lastMonthIdx;i++){
+    const janBal=janBalsForTotal[b.id]||{start:0};
+    let end=janBal.start||0;
+    for(let i=0;i<=MONTHS.indexOf(lastMonthWithData);i++){
       const m=MONTHS[i];
       const mRecs=allRecsForTotal.filter(r=>r.month===m&&r.bank_id===b.id);
-      const agg2={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
-      mRecs.forEach(r=>agg2[r.type]+=parseFloat(r.amount)||0);
-      end+=agg2.income+agg2.income_i+agg2.tr_in-agg2.tr_out-agg2.expense_i-agg2.expense;
+      const a2={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
+      mRecs.forEach(r=>a2[r.type]+=parseFloat(r.amount)||0);
+      end+=a2.income+a2.income_i+a2.tr_in-a2.tr_out-a2.expense_i-a2.expense;
     }
-    if(b.type==='debit'||b.type==='credit')totalDebit+=end;
-    else if(b.type==='savings')totalSavings+=end;
-    else if(b.type==='cash')totalCash+=end;
+    totalMoney+=end;
   });
-  deps.forEach(d=>totalDeposit+=parseFloat(d.amount)||0);
-  const totalMoney=totalDebit+totalSavings+totalDeposit+totalCash;
+  deps.forEach(d=>totalMoney+=parseFloat(d.amount)||0);
+  const totalDebit=0,totalSavings=0,totalDeposit=0,totalCash=0;
 
   // Load envelopes for reserve display
   let totalReserved=0;
@@ -1362,6 +1363,8 @@ async function renderDash(){
   const totalFree=totalMoney-totalReserved;
 
   document.getElementById('dash-total-money').textContent=fmtF(totalMoney);
+  const subtitleEl=document.getElementById('total-subtitle');
+  if(subtitleEl)subtitleEl.textContent='актуально на '+lastMonthWithData+' 2026';
   document.getElementById('dash-breakdown').innerHTML=`
     <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase">Карты</span><span style="font-size:15px;font-weight:700;color:var(--accent);font-family:Manrope,sans-serif">${fmtF(totalDebit)}</span></div>
     <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
