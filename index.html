@@ -58,44 +58,45 @@ body{background:var(--bg);color:var(--text);font-family:'Calibri','Carlito',sans
 .layout{display:flex;flex-direction:row;min-height:100vh;}
 
 /* LEFT SIDEBAR */
-.sidebar{width:240px;flex-shrink:0;background:var(--nav-bg);display:flex;flex-direction:column;align-items:stretch;position:sticky;top:0;height:100vh;z-index:100;padding:0;transition:width .18s;overflow:hidden;}
+.sidebar{width:240px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:stretch;position:sticky;top:0;height:100vh;z-index:100;padding:0;transition:width .18s;overflow:hidden;}
 .sidebar.collapsed{width:68px;}
-.sb-logo{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.08);border-right:none;margin-right:0;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.sb-logo{padding:16px 18px;border-bottom:1px solid var(--border);border-right:none;margin-right:0;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .sb-logo-text{overflow:hidden;white-space:nowrap;}
 .sidebar.collapsed .sb-logo-text{display:none;}
-.sb-logo-title{font-family:'Manrope',sans-serif;font-size:17px;font-weight:800;color:var(--accent-bright);letter-spacing:-.3px;}
-.sb-logo-sub{display:block;font-size:13px;color:var(--nav-text-dim);margin-top:2px;}
-.sidebar-collapse-btn{background:none;border:none;cursor:pointer;color:var(--nav-text-dim);flex-shrink:0;display:flex;align-items:center;padding:4px;border-radius:6px;}
-.sidebar-collapse-btn:hover{background:rgba(255,255,255,.08);color:#fff;}
+.sb-logo-title{font-family:'Manrope',sans-serif;font-size:17px;font-weight:800;color:var(--accent);letter-spacing:-.3px;}
+.sb-logo-sub{display:block;font-size:13px;color:var(--text3);margin-top:2px;}
+.sidebar-collapse-btn{background:none;border:none;cursor:pointer;color:var(--text3);flex-shrink:0;display:flex;align-items:center;padding:4px;border-radius:6px;}
+.sidebar-collapse-btn:hover{background:var(--bg);color:var(--text);}
 .sidebar-collapse-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s;}
 .sidebar.collapsed .sidebar-collapse-btn svg{transform:rotate(180deg);}
 .nav{padding:10px;flex:1;display:flex;flex-direction:column;align-items:stretch;gap:2px;overflow-y:auto;overflow-x:hidden;}
-.nav-lbl{display:none;}
-.nb{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);font-size:15px;font-weight:500;color:var(--nav-text);background:none;border:none;cursor:pointer;transition:all .12s;text-align:left;white-space:nowrap;width:100%;}
+.nav-lbl{display:block;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding:14px 12px 5px;}
+.sidebar.collapsed .nav-lbl{display:none;}
+.nb{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);font-size:15px;font-weight:500;color:var(--text2);background:none;border:none;cursor:pointer;transition:all .12s;text-align:left;white-space:nowrap;width:100%;}
 .sidebar.collapsed .nb{justify-content:center;padding:9px;}
 .sidebar.collapsed .nb .nb-label{display:none;}
 .nav-divider{display:none;}
 .nb svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-.nb:hover{background:rgba(255,255,255,.06);color:#fff;}
-.nb.active{background:var(--accent-bright);color:#04222d;font-weight:600;}
+.nb:hover{background:var(--bg);color:var(--text);}
+.nb.active{background:var(--accent-l);color:var(--accent);font-weight:700;}
 .nb-logout{color:var(--red)!important;}
 .nb-logout:hover{background:var(--red-bg)!important;color:var(--red)!important;}
 
 .nb-more-wrap{position:relative;display:flex;flex-direction:column;}
 #more-menu-dropdown{display:none;position:static;background:none;box-shadow:none;padding:0 0 0 14px;margin-top:2px;min-width:0;flex-direction:column;gap:2px;}
 #more-menu-dropdown.open{display:flex;}
-#more-menu-dropdown .nb{color:var(--nav-text);}
-#more-menu-dropdown .nb:hover{background:rgba(255,255,255,.06);color:#fff;}
-#more-menu-dropdown .nb.active{background:var(--accent-bright);color:#04222d;}
+#more-menu-dropdown .nb{color:var(--text2);}
+#more-menu-dropdown .nb:hover{background:var(--bg);color:var(--text);}
+#more-menu-dropdown .nb.active{background:var(--accent-l);color:var(--accent);}
 .sidebar.collapsed #more-menu-dropdown{padding-left:0;}
 
-.nav-right{display:flex;align-items:center;gap:12px;margin-left:0;margin-top:auto;padding:14px 12px;border-top:1px solid rgba(255,255,255,.08);position:relative;flex-shrink:0;}
+.nav-right{display:flex;align-items:center;gap:12px;margin-left:0;margin-top:auto;padding:14px 12px;border-top:1px solid var(--border);position:relative;flex-shrink:0;}
 .sidebar.collapsed .nav-right{flex-direction:column;padding:14px 8px;}
-.nav-icon-btn{background:none;border:none;cursor:pointer;color:var(--nav-text);position:relative;display:flex;align-items:center;padding:4px;}
-.nav-icon-btn:hover{color:#fff;}
+.nav-icon-btn{background:none;border:none;cursor:pointer;color:var(--text3);position:relative;display:flex;align-items:center;padding:4px;}
+.nav-icon-btn:hover{color:var(--text);}
 .nav-icon-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-.profile-avatar{width:30px;height:30px;border-radius:50%;background:var(--accent-bright);color:#04222d;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;}
-#profile-panel{display:none;position:absolute;bottom:calc(100% + 10px);left:0;background:var(--surface);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);padding:16px;min-width:260px;z-index:150;}
+.profile-avatar{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;}
+#profile-panel{display:none;position:absolute;bottom:calc(100% + 10px);left:0;background:var(--surface);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);padding:16px;min-width:260px;z-index:150;border:1px solid var(--border);}
 #profile-panel.open{display:block;}
 
 .main{padding:16px 32px 28px;flex:1;min-width:0;}
@@ -105,6 +106,10 @@ body{background:var(--bg);color:var(--text);font-family:'Calibri','Carlito',sans
 
 /* MONTH BAR */
 .mbar{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:22px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:6px;}
+.sec-tabs{display:flex;gap:4px;margin-bottom:18px;border-bottom:2px solid var(--border);}
+.sec-tab{padding:9px 18px;font-size:15px;font-weight:600;color:var(--text3);background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;transition:all .12s;white-space:nowrap;position:relative;}
+.sec-tab:hover{color:var(--text);}
+.sec-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 .mtab{padding:calc(var(--tbl-font)*0.47) calc(var(--tbl-font)*0.93);border-radius:var(--radius-xs);font-size:calc(var(--tbl-font) - 1px);font-weight:500;cursor:pointer;border:none;background:none;color:var(--text2);transition:all .12s;font-family:inherit;}
 .mtab:hover{background:var(--bg);color:var(--text);}
 .mtab.active{background:var(--accent);color:#fff;font-weight:600;}
@@ -328,7 +333,7 @@ table.nit td.empty-cell{color:var(--text3);}
   .sidebar{position:fixed;top:0;left:0;bottom:0;width:240px;flex-direction:column;align-items:stretch;border-bottom:none;padding:0;transform:translateX(-100%);transition:transform .25s;}
   .sidebar.mob-open{transform:translateX(0);box-shadow:4px 0 20px rgba(0,0,0,0.15);}
   .sidebar.collapsed{width:240px;}
-  .sidebar.collapsed .sb-logo-text,.sidebar.collapsed .nb .nb-label{display:block;}
+  .sidebar.collapsed .sb-logo-text,.sidebar.collapsed .nb .nb-label,.sidebar.collapsed .nav-lbl{display:block;}
   .sidebar-collapse-btn{display:none;}
   .sb-logo{padding:20px 20px 18px;border-bottom:1px solid var(--border);border-right:none;margin-right:0;}
   .sb-logo-sub{display:block;}
@@ -408,6 +413,8 @@ table.nit td.empty-cell{color:var(--text3);}
 </nav>
 
 <main class="main">
+
+<div id="secondary-tabs" style="display:none"></div>
 
 <!-- DASHBOARD -->
 <div id="view-dashboard" class="view">
@@ -683,8 +690,12 @@ table.nit td.empty-cell{color:var(--text3);}
   <div class="ph"><h1>Настройки</h1><p>Счета, пароль и данные</p></div>
   <div class="section-div">Меню</div>
   <div class="panel" style="margin-bottom:20px">
-    <div class="panel-h">Пункты меню — показывать/скрывать, закреплять наверх</div>
-    <div class="panel-b" id="nav-settings-list" style="padding:8px 18px"></div>
+    <div class="panel-b" style="padding:14px 18px">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+        <input type="checkbox" id="setting-brokers-toggle" onchange="setBrokersHidden(!this.checked)">
+        <span style="font-size:15px;font-weight:500">Показывать раздел «Брокеры» в меню</span>
+      </label>
+    </div>
   </div>
   <div class="section-div">Внешний вид и функции</div>
   <div class="panel" style="margin-bottom:20px">
@@ -693,11 +704,6 @@ table.nit td.empty-cell{color:var(--text3);}
         <input type="checkbox" id="setting-reserves-toggle" onchange="setSverkaReservesEnabled(this.checked)">
         <span style="font-size:15px;font-weight:500">Показывать «Резервы» в Сверке месяца</span>
       </label>
-      <div style="display:flex;align-items:center;gap:12px">
-        <span style="font-size:15px;font-weight:500;min-width:170px">Основной цвет сайта</span>
-        <input type="color" id="setting-accent-color" onchange="setCustomAccentColor(this.value)" style="width:44px;height:34px;padding:2px;border:1px solid var(--border2);border-radius:8px;cursor:pointer">
-        <button onclick="resetCustomAccentColor()" style="font-size:13px;font-weight:600;color:var(--text3);background:var(--surface2);border:none;border-radius:6px;padding:6px 12px;cursor:pointer">Сбросить</button>
-      </div>
     </div>
   </div>
   <div class="section-div">Вклады и накопительные</div>
@@ -940,9 +946,9 @@ function applyJournalScopeLabels(){
   const scope=journalScope;
   const titleEl=document.getElementById('jrn-page-title');
   if(titleEl)titleEl.textContent=scope==='broker'?'Журнал брокеров':'Журнал операций';
-  document.querySelectorAll('.nb,.mob-nb').forEach(b=>b.classList.remove('active'));
-  document.getElementById(scope==='broker'?'nb-journal-broker':'nb-journal')?.classList.add('active');
+  document.querySelectorAll('.mob-nb').forEach(b=>b.classList.remove('active'));
   document.getElementById(scope==='broker'?'mob-journal-broker':'mob-journal')?.classList.add('active');
+  renderNav();
 }
 function setJournalScope(scope){
   journalScope=scope;
@@ -1066,6 +1072,13 @@ const CHANGELOG=[
     'Появилась кнопка сворачивания меню (стрелка рядом с логотипом «Финансы») — сворачивается в узкую полосу с иконками, разворачивается обратно тем же кликом',
     'Выбор запоминается — при следующем заходе меню откроется в том же состоянии (свёрнутое/развёрнутое)',
     'На мобильных ничего не изменилось — там меню по-прежнему открывается через гамбургер-значок'
+  ]},
+  {id:23,date:'22.08.2026',title:'Меню — светлое, сгруппированное, с вкладками сверху',items:[
+    'Левое меню снова светлое (как было исходно) — тёмно-синее оказалось слишком тяжёлым для глаз',
+    'Меню сгруппировано в 4 раздела: «Аналитика», «Банки» (Журнал/Сверка месяца/Кредитные карты), «Брокеры» (Журнал/Сводка), «Настройки»',
+    'При выборе «Банки» или «Брокеры» сверху появляется полоса вкладок для переключения между страницами внутри раздела — как в Bitrix24',
+    'В Настройках → «Меню» — можно скрыть раздел «Брокеры» целиком, если он не нужен',
+    'Убрана функция смены основного цвета сайта — по твоей просьбе, лишнее усложнение'
   ]}
 ];
 
@@ -2912,10 +2925,8 @@ function fillBankSelects(){
 async function go(name){
   if(name!=='journal')cameFromAnalytics=false;
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.mob-nb').forEach(b=>b.classList.remove('active'));
   document.getElementById('view-'+name).classList.add('active');
-  const nb=document.getElementById('nb-'+name);if(nb)nb.classList.add('active');
   const mob=document.getElementById('mob-'+name);if(mob)mob.classList.add('active');
   closeMobMenu();
   localStorage.setItem('last_view',name);
@@ -2925,7 +2936,7 @@ async function go(name){
   if(name==='settings')renderSettings();
   if(name==='brokersummary')renderBrokerSummary();
   if(name==='creditcards')renderCreditCards();
-  updateCreditAlertBanner(name);
+  renderNav();
 }
 
 function initTabs(){
@@ -3230,7 +3241,6 @@ async function initApp(){
   initTabs();
   applySidebarCollapse();
   await Promise.all([loadBanks(),loadCategories(),loadAppSettings()]);
-  applyCustomAccentColor();
   renderNav();
   renderMonthlyGoalWidget();
   fillBankSelects();
@@ -3247,25 +3257,8 @@ async function renderSettings(){
 
   const reservesToggle=document.getElementById('setting-reserves-toggle');
   if(reservesToggle)reservesToggle.checked=getSverkaReservesEnabled();
-  const accentInput=document.getElementById('setting-accent-color');
-  if(accentInput)accentInput.value=getCustomAccentColor()||'#075985';
-
-  const navCfg=getNavConfig();
-  const orderedNavItems=navCfg.order.map(id=>NAV_ITEMS.find(i=>i.id===id)).filter(Boolean);
-  document.getElementById('nav-settings-list').innerHTML='<div style="font-size:13px;color:var(--text3);margin-bottom:8px">Перетащи за ⠿, чтобы поменять порядок пунктов</div>'+orderedNavItems.map(item=>{
-    const hidden=navCfg.hidden.includes(item.id);
-    const pinned=navCfg.pinned.includes(item.id);
-    return `<div draggable="true" data-nav-id="${item.id}" ondragstart="navSettingsDragStart(event)" ondragover="navSettingsDragOver(event)" ondrop="navSettingsDrop(event)" style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);cursor:move">
-      <span style="color:var(--text3);font-size:16px;flex-shrink:0;cursor:move" title="Перетащить">⠿</span>
-      <span style="width:18px;height:18px;color:var(--text3);flex-shrink:0;display:flex">${item.icon}</span>
-      <span style="font-size:15px;font-weight:500;flex:1;min-width:120px;${hidden?'color:var(--text3);text-decoration:line-through':''}">${item.label}</span>
-      ${item.defaultTop?'<span style="font-size:12px;color:var(--text3)">всегда наверху</span>':
-        `<button onclick="toggleNavPinned('${item.id}')" title="${pinned?'Убрать с главного меню':'Закрепить на главном меню'}" style="background:${pinned?'var(--accent-l)':'var(--surface2)'};color:${pinned?'var(--accent)':'var(--text3)'};border:none;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">${pinned?'★ Закреплено':'☆ Закрепить'}</button>`}
-      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text3)">
-        <input type="checkbox" ${hidden?'':'checked'} onchange="toggleNavHidden('${item.id}')"> показывать
-      </label>
-    </div>`;
-  }).join('');
+  const brokersToggle=document.getElementById('setting-brokers-toggle');
+  if(brokersToggle)brokersToggle.checked=!isBrokersHidden();
 
   const depBanks=banks.filter(b=>b.type==='deposit'||b.type==='savings');
   document.getElementById('dep-settings-list').innerHTML=depBanks.length
@@ -3738,93 +3731,71 @@ function setTableFontSize(px){
   if(slider)slider.value=px;
   localStorage.setItem('tbl_font_size',px);
 }
-// ─── МЕНЮ: пункты, скрытие/закрепление, «Ещё», профиль ─────────────
-const NAV_ITEMS=[
-  {id:'dashboard',label:'Аналитика',action:"go('dashboard')",defaultTop:true,
-    icon:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>'},
-  {id:'journal',label:'Журнал',action:"setJournalScope('bank')",defaultTop:true,
-    icon:'<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>'},
-  {id:'sverka',label:'Сверка месяца',action:"go('sverka')",defaultTop:true,
-    icon:'<svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>'},
-  {id:'journal-broker',label:'Журнал брокеров',action:"setJournalScope('broker')",defaultTop:false,
-    icon:'<svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>'},
-  {id:'brokersummary',label:'Сводка по брокерам',action:"go('brokersummary')",defaultTop:false,
-    icon:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'},
-  {id:'creditcards',label:'Кредитные карты',action:"go('creditcards')",defaultTop:false,badge:'credit-nav-badge',
-    icon:'<svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>'},
-  {id:'settings',label:'Настройки',action:"go('settings')",defaultTop:false,
-    icon:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>'}
+// ─── МЕНЮ: группы с вложенными вкладками (как в Bitrix24) ───────────
+const NAV_GROUPS=[
+  {id:'dashboard',label:'Аналитика',standalone:true,action:"go('dashboard')",
+    icon:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+    matches:v=>v==='dashboard'},
+  {id:'banks',label:'Банки',standalone:false,
+    icon:'<svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M9 21V13h6v8"/></svg>',
+    matches:v=>v==='journal'&&journalScope==='bank'||v==='sverka'||v==='creditcards',
+    tabs:[
+      {id:'journal',label:'Журнал',action:"setJournalScope('bank')",matches:v=>v==='journal'&&journalScope==='bank'},
+      {id:'sverka',label:'Сверка месяца',action:"go('sverka')",matches:v=>v==='sverka'},
+      {id:'creditcards',label:'Кредитные карты',action:"go('creditcards')",matches:v=>v==='creditcards',badge:'credit-nav-badge'}
+    ]},
+  {id:'brokers',label:'Брокеры',standalone:false,hideSetting:'nav_hide_brokers',
+    icon:'<svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>',
+    matches:v=>v==='journal'&&journalScope==='broker'||v==='brokersummary',
+    tabs:[
+      {id:'journal-broker',label:'Журнал',action:"setJournalScope('broker')",matches:v=>v==='journal'&&journalScope==='broker'},
+      {id:'brokersummary',label:'Сводка',action:"go('brokersummary')",matches:v=>v==='brokersummary'}
+    ]},
+  {id:'settings',label:'Настройки',standalone:true,action:"go('settings')",
+    icon:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+    matches:v=>v==='settings'}
 ];
-function getNavConfig(){
-  const dbVal=appSettings['nav_config'];
-  const raw=dbVal!==undefined?dbVal:localStorage.getItem('nav_config');
-  try{
-    const cfg=JSON.parse(raw||'{}');
-    const savedOrder=cfg.order||[];
-    const allIds=NAV_ITEMS.map(i=>i.id);
-    const order=savedOrder.length&&allIds.every(id=>savedOrder.includes(id))?savedOrder:allIds;
-    return{hidden:cfg.hidden||[],pinned:cfg.pinned||[],order};
-  }catch(e){return{hidden:[],pinned:[],order:NAV_ITEMS.map(i=>i.id)};}
+function isBrokersHidden(){
+  const dbVal=appSettings['nav_hide_brokers'];
+  const raw=dbVal!==undefined?dbVal:localStorage.getItem('nav_hide_brokers');
+  return raw==='true';
 }
-async function saveNavConfig(cfg){
-  const json=JSON.stringify(cfg);
-  localStorage.setItem('nav_config',json);
-  await saveAppSetting('nav_config',json);
+async function setBrokersHidden(val){
+  localStorage.setItem('nav_hide_brokers',val?'true':'false');
+  await saveAppSetting('nav_hide_brokers',val?'true':'false');
   renderNav();
 }
-async function toggleNavHidden(id){
-  const cfg=getNavConfig();
-  if(cfg.hidden.includes(id))cfg.hidden=cfg.hidden.filter(x=>x!==id);
-  else cfg.hidden.push(id);
-  await saveNavConfig(cfg);
-  renderSettings();
-}
-async function toggleNavPinned(id){
-  const cfg=getNavConfig();
-  if(cfg.pinned.includes(id))cfg.pinned=cfg.pinned.filter(x=>x!==id);
-  else cfg.pinned.push(id);
-  await saveNavConfig(cfg);
-  renderSettings();
-}
-let navDragId=null;
-function navSettingsDragStart(e){navDragId=e.currentTarget.dataset.navId;e.dataTransfer.effectAllowed='move';}
-function navSettingsDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';}
-async function navSettingsDrop(e){
-  e.preventDefault();
-  const targetId=e.currentTarget.dataset.navId;
-  if(!navDragId||!targetId||navDragId===targetId)return;
-  const cfg=getNavConfig();
-  const fromIdx=cfg.order.indexOf(navDragId);
-  const toIdx=cfg.order.indexOf(targetId);
-  if(fromIdx===-1||toIdx===-1)return;
-  cfg.order.splice(fromIdx,1);
-  cfg.order.splice(toIdx,0,navDragId);
-  navDragId=null;
-  await saveNavConfig(cfg);
-  renderSettings();
-}
-function navBtnHtml(item,inDropdown){
-  const badge=item.badge?`<span id="${item.badge}" style="display:none;position:absolute;top:-2px;right:-4px;background:var(--red);color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 3px;line-height:1"></span>`:'';
-  return `<button class="nb" id="nb-${item.id}" onclick="${item.action}" style="position:relative" title="${item.label}">${item.icon}<span class="nb-label">${item.label}</span>${badge}</button>`;
+function currentViewId(){
+  return document.querySelector('.view.active')?.id.replace('view-','')||'';
 }
 function renderNav(){
   const wrap=document.getElementById('nav-items');
   if(!wrap)return;
-  const cfg=getNavConfig();
-  const orderedItems=cfg.order.map(id=>NAV_ITEMS.find(i=>i.id===id)).filter(Boolean);
-  const visible=orderedItems.filter(i=>!cfg.hidden.includes(i.id));
-  const topItems=visible.filter(i=>i.defaultTop||cfg.pinned.includes(i.id));
-  const moreItems=visible.filter(i=>!i.defaultTop&&!cfg.pinned.includes(i.id));
-  let html=topItems.map(i=>navBtnHtml(i,false)).join('');
-  if(moreItems.length){
-    html+=`<div class="nb-more-wrap">
-      <button class="nb" id="nb-more" onclick="toggleMoreMenu()" title="Ещё"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg><span class="nb-label" style="flex:1">Ещё</span><svg viewBox="0 0 24 24" class="nb-label" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="6 9 12 15 18 9"/></svg></button>
-      <div id="more-menu-dropdown">${moreItems.map(i=>navBtnHtml(i,true)).join('')}</div>
-    </div>`;
-  }
-  wrap.innerHTML=html;
+  const curView=currentViewId();
+  const groups=NAV_GROUPS.filter(g=>!(g.id==='brokers'&&isBrokersHidden()));
+  wrap.innerHTML=groups.map(g=>{
+    const isActive=g.matches(curView);
+    const badge=g.tabs?g.tabs.find(t=>t.badge)?.badge:null;
+    const badgeHtml=badge?`<span id="${badge}" style="display:none;position:absolute;top:-2px;right:-4px;background:var(--red);color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 3px;line-height:1"></span>`:'';
+    const action=g.standalone?g.action:g.tabs[0].action;
+    return `<button class="nb${isActive?' active':''}" id="nb-${g.id}" onclick="${action}" style="position:relative" title="${g.label}">${g.icon}<span class="nb-label">${g.label}</span>${badgeHtml}</button>`;
+  }).join('');
+  renderSecondaryTabs();
   // Восстанавливаем значок непрочитанных кредиток, если он был показан
-  updateCreditAlertBanner(document.querySelector('.view.active')?.id.replace('view-',''));
+  updateCreditAlertBanner(curView);
+}
+function renderSecondaryTabs(){
+  const el=document.getElementById('secondary-tabs');
+  if(!el)return;
+  const curView=currentViewId();
+  const group=NAV_GROUPS.find(g=>!g.standalone&&g.matches(curView));
+  if(!group){el.style.display='none';el.innerHTML='';return;}
+  el.style.display='block';
+  el.innerHTML=`<div class="sec-tabs">${group.tabs.map(t=>{
+    const isActive=t.matches(curView);
+    const badgeHtml=t.badge?`<span id="sec-${t.badge}" style="display:none;position:absolute;top:2px;right:2px;background:var(--red);color:#fff;font-size:9px;font-weight:700;min-width:14px;height:14px;border-radius:7px;align-items:center;justify-content:center;padding:0 3px;line-height:1"></span>`:'';
+    return `<button class="sec-tab${isActive?' active':''}" onclick="${t.action}" style="position:relative">${t.label}${badgeHtml}</button>`;
+  }).join('')}</div>`;
 }
 function getSidebarCollapsed(){
   return localStorage.getItem('sidebar_collapsed')==='true';
@@ -3837,15 +3808,10 @@ function toggleSidebarCollapse(){
 function applySidebarCollapse(){
   document.getElementById('app-sidebar')?.classList.toggle('collapsed',getSidebarCollapsed());
 }
-function toggleMoreMenu(){
-  document.getElementById('more-menu-dropdown')?.classList.toggle('open');
-}
 function toggleProfilePanel(){
   document.getElementById('profile-panel')?.classList.toggle('open');
 }
 document.addEventListener('click',e=>{
-  const moreWrap=document.querySelector('.nb-more-wrap');
-  if(moreWrap&&!moreWrap.contains(e.target))document.getElementById('more-menu-dropdown')?.classList.remove('open');
   const profileBtn=document.getElementById('btn-profile');
   const profilePanel=document.getElementById('profile-panel');
   if(profilePanel&&!profilePanel.contains(e.target)&&e.target!==profileBtn)profilePanel.classList.remove('open');
@@ -3907,52 +3873,6 @@ async function renderMonthlyGoalWidget(){
       <input type="number" id="goal-input" placeholder="Сумма цели" value="${hasGoal?goal.amount:''}" style="flex:1;font-size:13px;padding:5px 8px;border:1px solid var(--border2);border-radius:6px">
       <button onclick="saveMonthlyGoal(document.getElementById('goal-input').value)" style="font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:0 10px;cursor:pointer">✓</button>
     </div>`;
-}
-
-// ─── КАСТОМНЫЙ ОСНОВНОЙ ЦВЕТ САЙТА ──────────────────────────────────
-function hexToRgb(hex){
-  hex=hex.replace('#','');
-  if(hex.length===3)hex=hex.split('').map(c=>c+c).join('');
-  const num=parseInt(hex,16);
-  return{r:(num>>16)&255,g:(num>>8)&255,b:num&255};
-}
-function shadeColor(hex,percent){
-  const {r,g,b}=hexToRgb(hex);
-  const t=percent<0?0:255;
-  const p=Math.abs(percent)/100;
-  const nr=Math.round((t-r)*p+r),ng=Math.round((t-g)*p+g),nb=Math.round((t-b)*p+b);
-  return `#${((1<<24)+(nr<<16)+(ng<<8)+nb).toString(16).slice(1)}`;
-}
-function getCustomAccentColor(){
-  const dbVal=appSettings['custom_accent_color'];
-  const raw=dbVal!==undefined?dbVal:localStorage.getItem('custom_accent_color');
-  return raw||null;
-}
-async function setCustomAccentColor(hex){
-  localStorage.setItem('custom_accent_color',hex);
-  await saveAppSetting('custom_accent_color',hex);
-  applyCustomAccentColor();
-  toast('✓ Цвет сохранён на всех устройствах');
-}
-async function resetCustomAccentColor(){
-  localStorage.removeItem('custom_accent_color');
-  await saveAppSetting('custom_accent_color','');
-  applyCustomAccentColor();
-  const accentInput=document.getElementById('setting-accent-color');
-  if(accentInput)accentInput.value='#075985';
-  toast('✓ Цвет сброшен к стандартному');
-}
-function applyCustomAccentColor(){
-  const hex=getCustomAccentColor();
-  if(hex){
-    document.documentElement.style.setProperty('--accent',hex);
-    document.documentElement.style.setProperty('--accent-d',shadeColor(hex,-15));
-    document.documentElement.style.setProperty('--accent-l',shadeColor(hex,88));
-  } else {
-    document.documentElement.style.removeProperty('--accent');
-    document.documentElement.style.removeProperty('--accent-d');
-    document.documentElement.style.removeProperty('--accent-l');
-  }
 }
 
 function toggleTheme(){
