@@ -403,7 +403,7 @@ table.nit td.empty-cell{color:var(--text3);}
     </div>
     <div id="total-content" style="display:block">
       <div style="font-size:11px;font-weight:700;color:var(--money-card-text-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">₽ Рубли</div>
-      <div style="display:flex;align-items:flex-end;gap:28px;flex-wrap:wrap;margin-bottom:10px">
+      <div style="display:flex;align-items:flex-end;gap:28px;flex-wrap:wrap;margin-bottom:10px;justify-content:flex-start">
         <div>
           <div style="font-size:11px;font-weight:700;color:var(--money-card-text-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Всего моих денег</div>
           <div id="dash-total-money" style="font-family:Manrope,sans-serif;font-size:34px;font-weight:800;color:var(--money-card-text);letter-spacing:-1px;flex-shrink:0">—</div>
@@ -412,7 +412,7 @@ table.nit td.empty-cell{color:var(--text3);}
           <div style="font-size:11px;font-weight:700;color:var(--money-card-text-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Всего с кредитными</div>
           <div id="dash-total-with-credit" style="font-family:Manrope,sans-serif;font-size:34px;font-weight:800;color:var(--money-card-text-dim);letter-spacing:-1px;flex-shrink:0">—</div>
         </div>
-        <div id="dash-breakdown" style="display:flex;gap:24px;flex-wrap:wrap;align-items:center"></div>
+        <div id="dash-breakdown" style="display:flex;gap:24px;flex-wrap:wrap;align-items:center;justify-content:flex-start"></div>
       </div>
       <div id="dash-other-currencies" style="display:none">
         <div style="font-size:11px;font-weight:700;color:var(--money-card-text-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;padding-top:8px;border-top:1px solid rgba(255,255,255,.1)">Другие валюты</div>
@@ -666,6 +666,20 @@ table.nit td.empty-cell{color:var(--text3);}
   <div class="panel" style="margin-bottom:20px">
     <div class="panel-h">Пункты меню — показывать/скрывать, закреплять наверх</div>
     <div class="panel-b" id="nav-settings-list" style="padding:8px 18px"></div>
+  </div>
+  <div class="section-div">Внешний вид и функции</div>
+  <div class="panel" style="margin-bottom:20px">
+    <div class="panel-b" style="padding:14px 18px;display:flex;flex-direction:column;gap:14px">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+        <input type="checkbox" id="setting-reserves-toggle" onchange="setSverkaReservesEnabled(this.checked)">
+        <span style="font-size:15px;font-weight:500">Показывать «Резервы» в Сверке месяца</span>
+      </label>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:15px;font-weight:500;min-width:170px">Основной цвет сайта</span>
+        <input type="color" id="setting-accent-color" onchange="setCustomAccentColor(this.value)" style="width:44px;height:34px;padding:2px;border:1px solid var(--border2);border-radius:8px;cursor:pointer">
+        <button onclick="resetCustomAccentColor()" style="font-size:13px;font-weight:600;color:var(--text3);background:var(--surface2);border:none;border-radius:6px;padding:6px 12px;cursor:pointer">Сбросить</button>
+      </div>
+    </div>
   </div>
   <div class="section-div">Вклады и накопительные</div>
   <div class="panel" style="margin-bottom:20px">
@@ -1021,6 +1035,12 @@ const CHANGELOG=[
     'Сводка по брокерам: «Изменение за мес» теперь считается автоматически (Купоны − Комиссии + Прибыль от продаж + Прибыль от изменения цены + НКД)',
     'Сводка по брокерам: «Итог» = Начало + Изменение за мес',
     'Сводка по брокерам: новый столбец «Отклонение» = Итог − Снежный ком, для быстрой сверки'
+  ]},
+  {id:21,date:'22.08.2026',title:'Резервы, перенос текста и свой цвет сайта',items:[
+    'Мини-сверка под конкретным банком в Журнале теперь повторяет твою настройку столбцов Сверки (порядок/названия) — раньше показывала стандартный набор',
+    'Заголовки столбцов в Сверке снова переносятся на новую строку, если название длинное',
+    'Резервы (конверты) вернулись в Сверку месяца — новый столбец «Резерв». Включается/выключается в Настройках → «Внешний вид и функции» (у каждого своя настройка)',
+    'В Настройках — выбор основного цвета сайта (кнопки, ссылки, крупные суммы), с кнопкой сброса к стандартному'
   ]}
 ];
 
@@ -1365,28 +1385,13 @@ async function renderJournal(){
           <div class="panel-h">Сверка по счёту «${bank.name}» — ${curMonth} <span style="font-size:13px;color:var(--text3);font-weight:400">· та же строка, что и на вкладке «Сверка месяца»</span></div>
           <div class="tbl-wrap">
             <table class="svt" id="jrn-bank-sverka-table">
-              <thead><tr>
-                <th style="text-align:left">Банк</th>
-                <th class="gh">Д.Общий</th>
-                <th class="gh" style="background:#fff8e1;color:#b45309">Выписка Д</th>
-                <th class="gh">✓</th>
-                <th class="rh">Р.Общий</th>
-                <th class="rh" style="background:#fff8e1;color:#b45309">Выписка Р</th>
-                <th class="rh">✓</th>
-                <th class="gh">+Вне систем</th>
-                <th class="rh">−Вне систем</th>
-                <th class="bh">Перевод +</th>
-                <th class="bh">Перевод −</th>
-                <th class="bh">Внутрен.+</th>
-                <th class="bh">Внутрен.−</th>
-                <th>Нач.</th>
-                <th style="background:var(--teal-bg);color:var(--teal);font-weight:800">Кон.</th>
-                <th>Δ</th>
-              </tr></thead>
-              <tbody>${renderSverkaRowDefaultOrder(bank,aggOne,banksBals,banksBtots,tdNumB,tdInpB)}</tbody>
+              <thead><tr id="jrn-bank-sverka-head-row"></tr></thead>
+              <tbody>${renderSverkaRowHTML(bank,aggOne,banksBals,banksBtots,tdNumB,tdInpB)}</tbody>
             </table>
           </div>
         </div>`;
+        renderSverkaHeaderInto('jrn-bank-sverka-head-row');
+        document.getElementById('jrn-bank-sverka-table').dataset.resizable='';
         makeColumnsResizable(document.getElementById('jrn-bank-sverka-table'));
       }
     }catch(e){
@@ -1433,11 +1438,23 @@ const SVERKA_COL_DEFAULT_LABELS={
   expTotal:'Р.Общий',expSlip:'Выписка Р',expChk:'✓',
   incOut:'+Вне систем',expOut:'−Вне систем',
   trIn:'Перевод +',trOut:'Перевод −',incI:'Внутрен.+',expI:'Внутрен.−',
-  start:'Нач.',end:'Кон.',delta:'Δ'
+  start:'Нач.',reserve:'Резерв',end:'Кон.',delta:'Δ'
 };
-const SVERKA_COL_ORDER_DEFAULT=['bank','incTotal','incSlip','incChk','expTotal','expSlip','expChk','incOut','expOut','trIn','trOut','incI','expI','start','end','delta'];
+const SVERKA_COL_ORDER_DEFAULT=['bank','incTotal','incSlip','incChk','expTotal','expSlip','expChk','incOut','expOut','trIn','trOut','incI','expI','start','reserve','end','delta'];
 const SVERKA_COL_CLASS={incTotal:'gh',incSlip:'gh',incChk:'gh',expTotal:'rh',expSlip:'rh',expChk:'rh',incOut:'gh',expOut:'rh',trIn:'bh',trOut:'bh',incI:'bh',expI:'bh'};
-const SVERKA_HIDEABLE=['incTotal','incSlip','incChk','expTotal','expSlip','expChk'];
+const SVERKA_HIDEABLE=['incTotal','incSlip','incChk','expTotal','expSlip','expChk','reserve'];
+
+// Резервы в Сверке — отдельный переключатель (у каждого пользователя свой)
+function getSverkaReservesEnabled(){
+  const dbVal=appSettings['sverka_show_reserves'];
+  const raw=dbVal!==undefined?dbVal:localStorage.getItem('sverka_show_reserves');
+  return raw==='true';
+}
+async function setSverkaReservesEnabled(val){
+  localStorage.setItem('sverka_show_reserves',val?'true':'false');
+  await saveAppSetting('sverka_show_reserves',val?'true':'false');
+  renderSverka();
+}
 
 function getSverkaColOrder(){
   const saved=JSON.parse(localStorage.getItem('sverka_col_order')||'null');
@@ -1450,7 +1467,12 @@ function getSverkaColLabels(){
   if(dbVal!==undefined){try{return JSON.parse(dbVal||'{}');}catch(e){return{};}}
   try{return JSON.parse(localStorage.getItem('sverka_col_labels')||'{}');}catch(e){return{};}
 }
-function getSverkaHiddenCols(){return JSON.parse(localStorage.getItem('sverka_hidden_cols')||'[]');}
+function getSverkaHiddenCols(){
+  const manual=JSON.parse(localStorage.getItem('sverka_hidden_cols')||'[]');
+  // Столбец "Резерв" скрыт всегда, пока не включена соответствующая настройка
+  if(!getSverkaReservesEnabled()&&!manual.includes('reserve'))return[...manual,'reserve'];
+  return manual;
+}
 
 async function resetSverkaColumns(){
   if(!confirm('Сбросить порядок, ширину и названия столбцов Сверки к значениям по умолчанию?'))return;
@@ -1533,26 +1555,33 @@ function sverkaColDrop(e){
   renderSverka();
 }
 
-function renderSverkaHeader(){
+function renderSverkaHeader(rowId,tableId){
+  rowId=rowId||'sverka-head-row';
+  tableId=tableId||'sverka-table';
   const order=getSverkaColOrder();
   const hidden=getSverkaHiddenCols();
   const labels=getSverkaColLabels();
-  const headRow=document.getElementById('sverka-head-row');
+  const headRow=document.getElementById(rowId);
+  if(!headRow)return;
   headRow.innerHTML=order.filter(id=>!hidden.includes(id)).map(id=>{
     const cls=SVERKA_COL_CLASS[id]||'';
     const label=labels[id]||SVERKA_COL_DEFAULT_LABELS[id];
-    let extraStyle='white-space:nowrap;padding-right:16px;';
+    let extraStyle='white-space:normal;word-break:break-word;line-height:1.25;padding-right:16px;';
     if(id==='incSlip'||id==='expSlip')extraStyle+='background:#fff8e1;color:#b45309;';
     if(id==='bank')extraStyle+='text-align:left;';
     if(id==='end')extraStyle+='background:var(--teal-bg);color:var(--teal);font-weight:800;';
     return `<th class="${cls}" draggable="true" data-col="${id}" ondragstart="sverkaColDragStart(event)" ondragover="sverkaColDragOver(event)" ondrop="sverkaColDrop(event)" ondblclick="renameSverkaCol('${id}')" style="${extraStyle}cursor:move" title="Перетащи — переставить местами. Двойной клик — переименовать.">${label}</th>`;
   }).join('');
   // Хедер перестраивается каждый раз — сбрасываем флаг, чтобы ручки растягивания навесились заново
-  document.getElementById('sverka-table').dataset.resizable='';
-  makeColumnsResizable(document.getElementById('sverka-table'));
+  const tableEl=document.getElementById(tableId);
+  if(tableEl){tableEl.dataset.resizable='';makeColumnsResizable(tableEl);}
+}
+function renderSverkaHeaderInto(rowId){
+  renderSverkaHeader(rowId,'jrn-bank-sverka-table');
 }
 
-function buildSverkaRowCells(b,agg,bals,btots,tdNum,tdInp,inactive){
+function buildSverkaRowCells(b,agg,bals,btots,tdNum,tdInp,inactive,envByBank){
+  envByBank=envByBank||{};
   const a=agg[b.id];
   const bal=bals[b.id]||{start:0,end:0};
   const bt=btots[b.id]||{income:0,expense:0};
@@ -1612,12 +1641,13 @@ function buildSverkaRowCells(b,agg,bals,btots,tdNum,tdInp,inactive){
             onchange="saveStartBalance('${b.id}',this.value,this)">`
         :`<span style="display:block;text-align:right;padding:0 6px;font-size:var(--tbl-font);font-weight:700;color:${bal.start?'var(--text2)':'var(--text3)'};font-variant-numeric:tabular-nums">${bal.start?fmtF(bal.start):'—'}</span>`}
     </td>`,
+    reserve:`<td onclick="go('sverka');document.getElementById('panel-envelopes')?.scrollIntoView({behavior:'smooth'})" style="cursor:pointer;text-align:right;padding:6px 10px;color:var(--purple);font-weight:600" title="Зарезервировано на этом счёте — перейти к конвертам">${envByBank[b.id]?fmtF(envByBank[b.id]):'—'}</td>`,
     end:`<td style="text-align:right;padding:6px 10px;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:800;color:var(--teal);background:var(--teal-bg)">${fmtF(autoEnd)}</td>`,
     delta:`<td style="text-align:right;padding:6px 10px;font-variant-numeric:tabular-nums;white-space:nowrap;color:${delta>0?'var(--green)':delta<0?'var(--red)':'var(--text3)'}">${delta?(delta>0?'+':'')+fmtF(delta):'—'}</td>`
   };
 }
-function renderSverkaRowHTML(b,agg,bals,btots,tdNum,tdInp,inactive,extraTrAttrs){
-  const cells=buildSverkaRowCells(b,agg,bals,btots,tdNum,tdInp,inactive);
+function renderSverkaRowHTML(b,agg,bals,btots,tdNum,tdInp,inactive,extraTrAttrs,envByBank){
+  const cells=buildSverkaRowCells(b,agg,bals,btots,tdNum,tdInp,inactive,envByBank);
   const order=getSverkaColOrder();
   const hidden=getSverkaHiddenCols();
   return `<tr${extraTrAttrs?(' '+extraTrAttrs):''}>${order.filter(id=>!hidden.includes(id)).map(id=>cells[id]).join('')}</tr>`;
@@ -1665,6 +1695,7 @@ function setSverkaTypeFilter(type){
 }
 async function renderSverka(){
   document.getElementById('sverka-m-lbl').textContent=curMonth;
+  const reservesOn=getSverkaReservesEnabled();
   const [recs,bals,btots]=await Promise.all([
     loadRecordsMonth(curMonth),
     loadBalances(curMonth),
@@ -1717,14 +1748,16 @@ async function renderSverka(){
   let envByBank={};
   let envsByBank={};
   let envsLoaded=[];
-  try{
-    envsLoaded=await loadEnvelopes();
-    envsLoaded.forEach(e=>{
-      envByBank[e.bank_id]=(envByBank[e.bank_id]||0)+parseFloat(e.amount)||0;
-      if(!envsByBank[e.bank_id])envsByBank[e.bank_id]=[];
-      envsByBank[e.bank_id].push(e);
-    });
-  }catch(e){console.warn('envelopes not available',e);}
+  if(reservesOn){
+    try{
+      envsLoaded=await loadEnvelopes();
+      envsLoaded.forEach(e=>{
+        envByBank[e.bank_id]=(envByBank[e.bank_id]||0)+parseFloat(e.amount)||0;
+        if(!envsByBank[e.bank_id])envsByBank[e.bank_id]=[];
+        envsByBank[e.bank_id].push(e);
+      });
+    }catch(e){console.warn('envelopes not available',e);}
+  }
 
   let totTrIn=0,totTrOut=0,totIncI=0,totExpI=0;
   active.forEach(b=>{totTrIn+=agg[b.id].tr_in;totTrOut+=agg[b.id].tr_out;totIncI+=agg[b.id].income_i;totExpI+=agg[b.id].expense_i;});
@@ -1778,12 +1811,12 @@ async function renderSverka(){
       bodyHtml+=`<tr><td colspan="16" style="padding:4px 14px;background:var(--accent-l);font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em">${CURRENCY[curr]||curr} ${CURRENCY_NAME[curr]||curr}</td></tr>`;
     }
     withOpsThisCurr.forEach(b=>{
-      bodyHtml+=renderSverkaRowHTML(b,agg,bals,btots,tdNum,tdInp,false);
+      bodyHtml+=renderSverkaRowHTML(b,agg,bals,btots,tdNum,tdInp,false,null,envByBank);
     });
     if(noOpsThisCurr.length){
       bodyHtml+=`<tr><td colspan="16" style="padding:5px 14px;background:var(--surface2);border-top:2px solid var(--border2)"><span style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Без операций в этом месяце</span><button onclick="toggleNoOpsRows()" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:1px solid var(--border);border-radius:6px;padding:3px 10px;cursor:pointer;white-space:nowrap;text-transform:none;letter-spacing:normal">${noOpsHidden?'Показать':'Скрыть'}</button></span></td></tr>`;
       noOpsThisCurr.forEach(b=>{
-        bodyHtml+=renderSverkaRowHTML(b,agg,bals,btots,tdNum,tdInp,true,`class="no-ops-row" style="${noOpsHidden?'display:none;':''}opacity:0.5;background:#fafafa"`);
+        bodyHtml+=renderSverkaRowHTML(b,agg,bals,btots,tdNum,tdInp,true,`class="no-ops-row" style="${noOpsHidden?'display:none;':''}opacity:0.5;background:#fafafa"`,envByBank);
       });
     }
     const t=totalsByCurr[curr];
@@ -3171,6 +3204,7 @@ async function saveAppSetting(key,value){
 async function initApp(){
   initTabs();
   await Promise.all([loadBanks(),loadCategories(),loadAppSettings()]);
+  applyCustomAccentColor();
   renderNav();
   renderMonthlyGoalWidget();
   fillBankSelects();
@@ -3184,6 +3218,11 @@ async function initApp(){
 // ─── SETTINGS ────────────────────────────────────────────────────
 async function renderSettings(){
   await loadCategories();
+
+  const reservesToggle=document.getElementById('setting-reserves-toggle');
+  if(reservesToggle)reservesToggle.checked=getSverkaReservesEnabled();
+  const accentInput=document.getElementById('setting-accent-color');
+  if(accentInput)accentInput.value=getCustomAccentColor()||'#075985';
 
   const navCfg=getNavConfig();
   const orderedNavItems=navCfg.order.map(id=>NAV_ITEMS.find(i=>i.id===id)).filter(Boolean);
@@ -3831,6 +3870,52 @@ async function renderMonthlyGoalWidget(){
       <input type="number" id="goal-input" placeholder="Сумма цели" value="${hasGoal?goal.amount:''}" style="flex:1;font-size:13px;padding:5px 8px;border:1px solid var(--border2);border-radius:6px">
       <button onclick="saveMonthlyGoal(document.getElementById('goal-input').value)" style="font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:0 10px;cursor:pointer">✓</button>
     </div>`;
+}
+
+// ─── КАСТОМНЫЙ ОСНОВНОЙ ЦВЕТ САЙТА ──────────────────────────────────
+function hexToRgb(hex){
+  hex=hex.replace('#','');
+  if(hex.length===3)hex=hex.split('').map(c=>c+c).join('');
+  const num=parseInt(hex,16);
+  return{r:(num>>16)&255,g:(num>>8)&255,b:num&255};
+}
+function shadeColor(hex,percent){
+  const {r,g,b}=hexToRgb(hex);
+  const t=percent<0?0:255;
+  const p=Math.abs(percent)/100;
+  const nr=Math.round((t-r)*p+r),ng=Math.round((t-g)*p+g),nb=Math.round((t-b)*p+b);
+  return `#${((1<<24)+(nr<<16)+(ng<<8)+nb).toString(16).slice(1)}`;
+}
+function getCustomAccentColor(){
+  const dbVal=appSettings['custom_accent_color'];
+  const raw=dbVal!==undefined?dbVal:localStorage.getItem('custom_accent_color');
+  return raw||null;
+}
+async function setCustomAccentColor(hex){
+  localStorage.setItem('custom_accent_color',hex);
+  await saveAppSetting('custom_accent_color',hex);
+  applyCustomAccentColor();
+  toast('✓ Цвет сохранён на всех устройствах');
+}
+async function resetCustomAccentColor(){
+  localStorage.removeItem('custom_accent_color');
+  await saveAppSetting('custom_accent_color','');
+  applyCustomAccentColor();
+  const accentInput=document.getElementById('setting-accent-color');
+  if(accentInput)accentInput.value='#075985';
+  toast('✓ Цвет сброшен к стандартному');
+}
+function applyCustomAccentColor(){
+  const hex=getCustomAccentColor();
+  if(hex){
+    document.documentElement.style.setProperty('--accent',hex);
+    document.documentElement.style.setProperty('--accent-d',shadeColor(hex,-15));
+    document.documentElement.style.setProperty('--accent-l',shadeColor(hex,88));
+  } else {
+    document.documentElement.style.removeProperty('--accent');
+    document.documentElement.style.removeProperty('--accent-d');
+    document.documentElement.style.removeProperty('--accent-l');
+  }
 }
 
 function toggleTheme(){
