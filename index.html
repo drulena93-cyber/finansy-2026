@@ -55,36 +55,47 @@ body{background:var(--bg);color:var(--text);font-family:'Calibri','Carlito',sans
 
 /* APP */
 #app{display:none;min-height:100vh;}
-.layout{display:flex;flex-direction:column;min-height:100vh;}
+.layout{display:flex;flex-direction:row;min-height:100vh;}
 
-/* TOPBAR (была вертикальным сайдбаром) */
-.sidebar{width:100%;background:var(--nav-bg);border-bottom:none;display:flex;flex-direction:row;align-items:center;position:sticky;top:0;left:0;z-index:100;padding:0 18px;}
-.sb-logo{padding:8px 18px 8px 0;border-right:1px solid rgba(255,255,255,.08);margin-right:6px;flex-shrink:0;}
+/* LEFT SIDEBAR */
+.sidebar{width:240px;flex-shrink:0;background:var(--nav-bg);display:flex;flex-direction:column;align-items:stretch;position:sticky;top:0;height:100vh;z-index:100;padding:0;transition:width .18s;overflow:hidden;}
+.sidebar.collapsed{width:68px;}
+.sb-logo{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.08);border-right:none;margin-right:0;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.sb-logo-text{overflow:hidden;white-space:nowrap;}
+.sidebar.collapsed .sb-logo-text{display:none;}
 .sb-logo-title{font-family:'Manrope',sans-serif;font-size:17px;font-weight:800;color:var(--accent-bright);letter-spacing:-.3px;}
-.sb-logo-sub{display:none;font-size:14px;color:var(--nav-text-dim);margin-top:3px;}
-.nav{padding:8px 0;flex:1;display:flex;flex-direction:row;align-items:center;gap:2px;overflow:visible;}
+.sb-logo-sub{display:block;font-size:13px;color:var(--nav-text-dim);margin-top:2px;}
+.sidebar-collapse-btn{background:none;border:none;cursor:pointer;color:var(--nav-text-dim);flex-shrink:0;display:flex;align-items:center;padding:4px;border-radius:6px;}
+.sidebar-collapse-btn:hover{background:rgba(255,255,255,.08);color:#fff;}
+.sidebar-collapse-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s;}
+.sidebar.collapsed .sidebar-collapse-btn svg{transform:rotate(180deg);}
+.nav{padding:10px;flex:1;display:flex;flex-direction:column;align-items:stretch;gap:2px;overflow-y:auto;overflow-x:hidden;}
 .nav-lbl{display:none;}
-.nb{display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:var(--radius-sm);font-size:15px;font-weight:500;color:var(--nav-text);background:none;border:none;cursor:pointer;transition:all .12s;text-align:left;white-space:nowrap;flex-shrink:0;}
-.nav-divider{width:1px;align-self:stretch;margin:6px 6px;background:rgba(255,255,255,.1);flex-shrink:0;}
+.nb{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);font-size:15px;font-weight:500;color:var(--nav-text);background:none;border:none;cursor:pointer;transition:all .12s;text-align:left;white-space:nowrap;width:100%;}
+.sidebar.collapsed .nb{justify-content:center;padding:9px;}
+.sidebar.collapsed .nb .nb-label{display:none;}
+.nav-divider{display:none;}
 .nb svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .nb:hover{background:rgba(255,255,255,.06);color:#fff;}
 .nb.active{background:var(--accent-bright);color:#04222d;font-weight:600;}
 .nb-logout{color:var(--red)!important;}
 .nb-logout:hover{background:var(--red-bg)!important;color:var(--red)!important;}
 
-.nb-more-wrap{position:relative;}
-#more-menu-dropdown{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--surface);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);padding:6px;min-width:220px;z-index:150;flex-direction:column;gap:2px;}
+.nb-more-wrap{position:relative;display:flex;flex-direction:column;}
+#more-menu-dropdown{display:none;position:static;background:none;box-shadow:none;padding:0 0 0 14px;margin-top:2px;min-width:0;flex-direction:column;gap:2px;}
 #more-menu-dropdown.open{display:flex;}
-#more-menu-dropdown .nb{color:var(--text2);}
-#more-menu-dropdown .nb:hover{background:var(--bg);color:var(--text);}
-#more-menu-dropdown .nb.active{background:var(--accent-l);color:var(--accent);}
+#more-menu-dropdown .nb{color:var(--nav-text);}
+#more-menu-dropdown .nb:hover{background:rgba(255,255,255,.06);color:#fff;}
+#more-menu-dropdown .nb.active{background:var(--accent-bright);color:#04222d;}
+.sidebar.collapsed #more-menu-dropdown{padding-left:0;}
 
-.nav-right{display:flex;align-items:center;gap:14px;margin-left:auto;position:relative;}
+.nav-right{display:flex;align-items:center;gap:12px;margin-left:0;margin-top:auto;padding:14px 12px;border-top:1px solid rgba(255,255,255,.08);position:relative;flex-shrink:0;}
+.sidebar.collapsed .nav-right{flex-direction:column;padding:14px 8px;}
 .nav-icon-btn{background:none;border:none;cursor:pointer;color:var(--nav-text);position:relative;display:flex;align-items:center;padding:4px;}
 .nav-icon-btn:hover{color:#fff;}
 .nav-icon-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .profile-avatar{width:30px;height:30px;border-radius:50%;background:var(--accent-bright);color:#04222d;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;}
-#profile-panel{display:none;position:absolute;top:calc(100% + 10px);right:0;background:var(--surface);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);padding:16px;min-width:260px;z-index:150;}
+#profile-panel{display:none;position:absolute;bottom:calc(100% + 10px);left:0;background:var(--surface);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);padding:16px;min-width:260px;z-index:150;}
 #profile-panel.open{display:block;}
 
 .main{padding:16px 32px 28px;flex:1;min-width:0;}
@@ -316,6 +327,9 @@ table.nit td.empty-cell{color:var(--text3);}
 @media(max-width:768px){
   .sidebar{position:fixed;top:0;left:0;bottom:0;width:240px;flex-direction:column;align-items:stretch;border-bottom:none;padding:0;transform:translateX(-100%);transition:transform .25s;}
   .sidebar.mob-open{transform:translateX(0);box-shadow:4px 0 20px rgba(0,0,0,0.15);}
+  .sidebar.collapsed{width:240px;}
+  .sidebar.collapsed .sb-logo-text,.sidebar.collapsed .nb .nb-label{display:block;}
+  .sidebar-collapse-btn{display:none;}
   .sb-logo{padding:20px 20px 18px;border-bottom:1px solid var(--border);border-right:none;margin-right:0;}
   .sb-logo-sub{display:block;}
   .nav{flex-direction:column;align-items:stretch;padding:14px 10px;overflow-y:auto;overflow-x:visible;}
@@ -360,10 +374,15 @@ table.nit td.empty-cell{color:var(--text3);}
 <div id="offline-banner" style="display:none;align-items:center;gap:8px;background:var(--amber-bg);color:#92400e;font-size:13px;font-weight:600;padding:8px 18px;border-bottom:1px solid var(--amber-b)"></div>
 <div id="credit-alert-banner" style="display:none;flex-direction:column;gap:4px;background:var(--red-bg);color:var(--red);font-size:13px;font-weight:600;padding:8px 18px;border-bottom:1px solid var(--red-b)"></div>
 <div class="layout">
-<nav class="sidebar">
+<nav class="sidebar" id="app-sidebar">
   <div class="sb-logo">
-    <div class="sb-logo-title">Финансы</div>
-    <div class="sb-logo-sub">Личный трекер</div>
+    <div class="sb-logo-text">
+      <div class="sb-logo-title">Финансы</div>
+      <div class="sb-logo-sub">Личный трекер</div>
+    </div>
+    <button class="sidebar-collapse-btn" onclick="toggleSidebarCollapse()" title="Свернуть/развернуть меню">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
   </div>
   <div class="nav" id="nav-items"></div>
   <div class="nav-right">
@@ -1041,6 +1060,12 @@ const CHANGELOG=[
     'Заголовки столбцов в Сверке снова переносятся на новую строку, если название длинное',
     'Резервы (конверты) вернулись в Сверку месяца — новый столбец «Резерв». Включается/выключается в Настройках → «Внешний вид и функции» (у каждого своя настройка)',
     'В Настройках — выбор основного цвета сайта (кнопки, ссылки, крупные суммы), с кнопкой сброса к стандартному'
+  ]},
+  {id:22,date:'22.08.2026',title:'Меню переехало налево',items:[
+    'Верхнее меню стало левым вертикальным — как в amoCRM/Bitrix24',
+    'Появилась кнопка сворачивания меню (стрелка рядом с логотипом «Финансы») — сворачивается в узкую полосу с иконками, разворачивается обратно тем же кликом',
+    'Выбор запоминается — при следующем заходе меню откроется в том же состоянии (свёрнутое/развёрнутое)',
+    'На мобильных ничего не изменилось — там меню по-прежнему открывается через гамбургер-значок'
   ]}
 ];
 
@@ -3203,6 +3228,7 @@ async function saveAppSetting(key,value){
 
 async function initApp(){
   initTabs();
+  applySidebarCollapse();
   await Promise.all([loadBanks(),loadCategories(),loadAppSettings()]);
   applyCustomAccentColor();
   renderNav();
@@ -3779,7 +3805,7 @@ async function navSettingsDrop(e){
 }
 function navBtnHtml(item,inDropdown){
   const badge=item.badge?`<span id="${item.badge}" style="display:none;position:absolute;top:-2px;right:-4px;background:var(--red);color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 3px;line-height:1"></span>`:'';
-  return `<button class="nb" id="nb-${item.id}" onclick="${item.action}" style="position:relative">${item.icon}${item.label}${badge}</button>`;
+  return `<button class="nb" id="nb-${item.id}" onclick="${item.action}" style="position:relative" title="${item.label}">${item.icon}<span class="nb-label">${item.label}</span>${badge}</button>`;
 }
 function renderNav(){
   const wrap=document.getElementById('nav-items');
@@ -3792,13 +3818,24 @@ function renderNav(){
   let html=topItems.map(i=>navBtnHtml(i,false)).join('');
   if(moreItems.length){
     html+=`<div class="nb-more-wrap">
-      <button class="nb" id="nb-more" onclick="toggleMoreMenu()">Ещё<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="6 9 12 15 18 9"/></svg></button>
+      <button class="nb" id="nb-more" onclick="toggleMoreMenu()" title="Ещё"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg><span class="nb-label" style="flex:1">Ещё</span><svg viewBox="0 0 24 24" class="nb-label" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="6 9 12 15 18 9"/></svg></button>
       <div id="more-menu-dropdown">${moreItems.map(i=>navBtnHtml(i,true)).join('')}</div>
     </div>`;
   }
   wrap.innerHTML=html;
   // Восстанавливаем значок непрочитанных кредиток, если он был показан
   updateCreditAlertBanner(document.querySelector('.view.active')?.id.replace('view-',''));
+}
+function getSidebarCollapsed(){
+  return localStorage.getItem('sidebar_collapsed')==='true';
+}
+function toggleSidebarCollapse(){
+  const collapsed=!getSidebarCollapsed();
+  localStorage.setItem('sidebar_collapsed',collapsed?'true':'false');
+  applySidebarCollapse();
+}
+function applySidebarCollapse(){
+  document.getElementById('app-sidebar')?.classList.toggle('collapsed',getSidebarCollapsed());
 }
 function toggleMoreMenu(){
   document.getElementById('more-menu-dropdown')?.classList.toggle('open');
