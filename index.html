@@ -246,7 +246,7 @@ table.svt tr.check-row-warn td{background:var(--amber-bg);font-weight:700;color:
 .ver-fail{color:var(--red);font-weight:700;font-size:15px;}
 
 /* ADD BAR */
-.add-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;padding:14px 18px;background:var(--surface2);border-top:1px solid var(--border);}
+.add-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;padding:14px 18px;background:var(--surface);border-top:1px solid var(--border);}
 .fg{display:flex;flex-direction:column;gap:5px;}
 .fg label{font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;}
 .inp{height:36px;padding:0 12px;border:1.5px solid var(--border2);border-radius:var(--radius-xs);font-family:inherit;font-size:15px;color:var(--text);background:var(--surface);outline:none;transition:border .12s;}
@@ -506,7 +506,7 @@ table.nit td.empty-cell{color:var(--text3);}
         <label>Дата</label>
         <input type="date" class="inp w110" id="f-date" oninput="checkFormDate(this)">
       </div>
-      <div class="fg"><label>Валюта</label>
+      <div class="fg" id="f-currency-wrap"><label>Валюта</label>
         <select class="inp w90" id="f-currency" onchange="fillBankSelects();fillMirrorBankSelect()">
           <option value="">Все</option>
           <option value="RUB">₽ Рубли</option><option value="USD">$ Доллары</option>
@@ -514,7 +514,7 @@ table.nit td.empty-cell{color:var(--text3);}
         </select>
       </div>
       <div class="fg"><label>Банк</label><select class="inp w150" id="f-bank" onchange="fillMirrorBankSelect()"></select></div>
-      <div class="fg">
+      <div class="fg" id="f-type-detailed-wrap">
         <label>Тип</label>
         <div style="display:flex;flex-direction:column;gap:5px">
           <div style="display:flex;gap:4px">
@@ -523,8 +523,19 @@ table.nit td.empty-cell{color:var(--text3);}
           </div>
           <div id="f-subtype-tags" style="display:flex;gap:4px"></div>
         </div>
-        <input type="hidden" id="f-type" value="income">
       </div>
+      <div class="fg" id="f-type-compact-wrap" style="display:none">
+        <label>Тип</label>
+        <select class="inp w170" id="f-type-compact" onchange="setFTypeCompact(this.value)">
+          <option value="income">↑ Приход вне систем</option>
+          <option value="income_i">↑ Приход внутри</option>
+          <option value="tr_in">↑ Приход из др.банка</option>
+          <option value="expense">↓ Расход вне систем</option>
+          <option value="expense_i">↓ Расход внутри</option>
+          <option value="tr_out">↓ Расход в др.банк</option>
+        </select>
+      </div>
+      <input type="hidden" id="f-type" value="income">
       <div class="fg" id="f-mirror-wrap" style="display:none">
         <label id="f-mirror-label">Куда</label>
         <select class="inp w150" id="f-mirror-bank"></select>
@@ -705,6 +716,14 @@ table.nit td.empty-cell{color:var(--text3);}
         <span style="font-size:15px;font-weight:500">Показывать «Резервы» в Сверке месяца</span>
       </label>
       <div style="height:1px;background:var(--border)"></div>
+      <div>
+        <div style="font-size:15px;font-weight:500;margin-bottom:8px">Вид формы «+ Новая операция»</div>
+        <div style="display:flex;gap:8px">
+          <button id="btn-form-detailed" onclick="setFormViewModeUI('detailed')" style="font-size:13px;font-weight:600;padding:6px 14px;border-radius:6px;border:1.5px solid var(--border2);cursor:pointer;background:var(--surface);color:var(--text2)">Подробный (кнопки)</button>
+          <button id="btn-form-compact" onclick="setFormViewModeUI('compact')" style="font-size:13px;font-weight:600;padding:6px 14px;border-radius:6px;border:1.5px solid var(--border2);cursor:pointer;background:var(--surface);color:var(--text2)">Компактный (список)</button>
+        </div>
+      </div>
+      <div style="height:1px;background:var(--border)"></div>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <span style="font-size:15px;font-weight:500;min-width:190px">Фон меню слева</span>
         <input type="color" id="setting-color-nav" onchange="setCustomColor('nav',this.value)" style="width:44px;height:34px;padding:2px;border:1px solid var(--border2);border-radius:8px;cursor:pointer">
@@ -720,6 +739,8 @@ table.nit td.empty-cell{color:var(--text3);}
         <input type="color" id="setting-color-bg" onchange="setCustomColor('bg',this.value)" style="width:44px;height:34px;padding:2px;border:1px solid var(--border2);border-radius:8px;cursor:pointer">
         <button onclick="resetCustomColor('bg')" style="font-size:13px;font-weight:600;color:var(--text3);background:var(--surface2);border:none;border-radius:6px;padding:6px 12px;cursor:pointer">Сбросить</button>
       </div>
+      <div style="height:1px;background:var(--border)"></div>
+      <button onclick="resetAllCustomColors()" style="align-self:flex-start;font-size:13px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:8px 16px;cursor:pointer">↺ Вернуть исходный дизайн (все цвета сразу)</button>
     </div>
   </div>
   <div class="section-div">Вклады и накопительные</div>
@@ -1101,6 +1122,13 @@ const CHANGELOG=[
     'Цвет текста в меню теперь сам подстраивается под выбранный фон (тёмный фон → светлый текст, и наоборот) — читаемость не потеряется при любом выбранном цвете',
     'Все карточки-блоки на сайте (например, «+ Новая операция») снова чётко отделены от фона — вернула тонкую рамку вместе с тенью',
     'Панель «🪙 Конверты (резервы)» под Сверкой месяца — полный список с добавлением/типом/банком/суммой — снова показывается (управляется той же настройкой «Резервы в Сверке месяца»)'
+  ]},
+  {id:25,date:'23.08.2026',title:'Компактная форма, починка итогов, кнопка сброса дизайна',items:[
+    'Починен баг — итоговая строка в Сверке съезжала из-за отсутствующей ячейки «Резерв»',
+    'Убран синеватый оттенок фона у блока «+ Новая операция»',
+    'Настройки → «Внешний вид»: кнопка «↺ Вернуть исходный дизайн» — сбрасывает все три цвета сразу, не нужно жать «Сбросить» по одному',
+    'Новый переключатель вида формы «+ Новая операция»: Подробный (кнопки, как сейчас) / Компактный (один список «Тип», как в первых версиях)',
+    'Поле «Валюта» в форме теперь скрывается само, если у всех счетов одна и та же валюта'
   ]}
 ];
 
@@ -2537,6 +2565,47 @@ function renderFSubtypes(dir){
   if(!container)return;
   container.innerHTML=SUBTYPES[dir].map(s=>`<button type="button" class="sub-tag" data-v="${s.v}" onclick="setFSubtype('${s.v}','${dir}')">${s.l}</button>`).join('');
 }
+function setFTypeCompact(type){
+  const dir=(type==='income'||type==='income_i'||type==='tr_in')?'income':'expense';
+  setFSubtype(type,dir);
+}
+async function setFormViewModeUI(mode){
+  await setFormViewMode(mode);
+  updateFormViewModeButtons();
+}
+function updateFormViewModeButtons(){
+  const mode=getFormViewMode();
+  const detailedBtn=document.getElementById('btn-form-detailed');
+  const compactBtn=document.getElementById('btn-form-compact');
+  if(detailedBtn){detailedBtn.style.background=mode==='detailed'?'var(--accent-l)':'var(--surface)';detailedBtn.style.color=mode==='detailed'?'var(--accent)':'var(--text2)';detailedBtn.style.borderColor=mode==='detailed'?'var(--accent)':'var(--border2)';}
+  if(compactBtn){compactBtn.style.background=mode==='compact'?'var(--accent-l)':'var(--surface)';compactBtn.style.color=mode==='compact'?'var(--accent)':'var(--text2)';compactBtn.style.borderColor=mode==='compact'?'var(--accent)':'var(--border2)';}
+}
+function getFormViewMode(){
+  const dbVal=appSettings['form_view_mode'];
+  const raw=dbVal!==undefined?dbVal:localStorage.getItem('form_view_mode');
+  return raw==='compact'?'compact':'detailed';
+}
+async function setFormViewMode(mode){
+  localStorage.setItem('form_view_mode',mode);
+  await saveAppSetting('form_view_mode',mode);
+  applyFormViewMode();
+}
+function applyFormViewMode(){
+  const compact=getFormViewMode()==='compact';
+  const detailedWrap=document.getElementById('f-type-detailed-wrap');
+  const compactWrap=document.getElementById('f-type-compact-wrap');
+  if(detailedWrap)detailedWrap.style.display=compact?'none':'flex';
+  if(compactWrap)compactWrap.style.display=compact?'block':'none';
+  const typeInp=document.getElementById('f-type');
+  const compactSel=document.getElementById('f-type-compact');
+  if(compact&&compactSel&&typeInp)compactSel.value=typeInp.value;
+}
+function updateCurrencyFieldVisibility(){
+  const wrap=document.getElementById('f-currency-wrap');
+  if(!wrap)return;
+  const currencies=[...new Set(banks.map(b=>b.currency||'RUB'))];
+  wrap.style.display=currencies.length>1?'block':'none';
+}
 function setFSubtype(type,dir){
   const typeInp=document.getElementById('f-type');
   if(typeInp)typeInp.value=type;
@@ -2928,6 +2997,8 @@ async function recalcAllBalances(){
 }
 
 function fillBankSelects(){
+  updateCurrencyFieldVisibility();
+  applyFormViewMode();
   const currSel=document.getElementById('f-currency');
   const currVal=currSel?currSel.value:'';
   ['f-bank'].forEach(id=>{
@@ -3285,6 +3356,7 @@ async function renderSettings(){
   if(reservesToggle)reservesToggle.checked=getSverkaReservesEnabled();
   const brokersToggle=document.getElementById('setting-brokers-toggle');
   if(brokersToggle)brokersToggle.checked=!isBrokersHidden();
+  updateFormViewModeButtons();
   const colorNav=document.getElementById('setting-color-nav');
   if(colorNav)colorNav.value=getCustomColor('nav')||'#ffffff';
   const colorAccent=document.getElementById('setting-color-accent');
@@ -3942,6 +4014,15 @@ async function resetCustomColor(key){
   applyCustomColors();
   renderSettings();
   toast('✓ Цвет сброшен к стандартному');
+}
+async function resetAllCustomColors(){
+  for(const key of Object.keys(CUSTOM_COLOR_KEYS)){
+    localStorage.removeItem(CUSTOM_COLOR_KEYS[key]);
+    await saveAppSetting(CUSTOM_COLOR_KEYS[key],'');
+  }
+  applyCustomColors();
+  renderSettings();
+  toast('✓ Исходный дизайн восстановлен');
 }
 function getLuminance(hex){
   const {r,g,b}=hexToRgb(hex);
