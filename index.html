@@ -11,7 +11,7 @@
   --text:#0f1720;--text2:#45535c;--text3:#849098;
   --accent:#075985;--accent-l:#e0f7fa;--accent-d:#0c4a6e;
   --accent-bright:#5bc9eb;
-  --nav-bg:#141e33;--nav-text:#c3cbdb;--nav-text-dim:#7d8aa3;
+  --nav-bg:#ffffff;--sb-text:#45535c;--sb-text-dim:#849098;--sb-border:#dfe8ea;--sb-hover:#f3f7f8;
   --green:#16a34a;--green-bg:#f0fdf4;--green-b:#bbf7d0;
   --red:#dc2626;--red-bg:#fef2f2;--red-b:#fecaca;
   --amber:#d97706;--amber-bg:#fffbeb;--amber-b:#fcd34d;
@@ -28,7 +28,7 @@ body.dark-theme{
   --text:#eef4f6;--text2:#b6c2ca;--text3:#78848c;
   --accent:#22d3ee;--accent-l:#0e2f38;--accent-d:#06b6d4;
   --accent-bright:#5bc9eb;
-  --nav-bg:#0a1220;--nav-text:#c3cbdb;--nav-text-dim:#66748f;
+  --nav-bg:#131a21;--sb-text:#b6c2ca;--sb-text-dim:#78848c;--sb-border:#252f39;--sb-hover:#1a232c;
   --green:#4ade80;--green-bg:#0d2818;--green-b:#166534;
   --red:#f87171;--red-bg:#2a1316;--red-b:#7f1d1d;
   --amber:#fbbf24;--amber-bg:#2a2109;--amber-b:#78350f;
@@ -58,26 +58,26 @@ body{background:var(--bg);color:var(--text);font-family:'Calibri','Carlito',sans
 .layout{display:flex;flex-direction:row;min-height:100vh;}
 
 /* LEFT SIDEBAR */
-.sidebar{width:240px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:stretch;position:sticky;top:0;height:100vh;z-index:100;padding:0;transition:width .18s;overflow:hidden;}
+.sidebar{width:240px;flex-shrink:0;background:var(--nav-bg);border-right:1px solid var(--sb-border);display:flex;flex-direction:column;align-items:stretch;position:sticky;top:0;height:100vh;z-index:100;padding:0;transition:width .18s;overflow:hidden;}
 .sidebar.collapsed{width:68px;}
-.sb-logo{padding:16px 18px;border-bottom:1px solid var(--border);border-right:none;margin-right:0;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.sb-logo{padding:16px 18px;border-bottom:1px solid var(--sb-border);border-right:none;margin-right:0;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .sb-logo-text{overflow:hidden;white-space:nowrap;}
 .sidebar.collapsed .sb-logo-text{display:none;}
 .sb-logo-title{font-family:'Manrope',sans-serif;font-size:17px;font-weight:800;color:var(--accent);letter-spacing:-.3px;}
-.sb-logo-sub{display:block;font-size:13px;color:var(--text3);margin-top:2px;}
-.sidebar-collapse-btn{background:none;border:none;cursor:pointer;color:var(--text3);flex-shrink:0;display:flex;align-items:center;padding:4px;border-radius:6px;}
-.sidebar-collapse-btn:hover{background:var(--bg);color:var(--text);}
+.sb-logo-sub{display:block;font-size:13px;color:var(--sb-text-dim);margin-top:2px;}
+.sidebar-collapse-btn{background:none;border:none;cursor:pointer;color:var(--sb-text-dim);flex-shrink:0;display:flex;align-items:center;padding:4px;border-radius:6px;}
+.sidebar-collapse-btn:hover{background:var(--sb-hover);color:var(--sb-text);}
 .sidebar-collapse-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s;}
 .sidebar.collapsed .sidebar-collapse-btn svg{transform:rotate(180deg);}
 .nav{padding:10px;flex:1;display:flex;flex-direction:column;align-items:stretch;gap:2px;overflow-y:auto;overflow-x:hidden;}
-.nav-lbl{display:block;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding:14px 12px 5px;}
+.nav-lbl{display:block;font-size:11px;font-weight:700;color:var(--sb-text-dim);letter-spacing:.08em;text-transform:uppercase;padding:14px 12px 5px;}
 .sidebar.collapsed .nav-lbl{display:none;}
-.nb{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);font-size:15px;font-weight:500;color:var(--text2);background:none;border:none;cursor:pointer;transition:all .12s;text-align:left;white-space:nowrap;width:100%;}
+.nb{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);font-size:15px;font-weight:500;color:var(--sb-text);background:none;border:none;cursor:pointer;transition:all .12s;text-align:left;white-space:nowrap;width:100%;}
 .sidebar.collapsed .nb{justify-content:center;padding:9px;}
 .sidebar.collapsed .nb .nb-label{display:none;}
 .nav-divider{display:none;}
 .nb svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-.nb:hover{background:var(--bg);color:var(--text);}
+.nb:hover{background:var(--sb-hover);color:var(--sb-text);filter:brightness(0.9);}
 .nb.active{background:var(--accent-l);color:var(--accent);font-weight:700;}
 .nb-logout{color:var(--red)!important;}
 .nb-logout:hover{background:var(--red-bg)!important;color:var(--red)!important;}
@@ -85,15 +85,15 @@ body{background:var(--bg);color:var(--text);font-family:'Calibri','Carlito',sans
 .nb-more-wrap{position:relative;display:flex;flex-direction:column;}
 #more-menu-dropdown{display:none;position:static;background:none;box-shadow:none;padding:0 0 0 14px;margin-top:2px;min-width:0;flex-direction:column;gap:2px;}
 #more-menu-dropdown.open{display:flex;}
-#more-menu-dropdown .nb{color:var(--text2);}
-#more-menu-dropdown .nb:hover{background:var(--bg);color:var(--text);}
+#more-menu-dropdown .nb{color:var(--sb-text);}
+#more-menu-dropdown .nb:hover{background:var(--sb-hover);color:var(--sb-text);}
 #more-menu-dropdown .nb.active{background:var(--accent-l);color:var(--accent);}
 .sidebar.collapsed #more-menu-dropdown{padding-left:0;}
 
-.nav-right{display:flex;align-items:center;gap:12px;margin-left:0;margin-top:auto;padding:14px 12px;border-top:1px solid var(--border);position:relative;flex-shrink:0;}
+.nav-right{display:flex;align-items:center;gap:12px;margin-left:0;margin-top:auto;padding:14px 12px;border-top:1px solid var(--sb-border);position:relative;flex-shrink:0;}
 .sidebar.collapsed .nav-right{flex-direction:column;padding:14px 8px;}
-.nav-icon-btn{background:none;border:none;cursor:pointer;color:var(--text3);position:relative;display:flex;align-items:center;padding:4px;}
-.nav-icon-btn:hover{color:var(--text);}
+.nav-icon-btn{background:none;border:none;cursor:pointer;color:var(--sb-text-dim);position:relative;display:flex;align-items:center;padding:4px;}
+.nav-icon-btn:hover{color:var(--sb-text);}
 .nav-icon-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .profile-avatar{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;}
 #profile-panel{display:none;position:absolute;bottom:calc(100% + 10px);left:0;background:var(--surface);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);padding:16px;min-width:260px;z-index:150;border:1px solid var(--border);}
@@ -154,7 +154,7 @@ body{background:var(--bg);color:var(--text);font-family:'Calibri','Carlito',sans
 .total-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:18px;box-shadow:var(--shadow);}
 
 /* PANEL */
-.panel{background:var(--surface);border:none;border-radius:12px;overflow:hidden;box-shadow:var(--shadow);}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);}
 .panel-h{padding:14px 18px;border-bottom:1px solid var(--border);font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between;font-family:'Manrope',sans-serif;}
 .panel-b{padding:14px 18px;}
 
@@ -335,13 +335,13 @@ table.nit td.empty-cell{color:var(--text3);}
   .sidebar.collapsed{width:240px;}
   .sidebar.collapsed .sb-logo-text,.sidebar.collapsed .nb .nb-label,.sidebar.collapsed .nav-lbl{display:block;}
   .sidebar-collapse-btn{display:none;}
-  .sb-logo{padding:20px 20px 18px;border-bottom:1px solid var(--border);border-right:none;margin-right:0;}
+  .sb-logo{padding:20px 20px 18px;border-bottom:1px solid var(--sb-border);border-right:none;margin-right:0;}
   .sb-logo-sub{display:block;}
   .nav{flex-direction:column;align-items:stretch;padding:14px 10px;overflow-y:auto;overflow-x:visible;}
-  .nav-lbl{display:block;font-size:12px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding:12px 10px 5px;}
+  .nav-lbl{display:block;font-size:12px;font-weight:700;color:var(--sb-text-dim);letter-spacing:.08em;text-transform:uppercase;padding:12px 10px 5px;}
   .nb{width:100%;margin-bottom:2px;padding:10px 12px;}
   .nav-divider{display:none;}
-  .nav-right{margin-left:0;padding:14px 10px;border-top:1px solid var(--border);justify-content:center;}
+  .nav-right{margin-left:0;padding:14px 10px;border-top:1px solid var(--sb-border);justify-content:center;}
   #profile-panel{position:fixed;top:auto;bottom:0;left:0;right:0;border-radius:16px 16px 0 0;}
   #more-menu-dropdown{position:static;box-shadow:none;background:none;padding:0 0 0 12px;min-width:0;}
   .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:99;}
@@ -640,7 +640,7 @@ table.nit td.empty-cell{color:var(--text3);}
     <div id="sverka-checks" style="padding:12px 18px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--border);background:var(--surface2)"></div>
   </div>
 
-  <!-- ENVELOPES PANEL (скрыто — резервы не используются) -->
+  <!-- ENVELOPES PANEL (видимость управляется настройкой "Резервы в Сверке") -->
   <div class="panel" id="panel-envelopes" style="margin-top:14px;display:none">
     <div class="panel-h">
       <span>🪙 Конверты (резервы) <button onclick="showHelp('envelopes')" style="background:none;border:1.5px solid var(--border2);border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;cursor:pointer;color:var(--text3);padding:0;line-height:1;vertical-align:middle">?</button></span>
@@ -699,11 +699,27 @@ table.nit td.empty-cell{color:var(--text3);}
   </div>
   <div class="section-div">Внешний вид и функции</div>
   <div class="panel" style="margin-bottom:20px">
-    <div class="panel-b" style="padding:14px 18px;display:flex;flex-direction:column;gap:14px">
+    <div class="panel-b" style="padding:14px 18px;display:flex;flex-direction:column;gap:16px">
       <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
         <input type="checkbox" id="setting-reserves-toggle" onchange="setSverkaReservesEnabled(this.checked)">
         <span style="font-size:15px;font-weight:500">Показывать «Резервы» в Сверке месяца</span>
       </label>
+      <div style="height:1px;background:var(--border)"></div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <span style="font-size:15px;font-weight:500;min-width:190px">Фон меню слева</span>
+        <input type="color" id="setting-color-nav" onchange="setCustomColor('nav',this.value)" style="width:44px;height:34px;padding:2px;border:1px solid var(--border2);border-radius:8px;cursor:pointer">
+        <button onclick="resetCustomColor('nav')" style="font-size:13px;font-weight:600;color:var(--text3);background:var(--surface2);border:none;border-radius:6px;padding:6px 12px;cursor:pointer">Сбросить</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <span style="font-size:15px;font-weight:500;min-width:190px">Основной цвет (кнопки, акценты)</span>
+        <input type="color" id="setting-color-accent" onchange="setCustomColor('accent',this.value)" style="width:44px;height:34px;padding:2px;border:1px solid var(--border2);border-radius:8px;cursor:pointer">
+        <button onclick="resetCustomColor('accent')" style="font-size:13px;font-weight:600;color:var(--text3);background:var(--surface2);border:none;border-radius:6px;padding:6px 12px;cursor:pointer">Сбросить</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <span style="font-size:15px;font-weight:500;min-width:190px">Общий фон страниц</span>
+        <input type="color" id="setting-color-bg" onchange="setCustomColor('bg',this.value)" style="width:44px;height:34px;padding:2px;border:1px solid var(--border2);border-radius:8px;cursor:pointer">
+        <button onclick="resetCustomColor('bg')" style="font-size:13px;font-weight:600;color:var(--text3);background:var(--surface2);border:none;border-radius:6px;padding:6px 12px;cursor:pointer">Сбросить</button>
+      </div>
     </div>
   </div>
   <div class="section-div">Вклады и накопительные</div>
@@ -1079,6 +1095,12 @@ const CHANGELOG=[
     'При выборе «Банки» или «Брокеры» сверху появляется полоса вкладок для переключения между страницами внутри раздела — как в Bitrix24',
     'В Настройках → «Меню» — можно скрыть раздел «Брокеры» целиком, если он не нужен',
     'Убрана функция смены основного цвета сайта — по твоей просьбе, лишнее усложнение'
+  ]},
+  {id:24,date:'22.08.2026',title:'Кастомизация цвета, чёткие блоки, резервы вернулись',items:[
+    'Настройки → «Внешний вид и функции»: три отдельных цветовых пикера — фон меню слева, основной цвет (кнопки/акценты), общий фон страниц. У каждого своя кнопка «Сбросить»',
+    'Цвет текста в меню теперь сам подстраивается под выбранный фон (тёмный фон → светлый текст, и наоборот) — читаемость не потеряется при любом выбранном цвете',
+    'Все карточки-блоки на сайте (например, «+ Новая операция») снова чётко отделены от фона — вернула тонкую рамку вместе с тенью',
+    'Панель «🪙 Конверты (резервы)» под Сверкой месяца — полный список с добавлением/типом/банком/суммой — снова показывается (управляется той же настройкой «Резервы в Сверке месяца»)'
   ]}
 ];
 
@@ -1866,6 +1888,8 @@ async function renderSverka(){
   document.getElementById('sverka-body').innerHTML=bodyHtml;
 
   // Render envelopes panel
+  const envPanelEl=document.getElementById('panel-envelopes');
+  if(envPanelEl)envPanelEl.style.display=reservesOn?'block':'none';
   renderEnvelopes(envsLoaded,bals,agg,active);
 
   document.getElementById('sverka-checks').innerHTML=`
@@ -3241,6 +3265,7 @@ async function initApp(){
   initTabs();
   applySidebarCollapse();
   await Promise.all([loadBanks(),loadCategories(),loadAppSettings()]);
+  applyCustomColors();
   renderNav();
   renderMonthlyGoalWidget();
   fillBankSelects();
@@ -3259,6 +3284,12 @@ async function renderSettings(){
   if(reservesToggle)reservesToggle.checked=getSverkaReservesEnabled();
   const brokersToggle=document.getElementById('setting-brokers-toggle');
   if(brokersToggle)brokersToggle.checked=!isBrokersHidden();
+  const colorNav=document.getElementById('setting-color-nav');
+  if(colorNav)colorNav.value=getCustomColor('nav')||'#ffffff';
+  const colorAccent=document.getElementById('setting-color-accent');
+  if(colorAccent)colorAccent.value=getCustomColor('accent')||'#075985';
+  const colorBg=document.getElementById('setting-color-bg');
+  if(colorBg)colorBg.value=getCustomColor('bg')||'#f3f7f8';
 
   const depBanks=banks.filter(b=>b.type==='deposit'||b.type==='savings');
   document.getElementById('dep-settings-list').innerHTML=depBanks.length
@@ -3873,6 +3904,83 @@ async function renderMonthlyGoalWidget(){
       <input type="number" id="goal-input" placeholder="Сумма цели" value="${hasGoal?goal.amount:''}" style="flex:1;font-size:13px;padding:5px 8px;border:1px solid var(--border2);border-radius:6px">
       <button onclick="saveMonthlyGoal(document.getElementById('goal-input').value)" style="font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:0 10px;cursor:pointer">✓</button>
     </div>`;
+}
+
+// ─── КАСТОМНЫЕ ЦВЕТА: фон меню / основной цвет / общий фон ──────────
+function hexToRgb(hex){
+  hex=hex.replace('#','');
+  if(hex.length===3)hex=hex.split('').map(c=>c+c).join('');
+  const num=parseInt(hex,16);
+  return{r:(num>>16)&255,g:(num>>8)&255,b:num&255};
+}
+function shadeColor(hex,percent){
+  const {r,g,b}=hexToRgb(hex);
+  const t=percent<0?0:255;
+  const p=Math.abs(percent)/100;
+  const nr=Math.round((t-r)*p+r),ng=Math.round((t-g)*p+g),nb=Math.round((t-b)*p+b);
+  return `#${((1<<24)+(nr<<16)+(ng<<8)+nb).toString(16).slice(1)}`;
+}
+const CUSTOM_COLOR_KEYS={nav:'custom_color_nav',accent:'custom_color_accent',bg:'custom_color_bg'};
+function getCustomColor(key){
+  const settingKey=CUSTOM_COLOR_KEYS[key];
+  const dbVal=appSettings[settingKey];
+  const raw=dbVal!==undefined?dbVal:localStorage.getItem(settingKey);
+  return raw||null;
+}
+async function setCustomColor(key,hex){
+  const settingKey=CUSTOM_COLOR_KEYS[key];
+  localStorage.setItem(settingKey,hex);
+  await saveAppSetting(settingKey,hex);
+  applyCustomColors();
+  toast('✓ Цвет сохранён на всех устройствах');
+}
+async function resetCustomColor(key){
+  const settingKey=CUSTOM_COLOR_KEYS[key];
+  localStorage.removeItem(settingKey);
+  await saveAppSetting(settingKey,'');
+  applyCustomColors();
+  renderSettings();
+  toast('✓ Цвет сброшен к стандартному');
+}
+function getLuminance(hex){
+  const {r,g,b}=hexToRgb(hex);
+  const [rs,gs,bs]=[r,g,b].map(c=>{c=c/255;return c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4);});
+  return 0.2126*rs+0.7152*gs+0.0722*bs;
+}
+function applyCustomColors(){
+  const nav=getCustomColor('nav');
+  if(nav){
+    document.documentElement.style.setProperty('--nav-bg',nav);
+    const isDark=getLuminance(nav)<0.5;
+    document.documentElement.style.setProperty('--sb-text',isDark?'#e8edf2':'#1a1d2e');
+    document.documentElement.style.setProperty('--sb-text-dim',isDark?'#98a4b3':'#6b7684');
+    document.documentElement.style.setProperty('--sb-border',isDark?'rgba(255,255,255,.12)':'rgba(0,0,0,.1)');
+    document.documentElement.style.setProperty('--sb-hover',isDark?'rgba(255,255,255,.08)':'rgba(0,0,0,.05)');
+  }else{
+    document.documentElement.style.removeProperty('--nav-bg');
+    document.documentElement.style.removeProperty('--sb-text');
+    document.documentElement.style.removeProperty('--sb-text-dim');
+    document.documentElement.style.removeProperty('--sb-border');
+    document.documentElement.style.removeProperty('--sb-hover');
+  }
+  const accent=getCustomColor('accent');
+  if(accent){
+    document.documentElement.style.setProperty('--accent',accent);
+    document.documentElement.style.setProperty('--accent-d',shadeColor(accent,-15));
+    document.documentElement.style.setProperty('--accent-l',shadeColor(accent,88));
+    document.documentElement.style.setProperty('--accent-bright',shadeColor(accent,25));
+  }else{
+    document.documentElement.style.removeProperty('--accent');
+    document.documentElement.style.removeProperty('--accent-d');
+    document.documentElement.style.removeProperty('--accent-l');
+    document.documentElement.style.removeProperty('--accent-bright');
+  }
+  const bg=getCustomColor('bg');
+  if(bg){
+    document.documentElement.style.setProperty('--bg',bg);
+  }else{
+    document.documentElement.style.removeProperty('--bg');
+  }
 }
 
 function toggleTheme(){
