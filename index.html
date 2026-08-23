@@ -21,7 +21,7 @@
   --shadow:0 1px 3px rgba(15,23,32,0.07),0 4px 14px rgba(15,23,32,0.06);
   --shadow-md:0 8px 28px rgba(15,23,32,0.12);
   --tbl-font:15px;
-  --money-card-bg:#0f1f2e;--money-card-text:#ffffff;--money-card-text-dim:#8fa8bd;
+  --money-card-bg:#ffffff;--money-card-text:#0f1720;--money-card-text-dim:#849098;
 }
 body.dark-theme{
   --bg:#0a0f14;--surface:#131a21;--surface2:#1a232c;--border:#252f39;--border2:#37444f;
@@ -58,7 +58,7 @@ body{background:var(--bg);color:var(--text);font-family:'Calibri','Carlito',sans
 .layout{display:flex;flex-direction:row;min-height:100vh;}
 
 /* LEFT SIDEBAR */
-.sidebar{width:240px;flex-shrink:0;background:var(--nav-bg);border-right:1px solid var(--sb-border);display:flex;flex-direction:column;align-items:stretch;position:sticky;top:0;height:100vh;z-index:100;padding:0;transition:width .18s;overflow:hidden;}
+.sidebar{width:240px;flex-shrink:0;background:var(--nav-bg);border-right:1px solid var(--sb-border);display:flex;flex-direction:column;align-items:stretch;position:sticky;top:0;height:100vh;z-index:100;padding:0;transition:width .18s;overflow:visible;}
 .sidebar.collapsed{width:68px;}
 .sb-logo{padding:16px 18px;border-bottom:1px solid var(--sb-border);border-right:none;margin-right:0;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .sb-logo-text{overflow:hidden;white-space:nowrap;}
@@ -96,7 +96,7 @@ body{background:var(--bg);color:var(--text);font-family:'Calibri','Carlito',sans
 .nav-icon-btn:hover{color:var(--sb-text);}
 .nav-icon-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .profile-avatar{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;}
-#profile-panel{display:none;position:absolute;bottom:calc(100% + 10px);left:0;background:var(--surface);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);padding:16px;min-width:260px;z-index:150;border:1px solid var(--border);}
+#profile-panel{display:none;position:absolute;bottom:calc(100% + 10px);left:0;background:var(--surface);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);padding:16px;min-width:240px;z-index:150;border:1px solid var(--border);}
 #profile-panel.open{display:block;}
 
 .main{padding:16px 32px 28px;flex:1;min-width:0;}
@@ -421,11 +421,11 @@ table.nit td.empty-cell{color:var(--text3);}
   <div class="ph"><h1>Аналитика <span id="dep-alert-badge" onclick="go('settings')" style="display:none;cursor:pointer;font-size:13px;font-weight:700;color:#92400e;background:var(--amber-bg);border-radius:20px;padding:3px 10px;vertical-align:middle;margin-left:8px"></span></h1></div>
 
   <!-- TOTAL MONEY -->
-  <div style="background:var(--money-card-bg);border:none;border-radius:12px;padding:16px 22px;margin-bottom:14px;box-shadow:var(--shadow)">
+  <div style="background:var(--money-card-bg);border:1px solid var(--border);border-radius:12px;padding:16px 22px;margin-bottom:14px;box-shadow:var(--shadow)">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
       <div style="font-size:12px;font-weight:700;color:var(--money-card-text-dim);text-transform:uppercase;letter-spacing:.07em">Всего моих денег <button onclick="showHelp('total')" style="background:none;border:1.5px solid var(--money-card-text-dim);border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;cursor:pointer;color:var(--money-card-text-dim);padding:0;line-height:1;vertical-align:middle">?</button></div>
       <div id="total-subtitle" style="font-size:13px;color:var(--money-card-text-dim)">актуально на последний месяц</div>
-      <button onclick="toggleTotal()" id="btn-toggle-total" style="font-size:13px;font-weight:600;color:var(--accent-bright);background:rgba(91,201,235,.12);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">Скрыть</button>
+      <button onclick="toggleTotal()" id="btn-toggle-total" style="font-size:13px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">Скрыть</button>
     </div>
     <div id="total-content" style="display:block">
       <div style="font-size:11px;font-weight:700;color:var(--money-card-text-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">₽ Рубли</div>
@@ -441,7 +441,7 @@ table.nit td.empty-cell{color:var(--text3);}
         <div id="dash-breakdown" style="display:flex;gap:24px;flex-wrap:wrap;align-items:center;justify-content:flex-start"></div>
       </div>
       <div id="dash-other-currencies" style="display:none">
-        <div style="font-size:11px;font-weight:700;color:var(--money-card-text-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;padding-top:8px;border-top:1px solid rgba(255,255,255,.1)">Другие валюты</div>
+        <div style="font-size:11px;font-weight:700;color:var(--money-card-text-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;padding-top:8px;border-top:1px solid var(--border)">Другие валюты</div>
         <div id="dash-other-currencies-list" style="display:flex;gap:20px;flex-wrap:wrap"></div>
       </div>
     </div>
@@ -1129,6 +1129,14 @@ const CHANGELOG=[
     'Настройки → «Внешний вид»: кнопка «↺ Вернуть исходный дизайн» — сбрасывает все три цвета сразу, не нужно жать «Сбросить» по одному',
     'Новый переключатель вида формы «+ Новая операция»: Подробный (кнопки, как сейчас) / Компактный (один список «Тип», как в первых версиях)',
     'Поле «Валюта» в форме теперь скрывается само, если у всех счетов одна и та же валюта'
+  ]},
+  {id:26,date:'23.08.2026',title:'Карточка «Всего моих денег» — в тон сайту',items:[
+    'Убрала тёмно-синий/чёрный фон карточки «Всего моих денег» на Аналитике — теперь светлая, как весь остальной сайт',
+    'Поправила разделители и цвета внутри, которые были рассчитаны на тёмный фон — теперь читаются правильно',
+    'В тёмной теме сайта (☀️/🌙 переключатель) карточка по-прежнему тёмная — там это уместно'
+  ]},
+  {id:27,date:'23.08.2026',title:'Починена обрезающаяся панель профиля',items:[
+    'Панель профиля (клик на аватар в меню) раньше обрезалась по краю меню — панель была шире самого меню. Починила, теперь показывается полностью'
   ]}
 ];
 
@@ -2213,23 +2221,23 @@ async function renderDash(){
   const subtitleEl=document.getElementById('total-subtitle');
   if(subtitleEl)subtitleEl.textContent='актуально на '+lastMonthWithData+' 2026';
   document.getElementById('dash-breakdown').innerHTML=`
-    <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:var(--money-card-text-dim);font-weight:600;text-transform:uppercase">Дебетовые</span><span style="font-size:16px;font-weight:700;color:var(--accent-bright);font-family:Manrope,sans-serif">${fmtF(totalDebitCards)}</span></div>
-    <div style="width:1px;height:30px;background:rgba(255,255,255,.15);flex-shrink:0"></div>
+    <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:var(--money-card-text-dim);font-weight:600;text-transform:uppercase">Дебетовые</span><span style="font-size:16px;font-weight:700;color:var(--accent);font-family:Manrope,sans-serif">${fmtF(totalDebitCards)}</span></div>
+    <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
     <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:var(--money-card-text-dim);font-weight:600;text-transform:uppercase">Кредитные</span><span style="font-size:16px;font-weight:700;color:#f87171;font-family:Manrope,sans-serif">${fmtF(totalCreditCards)}</span></div>
-    <div style="width:1px;height:30px;background:rgba(255,255,255,.15);flex-shrink:0"></div>
+    <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
     <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:var(--money-card-text-dim);font-weight:600;text-transform:uppercase">Накопит.</span><span style="font-size:16px;font-weight:700;color:#2dd4bf;font-family:Manrope,sans-serif">${fmtF(totalSavings)}</span></div>
-    <div style="width:1px;height:30px;background:rgba(255,255,255,.15);flex-shrink:0"></div>
+    <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
     <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:var(--money-card-text-dim);font-weight:600;text-transform:uppercase">Вклады</span><span style="font-size:16px;font-weight:700;color:#c4b5fd;font-family:Manrope,sans-serif">${fmtF(totalDeposit)}</span></div>
-    <div style="width:1px;height:30px;background:rgba(255,255,255,.15);flex-shrink:0"></div>
+    <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
     <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:var(--money-card-text-dim);font-weight:600;text-transform:uppercase">Наличные</span><span style="font-size:16px;font-weight:700;color:#fbbf24;font-family:Manrope,sans-serif">${fmtF(totalCash)}</span></div>
     ${totalReserved?`
-    <div style="width:1px;height:30px;background:rgba(255,255,255,.15);flex-shrink:0"></div>
+    <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
     <div style="display:flex;flex-direction:column;gap:4px">
       <span style="font-size:12px;color:#c4b5fd;font-weight:700;text-transform:uppercase">🪙 Резервы</span>
       <span style="font-size:16px;font-weight:700;color:#c4b5fd;font-family:Manrope,sans-serif">−${fmtF(totalReserved)}</span>
       ${envDetails.map(([n,v])=>`<span style="font-size:12px;color:var(--money-card-text-dim)">${n}: ${fmtF(v)}</span>`).join('')}
     </div>
-    <div style="width:1px;height:30px;background:rgba(255,255,255,.15);flex-shrink:0"></div>
+    <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
     <div style="display:flex;flex-direction:column;gap:2px">
       <span style="font-size:12px;color:#4ade80;font-weight:700;text-transform:uppercase">✓ Свободно</span>
       <span style="font-size:18px;font-weight:800;color:#4ade80;font-family:Manrope,sans-serif">${fmtF(totalFree)}</span>
