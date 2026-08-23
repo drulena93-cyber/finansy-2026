@@ -1172,6 +1172,13 @@ const CHANGELOG=[
   {id:29,date:'23.08.2026',title:'Перестановка разделов меню и ручное раскрытие',items:[
     'Добавлена стрелка у «Банки»/«Брокеры» в левом меню — можно развернуть список страниц вручную, не заходя в сам раздел',
     'В Настройках → «Меню» — новый блок «Порядок разделов меню»: можно перетаскивать сами разделы (Аналитика/Банки/Брокеры/Настройки) в любом порядке'
+  ]},
+  {id:30,date:'23.08.2026',title:'Починки: компактная форма и раскрытие меню',items:[
+    'Компактный вид формы «+ Новая операция»: поле «Тип» теперь встаёт вертикально (подпись сверху, список снизу), как и остальные поля — раньше вставало в одну строку из-за неверного CSS-свойства',
+    'Стрелка раскрытия «Банки»/«Брокеры» в меню теперь работает на любой странице — раньше нельзя было свернуть раздел, если находишься именно в нём (активный раздел всегда пересиливал ручное решение)'
+  ]},
+  {id:31,date:'23.08.2026',title:'Починка: категории не фильтровались по банку',items:[
+    'Блоки «Расходы по категориям» и «Доходы по категориям» на Аналитике теперь учитывают фильтр по банку/типу/валюте, выставленный в блоке «Счета — по валюте и банку» выше — раньше фильтровались только по месяцу'
   ]}
 ];
 
@@ -2375,7 +2382,14 @@ async function renderDash(){
   }).join(''):'<div class="empty">Нет счетов этого типа</div>';
 
   // Расходы/доходы по категориям — текущий месяц, с эмодзи
-  const recsCurMonth=allRecsForTotal.filter(r=>r.month===curMonth);
+  // Учитываем те же фильтры, что и в блоке "Счета — по валюте и банку" (тип/валюта/банк)
+  const filteredBankIdsCat=new Set(banks.filter(b=>{
+    if(dashTypeFilter&&b.type!==dashTypeFilter)return false;
+    if(dashCurrFilterH&&(b.currency||'RUB')!==dashCurrFilterH)return false;
+    if(dashBankNameFilterH&&bankGroupName(b.name)!==dashBankNameFilterH)return false;
+    return true;
+  }).map(b=>b.id));
+  const recsCurMonth=allRecsForTotal.filter(r=>r.month===curMonth&&filteredBankIdsCat.has(r.bank_id));
   const catExpM={},catIncM={};
   recsCurMonth.forEach(r=>{
     const cat=r.category||'Без категории';
@@ -2638,7 +2652,7 @@ function applyFormViewMode(){
   const detailedWrap=document.getElementById('f-type-detailed-wrap');
   const compactWrap=document.getElementById('f-type-compact-wrap');
   if(detailedWrap)detailedWrap.style.display=compact?'none':'flex';
-  if(compactWrap)compactWrap.style.display=compact?'block':'none';
+  if(compactWrap)compactWrap.style.display=compact?'flex':'none';
   const typeInp=document.getElementById('f-type');
   const compactSel=document.getElementById('f-type-compact');
   if(compact&&compactSel&&typeInp)compactSel.value=typeInp.value;
@@ -4026,12 +4040,25 @@ function toggleGroupExpand(groupId){
   localStorage.setItem('nav_expanded_groups',JSON.stringify(expanded));
   renderNav();
 }
+let lastActiveGroupId=null;
 function renderNav(){
   const wrap=document.getElementById('nav-items');
   if(!wrap)return;
   const curView=currentViewId();
   const groups=orderedTopGroups().filter(g=>!(g.id==='brokers'&&isBrokersHidden()));
-  const manuallyExpanded=getExpandedGroups();
+  let manuallyExpanded=getExpandedGroups();
+  const activeGroup=groups.find(g=>!g.standalone&&g.matches(curView));
+  if(activeGroup){
+    // Заходим в раздел впервые за сессию — раскрываем автоматически один раз.
+    // Дальше (пока остаёмся в этом же разделе) — только ручное управление стрелкой.
+    if(activeGroup.id!==lastActiveGroupId&&!manuallyExpanded.includes(activeGroup.id)){
+      manuallyExpanded=[...manuallyExpanded,activeGroup.id];
+      localStorage.setItem('nav_expanded_groups',JSON.stringify(manuallyExpanded));
+    }
+    lastActiveGroupId=activeGroup.id;
+  } else {
+    lastActiveGroupId=null;
+  }
   wrap.innerHTML=groups.map(g=>{
     const isActive=g.matches(curView);
     if(g.standalone){
@@ -4045,7 +4072,7 @@ function renderNav(){
       const tBadgeHtml=t.badge?`<span id="sub-${t.badge}" style="display:none;position:absolute;top:50%;right:10px;transform:translateY(-50%);background:var(--red);color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:8px;align-items:center;justify-content:center;padding:0 3px;line-height:1"></span>`:'';
       return `<button class="nb nb-sub${tActive?' active':''}" onclick="${t.action}" style="position:relative">${t.label}${tBadgeHtml}</button>`;
     }).join('');
-    const showSub=isActive||manuallyExpanded.includes(g.id);
+    const showSub=manuallyExpanded.includes(g.id);
     return `<div class="nb-group">
       <div class="nb${isActive?' active':''}" id="nb-${g.id}" style="position:relative;padding:0 6px 0 0" title="${g.label}">
         <button onclick="${tabs[0].action}" style="flex:1;display:flex;align-items:center;gap:10px;background:none;border:none;padding:9px 6px 9px 12px;cursor:pointer;color:inherit;font:inherit;text-align:left;min-width:0">${g.icon}<span class="nb-label" style="flex:1;overflow:hidden;text-overflow:ellipsis">${g.label}</span>${badgeHtml}</button>
