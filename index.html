@@ -1731,6 +1731,7 @@ function buildSverkaTotalCells(label,t){
     incI:`<td style="text-align:right;padding:8px 10px;color:var(--purple);font-weight:700;white-space:nowrap">${fmtF(t.totIncI)}</td>`,
     expI:`<td style="text-align:right;padding:8px 10px;color:var(--purple);font-weight:700;white-space:nowrap">${fmtF(t.totExpI)}</td>`,
     start:`<td style="text-align:right;padding:8px 10px;color:var(--text2);font-weight:700;white-space:nowrap">${fmtF(t.totStart)}</td>`,
+    reserve:'<td></td>',
     end:`<td style="text-align:right;padding:8px 10px;font-weight:800;color:var(--teal);background:var(--teal-bg);white-space:nowrap">${fmtF(t.totEnd)}</td>`,
     delta:`<td style="text-align:right;padding:8px 10px;font-weight:700;color:${t.totDelta>0?'var(--green)':t.totDelta<0?'var(--red)':'var(--text3)'};white-space:nowrap">${t.totDelta?(t.totDelta>0?'+':'')+fmtF(t.totDelta):'—'}</td>`
   };
