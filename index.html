@@ -758,6 +758,12 @@ table.nit td.empty-cell{color:var(--text3);}
       <div id="cat-list"></div>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:8px">
         <input class="inp" style="flex:1" id="new-cat-name" placeholder="Новая категория">
+        <select class="inp" style="width:110px" id="new-cat-type">
+          <option value="both">↕ Оба</option>
+          <option value="income">↑ Приход</option>
+          <option value="expense">↓ Расход</option>
+          <option value="reserve">🪙 Резерв</option>
+        </select>
         <button class="btn btn-p btn-sm" onclick="addCategory()">+ Добавить</button>
       </div>
     </div>
@@ -2501,12 +2507,12 @@ function setFSubtype(type,dir){
   const typeInp=document.getElementById('f-type');
   if(typeInp)typeInp.value=type;
   document.querySelectorAll('#f-subtype-tags .sub-tag').forEach(b=>b.classList.toggle('active',b.dataset.v===type));
-  // Категория фильтруется по направлению (приход/расход); для резерва — не фильтруем,
-  // но по умолчанию подставляем категорию "Резерв" (её можно сменить вручную)
+  // Категория фильтруется по направлению (приход/расход/резерв);
+  // для резерва по умолчанию подставляем категорию "Резерв" (её можно сменить на подкатегорию)
   const catSel=document.getElementById('f-cat');
   if(catSel){
     const curCatVal=catSel.value;
-    if(dir==='reserve'){catSel.innerHTML=catOptions(curCatVal||'Резерв','');}
+    if(dir==='reserve'){catSel.innerHTML=catOptions(curCatVal||'Резерв','reserve');}
     else{catSel.innerHTML=catOptions(curCatVal,dir);}
   }
   // Поле "Куда"/"Откуда" — только для Внутри и Из/В др.банка
@@ -2776,11 +2782,13 @@ async function loadCategories(){
   catch(e){
     const c=cacheGet('categories');
     if(c){categories=c.data;setOfflineState(true,c.ts);}
-    else categories=[{name:'Еда'},{name:'Транспорт'},{name:'Медицина'},{name:'Подписка'},{name:'Аренда'},{name:'Развлечение'},{name:'Одежда'},{name:'Услуги банка'},{name:'Зарплата'},{name:'Кэшбэк'},{name:'Перевод'},{name:'Резерв'},{name:'Прочее'}];
+    else categories=[{name:'Еда',type:'both'},{name:'Транспорт',type:'both'},{name:'Медицина',type:'both'},{name:'Подписка',type:'both'},{name:'Аренда',type:'both'},{name:'Развлечение',type:'both'},{name:'Одежда',type:'both'},{name:'Услуги банка',type:'both'},{name:'Зарплата',type:'income'},{name:'Кэшбэк',type:'income'},{name:'Перевод',type:'both'},{name:'Резерв',type:'reserve'},{name:'Прочее',type:'both'}];
   }
 }
 function catOptions(selected='',filterType=''){
-  const list=filterType?categories.filter(c=>!c.type||c.type==='both'||c.type===filterType):categories;
+  const list=filterType==='reserve'
+    ?categories.filter(c=>c.type==='reserve')
+    :filterType?categories.filter(c=>!c.type||c.type==='both'||c.type===filterType):categories;
   return`<option value="">— выбрать —</option>`+list.map(c=>`<option${c.name===selected?' selected':''}>${c.name}</option>`).join('');
 }
 async function loadDeposits(){
@@ -3268,6 +3276,7 @@ async function renderSettings(){
         <option value="both"${(!c.type||c.type==='both')?' selected':''}>↕ Оба</option>
         <option value="income"${c.type==='income'?' selected':''}>↑ Приход</option>
         <option value="expense"${c.type==='expense'?' selected':''}>↓ Расход</option>
+        <option value="reserve"${c.type==='reserve'?' selected':''}>🪙 Резерв</option>
       </select>
       <button onclick="deleteCategory(${c.id},'${c.name}')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px;line-height:1;padding:0" title="Удалить">×</button>
     </div>`).join('')}</div>`
@@ -3333,7 +3342,8 @@ async function dropBank(e){
 async function addCategory(){
   const name=document.getElementById('new-cat-name').value.trim();
   if(!name){toast('Введите название');return;}
-  try{await q('INSERT INTO categories(name,sort_order,type) VALUES($1,$2,$3)',[name,categories.length+1,'both']);await loadCategories();renderSettings();document.getElementById('new-cat-name').value='';toast('✓ Категория добавлена');}
+  const type=document.getElementById('new-cat-type')?.value||'both';
+  try{await q('INSERT INTO categories(name,sort_order,type) VALUES($1,$2,$3)',[name,categories.length+1,type]);await loadCategories();renderSettings();document.getElementById('new-cat-name').value='';toast('✓ Категория добавлена');}
   catch(e){toast('Уже существует или ошибка');}
 }
 async function updateCategoryType(id,type){
