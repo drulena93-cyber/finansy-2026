@@ -1514,7 +1514,7 @@ async function renderJournal(){
     try{
       const bank=banks.find(bk=>bk.id===jrnBank);
       if(bank){
-        const [banksBals,banksBtots,reserveByBankOne]=await Promise.all([loadBalances(curMonth),loadBankTotals(curMonth),loadReserveByBank()]);
+        const [banksBals,banksBtots,reserveByBankOne]=await Promise.all([loadBalances(curMonth),loadBankTotals(curMonth),loadReserveByBank(curMonth)]);
         const aggOne={};aggOne[jrnBank]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
         monthRecs.filter(r=>r.bank_id===jrnBank).forEach(r=>{aggOne[jrnBank][r.type]+=parseFloat(r.amount)||0;});
         const tdNumB='style="text-align:right;padding:6px 10px;white-space:nowrap"';
@@ -1824,7 +1824,7 @@ async function renderSverka(){
     loadRecordsMonth(curMonth),
     loadBalances(curMonth),
     loadBankTotals(curMonth),
-    loadReserveByBank()
+    loadReserveByBank(curMonth)
   ]);
 
   const agg={};
@@ -1997,12 +1997,15 @@ async function saveSverka(bankId, field, val, journalVal, inp, chkId){
 }
 
 // ─── РЕЗЕРВ ПО БАНКАМ ───────────────────────────────────────────────
-// Резерв по банкам — считается нарастающим итогом по всем операциям с типом
-// reserve_out ("В резерв") / reserve_in ("Из резерва"), без привязки к месяцу.
-async function loadReserveByBank(){
+// Резерв по банкам — нарастающий итог по операциям reserve_out ("В резерв") /
+// reserve_in ("Из резерва") с начала года ДО указанного месяца включительно
+// (как и остальные суммы в Сверке — "Начало"/"Конец"). Без аргумента — весь период.
+async function loadReserveByBank(uptoMonth){
   const recs=await loadAllRecords();
+  const uptoIdx=uptoMonth?MONTHS.indexOf(uptoMonth):MONTHS.length-1;
   const out={};
   recs.forEach(r=>{
+    if(MONTHS.indexOf(r.month)>uptoIdx)return;
     if(r.type==='reserve_out')out[r.bank_id]=(out[r.bank_id]||0)+(parseFloat(r.amount)||0);
     else if(r.type==='reserve_in')out[r.bank_id]=(out[r.bank_id]||0)-(parseFloat(r.amount)||0);
   });
@@ -2083,7 +2086,7 @@ async function renderDash(){
   // Резерв — из операций Журнала (reserve_out/reserve_in), общей суммой
   let totalReserved=0;
   try{
-    const reserveByBank=await loadReserveByBank();
+    const reserveByBank=await loadReserveByBank(lastMonthWithData);
     totalReserved=Object.values(reserveByBank).reduce((s,v)=>s+v,0);
   }catch(e){}
   const totalFree=totalMoneyNoCredit-totalReserved;
