@@ -1,6 +1,6 @@
 // Версия кэша — при каждом заметном обновлении сайта увеличивай это число
 // (например, было v1, стало v2), чтобы у пользователей не залипала старая версия
-const CACHE_VERSION = 'finansy-cache-v52';
+const CACHE_VERSION = 'finansy-cache-v53';
 const APP_SHELL = ['/', '/index.html'];
  
 self.addEventListener('install', event => {
