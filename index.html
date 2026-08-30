@@ -445,7 +445,7 @@ table.nit td.empty-cell{color:var(--text3);}
           <div style="font-size:11px;font-weight:700;color:var(--money-card-text-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Всего с кредитными</div>
           <div id="dash-total-with-credit" style="font-family:Manrope,sans-serif;font-size:34px;font-weight:800;color:var(--money-card-text-dim);letter-spacing:-1px;flex-shrink:0">—</div>
         </div>
-        <div id="dash-breakdown" style="display:flex;gap:24px;flex-wrap:wrap;align-items:center;justify-content:flex-start"></div>
+        <div id="dash-breakdown" style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;justify-content:flex-start"></div>
       </div>
       <div id="dash-other-currencies" style="display:none">
         <div style="font-size:11px;font-weight:700;color:var(--money-card-text-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;padding-top:8px;border-top:1px solid var(--border)">Другие валюты</div>
@@ -527,6 +527,7 @@ table.nit td.empty-cell{color:var(--text3);}
           <div style="display:flex;gap:4px">
             <button type="button" class="dir-tag active" data-dir="income" onclick="setFDirection('income')">↑ Приход</button>
             <button type="button" class="dir-tag" data-dir="expense" onclick="setFDirection('expense')">↓ Расход</button>
+            <button type="button" class="dir-tag" data-dir="reserve" onclick="setFDirection('reserve')">🪙 Резерв</button>
           </div>
           <div id="f-subtype-tags" style="display:flex;gap:4px"></div>
         </div>
@@ -540,6 +541,8 @@ table.nit td.empty-cell{color:var(--text3);}
           <option value="expense">↓ Расход вне систем</option>
           <option value="expense_i">↓ Расход внутри</option>
           <option value="tr_out">↓ Расход в др.банк</option>
+          <option value="reserve_out">🪙 В резерв</option>
+          <option value="reserve_in">🪙 Из резерва</option>
         </select>
       </div>
       <input type="hidden" id="f-type" value="income">
@@ -580,8 +583,11 @@ table.nit td.empty-cell{color:var(--text3);}
           <option value="tr_out">↓ Списание в др.Б</option>
           <option value="expense_i">↓ Списание внутри</option>
           <option value="expense">↓ Расход вне систем</option>
+          <option value="reserve_out">🪙 В резерв</option>
+          <option value="reserve_in">🪙 Из резерва</option>
           <option value="__income_all">↑ Все приходы</option>
           <option value="__expense_all">↓ Все расходы</option>
+          <option value="__reserve_all">🪙 Все резервы</option>
         </select>
         <select class="inp w130" id="jf-sort" onchange="renderJournal()">
           <option value="date_desc">Дата ↓ (новые)</option>
@@ -657,31 +663,6 @@ table.nit td.empty-cell{color:var(--text3);}
     </div>
     <div id="sverka-checks" style="padding:12px 18px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--border);background:var(--surface2)"></div>
   </div>
-
-  <!-- ENVELOPES PANEL (видимость управляется настройкой "Резервы в Сверке") -->
-  <div class="panel" id="panel-envelopes" style="margin-top:14px;display:none">
-    <div class="panel-h">
-      <span>🪙 Конверты (резервы) <button onclick="showHelp('envelopes')" style="background:none;border:1.5px solid var(--border2);border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;cursor:pointer;color:var(--text3);padding:0;line-height:1;vertical-align:middle">?</button></span>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn btn-g btn-sm" onclick="toggleEnvelopeForm()">+ Добавить</button>
-        <button id="btn-env-toggle" onclick="toggleEnvelopePanel()" style="font-size:13px;font-weight:600;color:var(--accent);background:var(--accent-l);border:none;border-radius:6px;padding:4px 10px;cursor:pointer">Скрыть</button>
-      </div>
-    </div>
-    <div id="env-type-filter" style="display:flex;gap:6px;flex-wrap:wrap;padding:8px 18px;border-bottom:1px solid var(--border);background:var(--surface2)"></div>
-    <div id="env-panel-body">
-      <div id="envelope-form" style="display:none;padding:12px 18px;background:var(--surface2);border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;align-items:flex-end">
-        <div class="fg"><label>Название</label><input class="inp w150" id="env-name" placeholder="Отпуск, Подушка…"></div>
-        <div class="fg"><label>Тип</label><select class="inp w130" id="env-type"><option value="">— выбрать —</option><option>Отпуск</option><option>Подушка безопасности</option><option>Крупная покупка</option><option>Обучение</option><option>Здоровье</option><option>Прочее</option></select></div>
-        <div class="fg"><label>Банк</label><select class="inp w150" id="env-bank"></select></div>
-        <div class="fg"><label>Сумма</label><input type="number" class="inp w110" id="env-amount" placeholder="0"></div>
-        <div class="fg"><label>Дата</label><input type="date" class="inp w130" id="env-date"></div>
-        <button class="btn btn-p btn-sm" onclick="saveEnvelope()" style="margin-top:20px">Сохранить</button>
-        <button class="btn btn-g btn-sm" onclick="toggleEnvelopeForm()" style="margin-top:20px">Отмена</button>
-      </div>
-      <div id="envelope-list" style="padding:0 18px"></div>
-      <div id="envelope-totals" style="padding:10px 18px;background:var(--surface2);border-top:1px solid var(--border);font-size:15px;display:flex;gap:20px;flex-wrap:wrap"></div>
-    </div>
-  </div>
 </div>
 
 <!-- BROKER SUMMARY -->
@@ -738,11 +719,6 @@ table.nit td.empty-cell{color:var(--text3);}
   <div class="section-div">Внешний вид и функции</div>
   <div class="panel" style="margin-bottom:20px">
     <div class="panel-b" style="padding:14px 18px;display:flex;flex-direction:column;gap:16px">
-      <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
-        <input type="checkbox" id="setting-reserves-toggle" onchange="setSverkaReservesEnabled(this.checked)">
-        <span style="font-size:15px;font-weight:500">Показывать «Резервы» в Сверке месяца</span>
-      </label>
-      <div style="height:1px;background:var(--border)"></div>
       <div>
         <div style="font-size:15px;font-weight:500;margin-bottom:8px">Вид формы «+ Новая операция»</div>
         <div style="display:flex;gap:8px">
@@ -904,7 +880,7 @@ function scopedBanks(){
   return journalScope==='broker'?banks.filter(b=>b.type==='broker'):banks.filter(b=>b.type!=='broker');
 }
 // ─── ЖУРНАЛ: КОЛОНКИ (порядок/переименование — управляются данными) ────
-const JRN_COL_IDS=['date','bank','category','description','begin','income','expense','incomeI','expenseI','trIn','trOut','end','delta'];
+const JRN_COL_IDS=['date','bank','category','description','begin','income','expense','incomeI','expenseI','trIn','trOut','reserve','end','delta'];
 function jrnDefaultLabel(id){
   const broker=journalScope==='broker';
   const map={
@@ -913,7 +889,7 @@ function jrnDefaultLabel(id){
     expense:broker?'−Комиссии/налог':'−Вне систем',
     incomeI:broker?'+Пополнение':'+Внутри',
     expenseI:broker?'−Вывод':'−Внутри',
-    trIn:'+Из др.Б',trOut:'−В др.Б',end:'Конец',delta:'Δ'
+    trIn:'+Из др.Б',trOut:'−В др.Б',reserve:'🪙 Резерв',end:'Конец',delta:'Δ'
   };
   return map[id];
 }
@@ -973,6 +949,7 @@ function buildJrnTotalRowHTML(order){
     expenseI:'<td class="pc num" id="tots-expense-i">—</td>',
     trIn:'<td class="ac num" id="tots-tr-in">—</td>',
     trOut:'<td class="ac num" id="tots-tr-out">—</td>',
+    reserve:'<td class="num" id="tots-reserve" style="color:var(--purple)">—</td>',
     end:'<td class="col-end"></td>',
     delta:'<td class="col-delta"></td>'
   };
@@ -1045,6 +1022,15 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.cla
 
 // ─── ЖУРНАЛ ИЗМЕНЕНИЙ (заполняется вручную при каждой правке) ─────
 const CHANGELOG=[
+  {id:32,date:'30.08.2026',title:'Резерв — теперь через тип операции, а не конверты',items:[
+    'Новый тип операции «🪙 В резерв» / «🪙 Из резерва» — деньги остаются на том же счету, но откладываются отдельно от «свободных»',
+    'Столбец «Резерв» в Журнале операций — показывает сумму каждой резервной операции, итог за месяц — в строке «Итого»',
+    'Столбец «Резерв» в Сверке месяца теперь считается из операций Журнала (нарастающим итогом по каждому банку), а не из отдельной таблицы конвертов',
+    'Панель «Конверты (резервы)» под Сверкой убрана — конверты заменены операциями с категорией «Резерв»',
+    'Блок «Резервы» в карточке «Всего моих денег» на Аналитике — теперь разбивка по банкам вместо списка названий конвертов',
+    'Почина: карточка «Всего моих денег» на Аналитике — колонки съезжали по вертикали, когда блок «Резервы» становился выше остальных',
+    'Починка: столбцы в Сверке месяца иногда съезжали при переходе на вкладку без перезагрузки страницы — теперь ширина считается надёжнее'
+  ]},
   {id:9,date:'20.08.2026',title:'Столбцы, фильтры и история изменений',items:[
     'Ширина столбцов в Журнале и Сверке теперь запоминается — не сбрасывается при обновлении страницы',
     'Итоги в Сверке месяца теперь показываются сразу под каждой валютой (а не одним блоком внизу), «без операций» тоже разведены по валютам',
@@ -1262,6 +1248,13 @@ function setJrnCurrFilter(c){
 // ─── РАСТЯГИВАНИЕ СТОЛБЦОВ ТАБЛИЦ (как в Excel) ────────────────────
 function makeColumnsResizable(tableEl){
   if(!tableEl)return;
+  // Ждём, пока браузер закончит раскладку (актуально при переходе между вкладками без
+  // перезагрузки страницы — в момент вызова таблица иногда ещё не имеет финальных размеров,
+  // из-за чего offsetWidth столбцов считывается неверно и потом "замораживается")
+  requestAnimationFrame(()=>requestAnimationFrame(()=>applyColumnWidths(tableEl)));
+}
+function applyColumnWidths(tableEl){
+  if(!tableEl||!tableEl.isConnected)return;
   const tableId=tableEl.id||'tbl';
   const ths=tableEl.querySelectorAll('thead th');
   const savedWidths=JSON.parse(localStorage.getItem('colwidths_'+tableId)||'{}');
@@ -1394,8 +1387,9 @@ async function renderJournal(){
     bankChron.forEach(r=>{
       const amt=parseFloat(r.amount)||0;
       const isIncome=['income','income_i','tr_in'].includes(r.type);
+      const isReserve=RESERVE_TYPES.includes(r.type);
       const begin=running;
-      const end=isIncome?running+amt:running-amt;
+      const end=isReserve?running:(isIncome?running+amt:running-amt);
       balanceMap[r.id]={begin,end};
       running=end;
     });
@@ -1408,6 +1402,7 @@ async function renderJournal(){
   // Type filter
   if(ft==='__income_all')recs=recs.filter(r=>['income','income_i','tr_in'].includes(r.type));
   else if(ft==='__expense_all')recs=recs.filter(r=>['expense','expense_i','tr_out'].includes(r.type));
+  else if(ft==='__reserve_all')recs=recs.filter(r=>RESERVE_TYPES.includes(r.type));
   else if(ft)recs=recs.filter(r=>r.type===ft);
   // Text search
   if(search)recs=recs.filter(r=>(r.description||'').toLowerCase().includes(search)||(r.category||'').toLowerCase().includes(search));
@@ -1430,7 +1425,7 @@ async function renderJournal(){
     empty.style.display='none';
     tbody.innerHTML=recs.map(r=>{
       const b=bank(r.bank_id);const amt=parseFloat(r.amount)||0;
-      const cols={income:'',income_i:'',tr_in:'',tr_out:'',expense_i:'',expense:''};
+      const cols={income:'',income_i:'',tr_in:'',tr_out:'',expense_i:'',expense:'',reserve_out:'',reserve_in:''};
       cols[r.type]=fmt(amt);
       const dateStr=r.op_date?r.op_date.split('-').reverse().join('.'):'—';
       const isoDate=r.op_date||'';
@@ -1455,6 +1450,8 @@ async function renderJournal(){
                 <option value="expense_i"${r.type==='expense_i'?' selected':''}>↓ Расход внутри</option>
                 <option value="tr_in"${r.type==='tr_in'?' selected':''}>↑ Приход из др. банка</option>
                 <option value="tr_out"${r.type==='tr_out'?' selected':''}>↓ Списание в др. банк</option>
+                <option value="reserve_out"${r.type==='reserve_out'?' selected':''}>🪙 В резерв</option>
+                <option value="reserve_in"${r.type==='reserve_in'?' selected':''}>🪙 Из резерва</option>
               </select>
               <input type="number" value="${amt}" style="border:1px solid var(--border2);border-radius:4px;padding:2px 6px;font-size:14px;font-family:inherit;background:var(--surface);width:80px;text-align:right" onblur="updateRecordAmount(${r.id},'${r.type}',this.value)">
             </div>
@@ -1479,6 +1476,7 @@ async function renderJournal(){
           expenseI:`<td class="num pc">${cols.expense_i}</td>`,
           trIn:`<td class="num ac">${cols.tr_in}</td>`,
           trOut:`<td class="num ac">${cols.tr_out}</td>`,
+          reserve:`<td class="num" style="color:var(--purple);font-weight:600">${r.type==='reserve_out'?'+'+cols.reserve_out:r.type==='reserve_in'?'−'+cols.reserve_in:''}</td>`,
           end:`<td class="num col-end" style="color:var(--text2);font-weight:600;font-variant-numeric:tabular-nums">${endVal!==null?fmtF(endVal):'—'}</td>`,
           delta:`<td class="num col-delta" style="color:${deltaVal!==null?(deltaVal>=0?'var(--green)':'var(--red)'):'var(--text3)'};font-variant-numeric:tabular-nums">${deltaVal!==null?fmtF(deltaVal):'—'}</td>`
         };
@@ -1497,8 +1495,8 @@ async function renderJournal(){
   }
 
   // Update sticky totals row
-  const tots={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
-  recs.forEach(r=>tots[r.type]+=parseFloat(r.amount)||0);
+  const tots={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0,reserve_out:0,reserve_in:0};
+  recs.forEach(r=>{if(tots[r.type]!==undefined)tots[r.type]+=parseFloat(r.amount)||0;});
   document.getElementById('tots-count').textContent=recs.length+' зап.';
   document.getElementById('tots-income').textContent=tots.income?fmtF(tots.income):'—';
   document.getElementById('tots-income-i').textContent=tots.income_i?fmtF(tots.income_i):'—';
@@ -1506,6 +1504,9 @@ async function renderJournal(){
   document.getElementById('tots-tr-out').textContent=tots.tr_out?fmtF(tots.tr_out):'—';
   document.getElementById('tots-expense-i').textContent=tots.expense_i?fmtF(tots.expense_i):'—';
   document.getElementById('tots-expense').textContent=tots.expense?fmtF(tots.expense):'—';
+  const totsReserveNet=tots.reserve_out-tots.reserve_in;
+  const totsReserveEl=document.getElementById('tots-reserve');
+  if(totsReserveEl)totsReserveEl.textContent=totsReserveNet?(totsReserveNet>0?'+':'')+fmtF(totsReserveNet):'—';
 
   // Если выбран конкретный банк — дублируем его строку сверки прямо под журналом для удобной сверки
   const bankSverkaEl=document.getElementById('jrn-bank-sverka');
@@ -1513,7 +1514,7 @@ async function renderJournal(){
     try{
       const bank=banks.find(bk=>bk.id===jrnBank);
       if(bank){
-        const [banksBals,banksBtots]=await Promise.all([loadBalances(curMonth),loadBankTotals(curMonth)]);
+        const [banksBals,banksBtots,reserveByBankOne]=await Promise.all([loadBalances(curMonth),loadBankTotals(curMonth),loadReserveByBank()]);
         const aggOne={};aggOne[jrnBank]={income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
         monthRecs.filter(r=>r.bank_id===jrnBank).forEach(r=>{aggOne[jrnBank][r.type]+=parseFloat(r.amount)||0;});
         const tdNumB='style="text-align:right;padding:6px 10px;white-space:nowrap"';
@@ -1524,7 +1525,7 @@ async function renderJournal(){
           <div class="tbl-wrap">
             <table class="svt" id="jrn-bank-sverka-table">
               <thead><tr id="jrn-bank-sverka-head-row"></tr></thead>
-              <tbody>${renderSverkaRowHTML(bank,aggOne,banksBals,banksBtots,tdNumB,tdInpB)}</tbody>
+              <tbody>${renderSverkaRowHTML(bank,aggOne,banksBals,banksBtots,tdNumB,tdInpB,false,null,reserveByBankOne)}</tbody>
             </table>
           </div>
         </div>`;
@@ -1582,18 +1583,6 @@ const SVERKA_COL_ORDER_DEFAULT=['bank','incTotal','incSlip','incChk','expTotal',
 const SVERKA_COL_CLASS={incTotal:'gh',incSlip:'gh',incChk:'gh',expTotal:'rh',expSlip:'rh',expChk:'rh',incOut:'gh',expOut:'rh',trIn:'bh',trOut:'bh',incI:'bh',expI:'bh'};
 const SVERKA_HIDEABLE=['incTotal','incSlip','incChk','expTotal','expSlip','expChk','reserve'];
 
-// Резервы в Сверке — отдельный переключатель (у каждого пользователя свой)
-function getSverkaReservesEnabled(){
-  const dbVal=appSettings['sverka_show_reserves'];
-  const raw=dbVal!==undefined?dbVal:localStorage.getItem('sverka_show_reserves');
-  return raw==='true';
-}
-async function setSverkaReservesEnabled(val){
-  localStorage.setItem('sverka_show_reserves',val?'true':'false');
-  await saveAppSetting('sverka_show_reserves',val?'true':'false');
-  renderSverka();
-}
-
 function getSverkaColOrder(){
   const saved=JSON.parse(localStorage.getItem('sverka_col_order')||'null');
   if(saved&&Array.isArray(saved)&&saved.length===SVERKA_COL_ORDER_DEFAULT.length&&SVERKA_COL_ORDER_DEFAULT.every(id=>saved.includes(id)))return saved;
@@ -1606,10 +1595,7 @@ function getSverkaColLabels(){
   try{return JSON.parse(localStorage.getItem('sverka_col_labels')||'{}');}catch(e){return{};}
 }
 function getSverkaHiddenCols(){
-  const manual=JSON.parse(localStorage.getItem('sverka_hidden_cols')||'[]');
-  // Столбец "Резерв" скрыт всегда, пока не включена соответствующая настройка
-  if(!getSverkaReservesEnabled()&&!manual.includes('reserve'))return[...manual,'reserve'];
-  return manual;
+  return JSON.parse(localStorage.getItem('sverka_hidden_cols')||'[]');
 }
 
 async function resetSverkaColumns(){
@@ -1718,8 +1704,8 @@ function renderSverkaHeaderInto(rowId){
   renderSverkaHeader(rowId,'jrn-bank-sverka-table');
 }
 
-function buildSverkaRowCells(b,agg,bals,btots,tdNum,tdInp,inactive,envByBank){
-  envByBank=envByBank||{};
+function buildSverkaRowCells(b,agg,bals,btots,tdNum,tdInp,inactive,reserveByBank){
+  reserveByBank=reserveByBank||{};
   const a=agg[b.id];
   const bal=bals[b.id]||{start:0,end:0};
   const bt=btots[b.id]||{income:0,expense:0};
@@ -1779,13 +1765,13 @@ function buildSverkaRowCells(b,agg,bals,btots,tdNum,tdInp,inactive,envByBank){
             onchange="saveStartBalance('${b.id}',this.value,this)">`
         :`<span style="display:block;text-align:right;padding:0 6px;font-size:var(--tbl-font);font-weight:700;color:${bal.start?'var(--text2)':'var(--text3)'};font-variant-numeric:tabular-nums">${bal.start?fmtF(bal.start):'—'}</span>`}
     </td>`,
-    reserve:`<td onclick="go('sverka');document.getElementById('panel-envelopes')?.scrollIntoView({behavior:'smooth'})" style="cursor:pointer;text-align:right;padding:6px 10px;color:var(--purple);font-weight:600" title="Зарезервировано на этом счёте — перейти к конвертам">${envByBank[b.id]?fmtF(envByBank[b.id]):'—'}</td>`,
+    reserve:`<td onclick="goToBankType('${b.id}','__reserve_all')" style="cursor:pointer;text-align:right;padding:6px 10px;color:var(--purple);font-weight:600" title="Зарезервировано на этом счёте — перейти к операциям резерва в Журнале">${reserveByBank[b.id]?fmtF(reserveByBank[b.id]):'—'}</td>`,
     end:`<td style="text-align:right;padding:6px 10px;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:800;color:var(--teal);background:var(--teal-bg)">${fmtF(autoEnd)}</td>`,
     delta:`<td style="text-align:right;padding:6px 10px;font-variant-numeric:tabular-nums;white-space:nowrap;color:${delta>0?'var(--green)':delta<0?'var(--red)':'var(--text3)'}">${delta?(delta>0?'+':'')+fmtF(delta):'—'}</td>`
   };
 }
-function renderSverkaRowHTML(b,agg,bals,btots,tdNum,tdInp,inactive,extraTrAttrs,envByBank){
-  const cells=buildSverkaRowCells(b,agg,bals,btots,tdNum,tdInp,inactive,envByBank);
+function renderSverkaRowHTML(b,agg,bals,btots,tdNum,tdInp,inactive,extraTrAttrs,reserveByBank){
+  const cells=buildSverkaRowCells(b,agg,bals,btots,tdNum,tdInp,inactive,reserveByBank);
   const order=getSverkaColOrder();
   const hidden=getSverkaHiddenCols();
   return `<tr${extraTrAttrs?(' '+extraTrAttrs):''}>${order.filter(id=>!hidden.includes(id)).map(id=>cells[id]).join('')}</tr>`;
@@ -1834,11 +1820,11 @@ function setSverkaTypeFilter(type){
 }
 async function renderSverka(){
   document.getElementById('sverka-m-lbl').textContent=curMonth;
-  const reservesOn=getSverkaReservesEnabled();
-  const [recs,bals,btots]=await Promise.all([
+  const [recs,bals,btots,reserveByBank]=await Promise.all([
     loadRecordsMonth(curMonth),
     loadBalances(curMonth),
-    loadBankTotals(curMonth)
+    loadBankTotals(curMonth),
+    loadReserveByBank()
   ]);
 
   const agg={};
@@ -1881,21 +1867,6 @@ async function renderSverka(){
     ).join('');
   } else {
     currFilterEl.style.display='none';
-  }
-
-  // Envelope amounts by bank — load separately, don't block if fails
-  let envByBank={};
-  let envsByBank={};
-  let envsLoaded=[];
-  if(reservesOn){
-    try{
-      envsLoaded=await loadEnvelopes();
-      envsLoaded.forEach(e=>{
-        envByBank[e.bank_id]=(envByBank[e.bank_id]||0)+parseFloat(e.amount)||0;
-        if(!envsByBank[e.bank_id])envsByBank[e.bank_id]=[];
-        envsByBank[e.bank_id].push(e);
-      });
-    }catch(e){console.warn('envelopes not available',e);}
   }
 
   let totTrIn=0,totTrOut=0,totIncI=0,totExpI=0;
@@ -1950,12 +1921,12 @@ async function renderSverka(){
       bodyHtml+=`<tr><td colspan="16" style="padding:4px 14px;background:var(--accent-l);font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em">${CURRENCY[curr]||curr} ${CURRENCY_NAME[curr]||curr}</td></tr>`;
     }
     withOpsThisCurr.forEach(b=>{
-      bodyHtml+=renderSverkaRowHTML(b,agg,bals,btots,tdNum,tdInp,false,null,envByBank);
+      bodyHtml+=renderSverkaRowHTML(b,agg,bals,btots,tdNum,tdInp,false,null,reserveByBank);
     });
     if(noOpsThisCurr.length){
       bodyHtml+=`<tr><td colspan="16" style="padding:5px 14px;background:var(--surface2);border-top:2px solid var(--border2)"><span style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Без операций в этом месяце</span><button onclick="toggleNoOpsRows()" style="font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-l);border:1px solid var(--border);border-radius:6px;padding:3px 10px;cursor:pointer;white-space:nowrap;text-transform:none;letter-spacing:normal">${noOpsHidden?'Показать':'Скрыть'}</button></span></td></tr>`;
       noOpsThisCurr.forEach(b=>{
-        bodyHtml+=renderSverkaRowHTML(b,agg,bals,btots,tdNum,tdInp,true,`class="no-ops-row" style="${noOpsHidden?'display:none;':''}opacity:0.5;background:#fafafa"`,envByBank);
+        bodyHtml+=renderSverkaRowHTML(b,agg,bals,btots,tdNum,tdInp,true,`class="no-ops-row" style="${noOpsHidden?'display:none;':''}opacity:0.5;background:#fafafa"`,reserveByBank);
       });
     }
     const t=totalsByCurr[curr];
@@ -1965,11 +1936,6 @@ async function renderSverka(){
     }
   });
   document.getElementById('sverka-body').innerHTML=bodyHtml;
-
-  // Render envelopes panel
-  const envPanelEl=document.getElementById('panel-envelopes');
-  if(envPanelEl)envPanelEl.style.display=reservesOn?'block':'none';
-  renderEnvelopes(envsLoaded,bals,agg,active);
 
   document.getElementById('sverka-checks').innerHTML=`
     <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-sm);background:${trOk?'var(--green-bg)':'var(--red-bg)'};border:1px solid ${trOk?'var(--green-b)':'var(--red-b)'}">
@@ -2029,149 +1995,17 @@ async function saveSverka(bankId, field, val, journalVal, inp, chkId){
   }catch(e){toast('Ошибка сохранения');}
 }
 
-// ─── ENVELOPES ────────────────────────────────────────────────────
-async function loadEnvelopes(){
-  try{return await q('SELECT * FROM envelopes ORDER BY id');}catch(e){return[];}
-}
-
-function setEnvTypeFilter(type){
-  localStorage.setItem('env_type_filter',type);
-  renderSverka();
-}
-
-function toggleEnvelopePanel(){
-  const body=document.getElementById('env-panel-body');
-  const btn=document.getElementById('btn-env-toggle');
-  if(!body||!btn)return;
-  const hidden=body.style.display==='none';
-  body.style.display=hidden?'':'none';
-  btn.textContent=hidden?'Скрыть':'Показать';
-  localStorage.setItem('env_hidden',hidden?'0':'1');
-}
-
-function toggleEnvelopeForm(){
-  const f=document.getElementById('envelope-form');
-  const isHidden=f.style.display==='none'||f.style.display==='';
-  f.style.display=isHidden?'flex':'none';
-  if(isHidden){
-    document.getElementById('env-bank').innerHTML=banks.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
-    document.getElementById('env-name').focus();
-  }
-}
-
-async function saveEnvelope(){
-  const name=document.getElementById('env-name').value.trim();
-  const bankId=document.getElementById('env-bank').value;
-  const amount=parseFloat(document.getElementById('env-amount').value)||0;
-  const date=document.getElementById('env-date').value;
-  if(!name){toast('Введите название');return;}
-  if(!amount){toast('Введите сумму');return;}
-  const envType=document.getElementById('env-type')?.value||'';
-  try{
-    await q('INSERT INTO envelopes(name,bank_id,amount,op_date,env_type) VALUES($1,$2,$3,$4,$5)',[name,bankId,amount,date||null,envType||null]);
-    document.getElementById('env-name').value='';
-    document.getElementById('env-amount').value='';
-    document.getElementById('env-date').value='';
-    if(document.getElementById('env-type'))document.getElementById('env-type').value='';
-    toggleEnvelopeForm();
-    toast('✓ Конверт добавлен');
-    renderSverka();
-  }catch(e){toast('Ошибка: '+e.message);}
-}
-
-async function deleteEnvelope(id){
-  if(!confirm('Удалить конверт?'))return;
-  try{await q('DELETE FROM envelopes WHERE id=$1',[id]);toast('Удалено');renderSverka();}
-  catch(e){toast('Ошибка');}
-}
-
-async function updateEnvelopeType(id,val){
-  try{await q('UPDATE envelopes SET env_type=$1 WHERE id=$2',[val||null,id]);}
-  catch(e){toast('Ошибка');}
-}
-
-async function moveEnvelope(id,newBankId){
-  try{await q('UPDATE envelopes SET bank_id=$1 WHERE id=$2',[newBankId,id]);toast('✓ Конверт перемещён');renderSverka();}
-  catch(e){toast('Ошибка');}
-}
-
-async function updateEnvelopeAmount(id,val){
-  const amount=parseFloat(val)||0;
-  if(!amount){toast('Введите сумму');return;}
-  try{await q('UPDATE envelopes SET amount=$1 WHERE id=$2',[amount,id]);toast('✓ Сумма обновлена');renderSverka();}
-  catch(e){toast('Ошибка');}
-}
-
-function renderEnvelopes(envs,bals,agg,active){
-  const list=document.getElementById('envelope-list');
-  const totalsEl=document.getElementById('envelope-totals');
-  if(!list||!totalsEl)return;
-  // Фильтр по типу
-  const allTypes=[...new Set(envs.map(e=>e.env_type||'').filter(t=>t))];
-  const activeEnvType=localStorage.getItem('env_type_filter')||'';
-  const filterEl=document.getElementById('env-type-filter');
-  if(filterEl&&allTypes.length){
-    filterEl.style.display='flex';
-    filterEl.innerHTML=[{v:'',l:'Все'},...allTypes.map(t=>({v:t,l:t}))].map(({v,l})=>`<button onclick="setEnvTypeFilter('${v}')" style="padding:3px 10px;border-radius:20px;border:1.5px solid ${activeEnvType===v?'var(--purple)':'var(--border)'};background:${activeEnvType===v?'var(--purple)':'var(--surface)'};color:${activeEnvType===v?'#fff':'var(--text2)'};font-size:13px;font-weight:600;cursor:pointer">${l}</button>`).join('');
-  } else if(filterEl){filterEl.style.display='none';}
-  const filteredEnvs=activeEnvType?envs.filter(e=>(e.env_type||'')===activeEnvType):envs;
-
-  if(!envs.length){
-    list.innerHTML='<div class="empty" style="padding:16px">Конвертов нет — добавь операцию с категорией «Резерв»</div>';
-    totalsEl.innerHTML='';
-    return;
-  }
-
-  list.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:15px;">
-    <thead><tr>
-      <th style="text-align:left;padding:8px 12px;font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Конверт</th>
-      <th style="text-align:left;padding:8px 12px;font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Тип</th>
-      <th style="text-align:left;padding:8px 12px;font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Дата</th>
-      <th style="text-align:left;padding:8px 12px;font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Банк</th>
-      <th style="text-align:right;padding:8px 12px;font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface2)">Сумма</th>
-      <th style="padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surface2)"></th>
-    </tr></thead>
-    <tbody>${filteredEnvs.map(e=>{
-      const dateStr=e.op_date?e.op_date.split('T')[0].split('-').reverse().join('.'):'—';
-      return`<tr style="border-bottom:1px solid var(--border)">
-        <td style="padding:8px 12px;font-weight:600">
-          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--purple);margin-right:8px;vertical-align:middle"></span>${e.name}
-        </td>
-        <td style="padding:6px 8px">
-          <select onchange="updateEnvelopeType(${e.id},this.value)" style="border:1px solid var(--border2);border-radius:4px;padding:3px 6px;font-size:14px;font-family:inherit;background:var(--surface)">
-            <option value="">—</option>
-            ${['Отпуск','Подушка безопасности','Крупная покупка','Обучение','Здоровье','Прочее'].map(t=>`<option value="${t}"${(e.env_type||'')===t?' selected':''}>${t}</option>`).join('')}
-          </select>
-        </td>
-        <td style="padding:8px 12px;color:var(--text2);font-size:14px">${dateStr}</td>
-        <td style="padding:6px 8px">
-          <select onchange="moveEnvelope(${e.id},this.value)" style="border:1px solid var(--border2);border-radius:4px;padding:4px 8px;font-size:14px;font-family:inherit;background:var(--surface)">
-            ${banks.map(b2=>`<option value="${b2.id}"${b2.id===e.bank_id?' selected':''}>${b2.name}</option>`).join('')}
-          </select>
-        </td>
-        <td style="padding:8px 12px;text-align:right;font-weight:700;color:var(--purple);font-size:15px;font-family:Manrope,sans-serif">${fmtF(parseFloat(e.amount))}</td>
-        <td style="padding:6px 8px;text-align:center">
-          <button class="del-btn" onclick="deleteEnvelope(${e.id})" title="Удалить конверт">×</button>
-        </td>
-      </tr>`;
-    }).join('')}</tbody>
-  </table>`;
-
-  const totalReserved=envs.reduce((s,e)=>s+parseFloat(e.amount)||0,0);
-  const totalEnd=active.reduce((s,b)=>{
-    const a=agg[b.id]||{income:0,income_i:0,tr_in:0,tr_out:0,expense_i:0,expense:0};
-    const bal=bals[b.id]||{start:0};
-    const sumInc=a.income+a.income_i+a.tr_in;
-    const sumExp=a.tr_out+a.expense_i+a.expense;
-    return s+(bal.start||0)+sumInc-sumExp;
-  },0);
-
-  totalsEl.innerHTML=`
-    <div style="display:flex;gap:6px;align-items:center"><span style="font-size:14px;color:var(--text3)">Всего:</span><span style="font-weight:700;font-family:Manrope,sans-serif">${fmtF(totalEnd)}</span></div>
-    <div style="color:var(--text3)">−</div>
-    <div style="display:flex;gap:6px;align-items:center"><span style="font-size:14px;color:var(--text3)">Зарезервировано:</span><span style="font-weight:700;color:var(--purple);font-family:Manrope,sans-serif">${fmtF(totalReserved)}</span></div>
-    <div style="color:var(--text3)">=</div>
-    <div style="display:flex;gap:6px;align-items:center"><span style="font-size:14px;color:var(--text3)">Свободно:</span><span style="font-weight:800;color:var(--green);font-family:Manrope,sans-serif;font-size:16px">${fmtF(totalEnd-totalReserved)}</span></div>`;
+// ─── РЕЗЕРВ ПО БАНКАМ ───────────────────────────────────────────────
+// Резерв по банкам — считается нарастающим итогом по всем операциям с типом
+// reserve_out ("В резерв") / reserve_in ("Из резерва"), без привязки к месяцу.
+async function loadReserveByBank(){
+  const recs=await loadAllRecords();
+  const out={};
+  recs.forEach(r=>{
+    if(r.type==='reserve_out')out[r.bank_id]=(out[r.bank_id]||0)+(parseFloat(r.amount)||0);
+    else if(r.type==='reserve_in')out[r.bank_id]=(out[r.bank_id]||0)-(parseFloat(r.amount)||0);
+  });
+  return out;
 }
 
 // ─── DASHBOARD ──────────────────────────────────────────────────
@@ -2245,16 +2079,13 @@ async function renderDash(){
   const totalDeposit=totalDepositAcc;
   const totalMoneyNoCredit=totalDebitCards+totalSavings+totalDeposit+totalCash; // "Всего моих денег" — без учёта кредитных
 
-  // Load envelopes for reserve display
+  // Резерв — из операций Журнала (reserve_out/reserve_in), разбивка по банкам
   let totalReserved=0;
-  let envDetails=[];
+  let reserveDetails=[];
   try{
-    const envs=await loadEnvelopes();
-    totalReserved=envs.reduce((s,e)=>s+parseFloat(e.amount)||0,0);
-    // Group by name for display
-    const byName={};
-    envs.forEach(e=>{byName[e.name]=(byName[e.name]||0)+parseFloat(e.amount)||0;});
-    envDetails=Object.entries(byName);
+    const reserveByBank=await loadReserveByBank();
+    totalReserved=Object.values(reserveByBank).reduce((s,v)=>s+v,0);
+    reserveDetails=Object.entries(reserveByBank).filter(([,v])=>v).map(([bId,v])=>[bank(bId).name,v]);
   }catch(e){}
   const totalFree=totalMoneyNoCredit-totalReserved;
 
@@ -2277,7 +2108,7 @@ async function renderDash(){
     <div style="display:flex;flex-direction:column;gap:4px">
       <span style="font-size:12px;color:#c4b5fd;font-weight:700;text-transform:uppercase">🪙 Резервы</span>
       <span style="font-size:16px;font-weight:700;color:#c4b5fd;font-family:Manrope,sans-serif">−${fmtF(totalReserved)}</span>
-      ${envDetails.map(([n,v])=>`<span style="font-size:12px;color:var(--money-card-text-dim)">${n}: ${fmtF(v)}</span>`).join('')}
+      ${reserveDetails.map(([n,v])=>`<span style="font-size:12px;color:var(--money-card-text-dim)">${n}: ${fmtF(v)}</span>`).join('')}
     </div>
     <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
     <div style="display:flex;flex-direction:column;gap:2px">
@@ -2608,8 +2439,10 @@ function setSortJrn(col){
 // ─── ФОРМА ОПЕРАЦИИ: ПРИХОД/РАСХОД + ПОДТИП + ЗЕРКАЛИРОВАНИЕ ───────
 const SUBTYPES={
   income:[{v:'income',l:'Вне систем'},{v:'income_i',l:'Внутри'},{v:'tr_in',l:'Из др.банка'}],
-  expense:[{v:'expense',l:'Вне систем'},{v:'expense_i',l:'Внутри'},{v:'tr_out',l:'В др.банк'}]
+  expense:[{v:'expense',l:'Вне систем'},{v:'expense_i',l:'Внутри'},{v:'tr_out',l:'В др.банк'}],
+  reserve:[{v:'reserve_out',l:'В резерв'},{v:'reserve_in',l:'Из резерва'}]
 };
+const RESERVE_TYPES=['reserve_out','reserve_in'];
 const MIRROR_TYPE={income_i:'expense_i',expense_i:'income_i',tr_in:'tr_out',tr_out:'tr_in'};
 
 function setFDirection(dir){
@@ -2623,7 +2456,7 @@ function renderFSubtypes(dir){
   container.innerHTML=SUBTYPES[dir].map(s=>`<button type="button" class="sub-tag" data-v="${s.v}" onclick="setFSubtype('${s.v}','${dir}')">${s.l}</button>`).join('');
 }
 function setFTypeCompact(type){
-  const dir=(type==='income'||type==='income_i'||type==='tr_in')?'income':'expense';
+  const dir=RESERVE_TYPES.includes(type)?'reserve':(type==='income'||type==='income_i'||type==='tr_in')?'income':'expense';
   setFSubtype(type,dir);
 }
 async function setFormViewModeUI(mode){
@@ -2667,9 +2500,14 @@ function setFSubtype(type,dir){
   const typeInp=document.getElementById('f-type');
   if(typeInp)typeInp.value=type;
   document.querySelectorAll('#f-subtype-tags .sub-tag').forEach(b=>b.classList.toggle('active',b.dataset.v===type));
-  // Категория фильтруется по направлению (приход/расход)
+  // Категория фильтруется по направлению (приход/расход); для резерва — не фильтруем,
+  // но по умолчанию подставляем категорию "Резерв" (её можно сменить вручную)
   const catSel=document.getElementById('f-cat');
-  if(catSel){const curCatVal=catSel.value;catSel.innerHTML=catOptions(curCatVal,dir);}
+  if(catSel){
+    const curCatVal=catSel.value;
+    if(dir==='reserve'){catSel.innerHTML=catOptions(curCatVal||'Резерв','');}
+    else{catSel.innerHTML=catOptions(curCatVal,dir);}
+  }
   // Поле "Куда"/"Откуда" — только для Внутри и Из/В др.банка
   const mirrorWrap=document.getElementById('f-mirror-wrap');
   const mirrorLabel=document.getElementById('f-mirror-label');
@@ -2739,7 +2577,7 @@ async function addRecord(){
   const bankId=document.getElementById('f-bank').value;
   const type=document.getElementById('f-type').value;
   const amount=parseFloat(document.getElementById('f-amount').value);
-  const cat=document.getElementById('f-cat').value;
+  const cat=document.getElementById('f-cat').value||(RESERVE_TYPES.includes(type)?'Резерв':'');
   const desc=document.getElementById('f-desc').value.trim();
   const date=document.getElementById('f-date').value;
   if(!bankId){toast('Выберите счёт');return;}
@@ -2882,21 +2720,6 @@ async function applyMassCategory(){
     toast(`✓ Категория "${cat}" применена к ${ids.length} записям`);cancelMassEdit();renderJournal();
   }catch(e){toast('Ошибка: '+e.message);}
 }
-async function toggleEnvelopeRecord(recordId, name, amount, bankId, date){
-  try{
-    const envs=await loadEnvelopes();
-    const existing=envs.find(e=>e.record_id==recordId);
-    if(existing){
-      await q('DELETE FROM envelopes WHERE id=$1',[existing.id]);
-      toast('🪙 Убрано из резерва');
-    } else {
-      await q('INSERT INTO envelopes(name,bank_id,amount,record_id,op_date) VALUES($1,$2,$3,$4,$5)',[name||'Резерв',bankId,amount,recordId,date||null]);
-      toast('🪙 Добавлено в резерв');
-    }
-    renderJournal();
-  }catch(e){toast('Ошибка: '+e.message);}
-}
-
 async function delRecord(id){
   if(!confirm('Удалить запись?'))return;
   try{
@@ -2952,7 +2775,7 @@ async function loadCategories(){
   catch(e){
     const c=cacheGet('categories');
     if(c){categories=c.data;setOfflineState(true,c.ts);}
-    else categories=[{name:'Еда'},{name:'Транспорт'},{name:'Медицина'},{name:'Подписка'},{name:'Аренда'},{name:'Развлечение'},{name:'Одежда'},{name:'Услуги банка'},{name:'Зарплата'},{name:'Кэшбэк'},{name:'Перевод'},{name:'Прочее'}];
+    else categories=[{name:'Еда'},{name:'Транспорт'},{name:'Медицина'},{name:'Подписка'},{name:'Аренда'},{name:'Развлечение'},{name:'Одежда'},{name:'Услуги банка'},{name:'Зарплата'},{name:'Кэшбэк'},{name:'Перевод'},{name:'Резерв'},{name:'Прочее'}];
   }
 }
 function catOptions(selected='',filterType=''){
@@ -3409,8 +3232,6 @@ async function initApp(){
 async function renderSettings(){
   await loadCategories();
 
-  const reservesToggle=document.getElementById('setting-reserves-toggle');
-  if(reservesToggle)reservesToggle.checked=getSverkaReservesEnabled();
   const brokersToggle=document.getElementById('setting-brokers-toggle');
   if(brokersToggle)brokersToggle.checked=!isBrokersHidden();
   renderGroupTabOrderSettings();
@@ -3873,9 +3694,8 @@ function showHelp(topic){
     'total': '<b>Всего моих денег</b><br>Считается нарастающим итогом от начального остатка января по всем операциям до последнего месяца с данными. Не зависит от выбранного месяца — всегда показывает текущее состояние.<br><br><b>Карты</b> — дебетовые и кредитные счета<br><b>Накопит.</b> — накопительные счета<br><b>Вклады</b> — активные вклады из раздела «Вклады»<br><b>Наличные</b> — наличные деньги',
     'income': '<b>Чистый доход по месяцам</b><br>НАЧ. — остаток на начало месяца<br>КОН. — остаток на конец месяца<br>Δ — разница (доход или расход за месяц)<br><br>Считается через все операции нарастающим итогом от январского начального остатка.',
     'cats': '<b>Расходы по категориям</b><br>Суммирует все расходы (тип «expense») по категориям за каждый месяц. Можно фильтровать по банку. Клик на цифру открывает журнал с фильтром.',
-    'journal': '<b>Журнал операций</b><br>Все операции месяца. Типы:<br>• Приход вне систем — деньги пришли извне (зарплата, продажа)<br>• Приход из др. банка — перевод со своего счёта<br>• Расход вне систем — деньги ушли (покупки)<br>• Списание в др. банк — перевод на свой счёт<br><br>Кнопка 🪙 добавляет операцию в резервы.',
-    'sverka': '<b>Сверка месяца</b><br>Сравнивает данные из журнала с выписками банков. Введи сумму из приложения банка — система покажет совпадает ли она с журналом (✓ зелёный) или есть расхождение (красное число).<br><br>НАЧ. — начальный остаток (вводится вручную только для января)<br>КОН. — конечный остаток (считается автоматически)',
-    'envelopes': '<b>Конверты (резервы)</b><br>Деньги которые ты отложила на конкретные цели. Резервы уменьшают «свободную» сумму но физически остаются на счетах.<br><br>Фильтр по типу позволяет видеть только отпускные, подушку и т.д.',
+    'journal': '<b>Журнал операций</b><br>Все операции месяца. Типы:<br>• Приход вне систем — деньги пришли извне (зарплата, продажа)<br>• Приход из др. банка — перевод со своего счёта<br>• Расход вне систем — деньги ушли (покупки)<br>• Списание в др. банк — перевод на свой счёт<br>• 🪙 В резерв / Из резерва — деньги остаются на том же счету, но откладываются отдельно (уменьшают «Свободно» на Аналитике)',
+    'sverka': '<b>Сверка месяца</b><br>Сравнивает данные из журнала с выписками банков. Введи сумму из приложения банка — система покажет совпадает ли она с журналом (✓ зелёный) или есть расхождение (красное число).<br><br>НАЧ. — начальный остаток (вводится вручную только для января)<br>КОН. — конечный остаток (считается автоматически)<br>Резерв — сколько отложено на этом счету (нарастающим итогом по всем операциям «В резерв»/«Из резерва»)',
   };
   const el=document.getElementById('help-popup');
   const content=tips[topic]||'Нет описания';
