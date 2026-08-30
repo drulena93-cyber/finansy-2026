@@ -1,15 +1,15 @@
 // Версия кэша — при каждом заметном обновлении сайта увеличивай это число
 // (например, было v1, стало v2), чтобы у пользователей не залипала старая версия
-const CACHE_VERSION = 'finansy-cache-v51';
+const CACHE_VERSION = 'finansy-cache-v52';
 const APP_SHELL = ['/', '/index.html'];
-
+ 
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_VERSION).then(cache => cache.addAll(APP_SHELL))
   );
 });
-
+ 
 self.addEventListener('activate', event => {
   // Удаляем все старые версии кэша, чтобы не показывать устаревшую страницу
   event.waitUntil(
@@ -19,14 +19,14 @@ self.addEventListener('activate', event => {
   );
   self.clients.claim();
 });
-
+ 
 self.addEventListener('fetch', event => {
   const req = event.request;
-
+ 
   // Запросы к базе данных никогда не кэшируем — там всегда должны быть свежие данные
   if (req.url.includes('/api/')) return;
   if (req.method !== 'GET') return;
-
+ 
   // Стратегия "сначала сеть": если интернет есть — всегда берём свежую версию
   // и обновляем кэш. Если интернета нет — отдаём последнюю сохранённую копию.
   event.respondWith(
