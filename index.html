@@ -1795,7 +1795,7 @@ function buildSverkaTotalCells(label,t){
     incI:`<td style="text-align:right;padding:8px 10px;color:var(--purple);font-weight:700;white-space:nowrap">${fmtF(t.totIncI)}</td>`,
     expI:`<td style="text-align:right;padding:8px 10px;color:var(--purple);font-weight:700;white-space:nowrap">${fmtF(t.totExpI)}</td>`,
     start:`<td style="text-align:right;padding:8px 10px;color:var(--text2);font-weight:700;white-space:nowrap">${fmtF(t.totStart)}</td>`,
-    reserve:'<td></td>',
+    reserve:`<td style="text-align:right;padding:8px 10px;color:var(--purple);font-weight:700;white-space:nowrap">${t.totReserve?fmtF(t.totReserve):'—'}</td>`,
     end:`<td style="text-align:right;padding:8px 10px;font-weight:800;color:var(--teal);background:var(--teal-bg);white-space:nowrap">${fmtF(t.totEnd)}</td>`,
     delta:`<td style="text-align:right;padding:8px 10px;font-weight:700;color:${t.totDelta>0?'var(--green)':t.totDelta<0?'var(--red)':'var(--text3)'};white-space:nowrap">${t.totDelta?(t.totDelta>0?'+':'')+fmtF(t.totDelta):'—'}</td>`
   };
@@ -1886,7 +1886,7 @@ async function renderSverka(){
   const totalsByCurr={};
   active.forEach(b=>{
     const c=b.currency||'RUB';
-    if(!totalsByCurr[c])totalsByCurr[c]={totSumInc:0,totSumExp:0,totStart:0,totEnd:0,totDelta:0,totIncOut:0,totExpOut:0,totTrIn:0,totTrOut:0,totIncI:0,totExpI:0};
+    if(!totalsByCurr[c])totalsByCurr[c]={totSumInc:0,totSumExp:0,totStart:0,totEnd:0,totDelta:0,totIncOut:0,totExpOut:0,totTrIn:0,totTrOut:0,totIncI:0,totExpI:0,totReserve:0};
     const t=totalsByCurr[c];
     const a=agg[b.id];
     const bal=bals[b.id]||{start:0,end:0};
@@ -1899,6 +1899,7 @@ async function renderSverka(){
     t.totIncOut+=a.income;t.totExpOut+=a.expense;
     t.totTrIn+=a.tr_in;t.totTrOut+=a.tr_out;
     t.totIncI+=a.income_i;t.totExpI+=a.expense_i;
+    t.totReserve+=reserveByBank[b.id]||0;
   });
 
   const noOpsHidden=localStorage.getItem('no_ops_hidden')==='1';
@@ -2079,13 +2080,11 @@ async function renderDash(){
   const totalDeposit=totalDepositAcc;
   const totalMoneyNoCredit=totalDebitCards+totalSavings+totalDeposit+totalCash; // "Всего моих денег" — без учёта кредитных
 
-  // Резерв — из операций Журнала (reserve_out/reserve_in), разбивка по банкам
+  // Резерв — из операций Журнала (reserve_out/reserve_in), общей суммой
   let totalReserved=0;
-  let reserveDetails=[];
   try{
     const reserveByBank=await loadReserveByBank();
     totalReserved=Object.values(reserveByBank).reduce((s,v)=>s+v,0);
-    reserveDetails=Object.entries(reserveByBank).filter(([,v])=>v).map(([bId,v])=>[bank(bId).name,v]);
   }catch(e){}
   const totalFree=totalMoneyNoCredit-totalReserved;
 
@@ -2105,10 +2104,9 @@ async function renderDash(){
     <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;color:var(--money-card-text-dim);font-weight:600;text-transform:uppercase">Наличные</span><span style="font-size:16px;font-weight:700;color:#fbbf24;font-family:Manrope,sans-serif">${fmtF(totalCash)}</span></div>
     ${totalReserved?`
     <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
-    <div style="display:flex;flex-direction:column;gap:4px">
+    <div style="display:flex;flex-direction:column;gap:2px">
       <span style="font-size:12px;color:#c4b5fd;font-weight:700;text-transform:uppercase">🪙 Резервы</span>
       <span style="font-size:16px;font-weight:700;color:#c4b5fd;font-family:Manrope,sans-serif">−${fmtF(totalReserved)}</span>
-      ${reserveDetails.map(([n,v])=>`<span style="font-size:12px;color:var(--money-card-text-dim)">${n}: ${fmtF(v)}</span>`).join('')}
     </div>
     <div style="width:1px;height:30px;background:var(--border);flex-shrink:0"></div>
     <div style="display:flex;flex-direction:column;gap:2px">
