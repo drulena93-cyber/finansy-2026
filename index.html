@@ -878,6 +878,7 @@ const CURRENCY={RUB:'₽',USD:'$',THB:'฿',CNY:'¥'};
 const CURRENCY_NAME={RUB:'Рубли',USD:'Доллары',THB:'Баты',CNY:'Юани'};
 
 let banks=[],deposits=[],categories=[];
+let appSettings={};
 let curMonth=MONTHS[new Date().getMonth()];
 let jrnSort='date_desc';
 // "Журнал брокеров" — тот же журнал, но с сужением до счетов нужного типа
@@ -3208,9 +3209,10 @@ async function saveBrokerExtra(id,snowball,unrealized){
 async function loadAppSettings(){
   try{
     const rows=await q('SELECT key,value FROM app_settings');
-    appSettings={};
-    rows.forEach(r=>{appSettings[r.key]=r.value;});
-  }catch(e){console.warn('Таблица app_settings недоступна (нужна миграция в базе)',e);}
+    const loaded={};
+    rows.forEach(r=>{loaded[r.key]=r.value;});
+    appSettings=loaded;
+  }catch(e){console.warn('Таблица app_settings недоступна или нет соединения — использую настройки по умолчанию',e);}
 }
 async function saveAppSetting(key,value){
   appSettings[key]=value;
