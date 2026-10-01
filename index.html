@@ -1288,10 +1288,21 @@ function updateChangelogBadge(){
   else{badge.style.display='none';}
 }
 
+// Оба пароля (владельца и ограниченного доступа) хранятся в базе (app_settings),
+// чтобы вход работал одинаково на любом устройстве, а не только там, где пароль задали.
+// localStorage(PWD_KEY) оставлен как запасной вариант на случай, если нет связи с базой.
+async function getServerPwds(){
+  try{
+    const rows=await q("SELECT key,value FROM app_settings WHERE key IN ('owner_pwd','restricted_pwd')");
+    const out={};rows.forEach(r=>{out[r.key]=r.value;});
+    return out;
+  }catch(e){return{};}
+}
 async function doLogin(){
   const pwd=document.getElementById('pwd-inp').value;
-  const stored=localStorage.getItem(PWD_KEY)||DEFAULT_PWD;
-  if(!stored||pwd===stored){
+  const pwds=await getServerPwds();
+  const ownerPwd=pwds.owner_pwd!==undefined?pwds.owner_pwd:(localStorage.getItem(PWD_KEY)||DEFAULT_PWD);
+  if(!ownerPwd||pwd===ownerPwd){
     userRole='owner';
     localStorage.setItem('fin26_role','owner');
     document.getElementById('login-screen').style.display='none';
@@ -1299,20 +1310,14 @@ async function doLogin(){
     initApp();
     return;
   }
-  // Проверяем пароль ограниченного доступа — он хранится в базе (app_settings),
-  // чтобы срабатывал на любом устройстве, а не только там, где его завели
-  try{
-    const rows=await q("SELECT value FROM app_settings WHERE key='restricted_pwd'");
-    const restrictedPwd=rows[0]&&rows[0].value;
-    if(restrictedPwd&&pwd===restrictedPwd){
-      userRole='restricted';
-      localStorage.setItem('fin26_role','restricted');
-      document.getElementById('login-screen').style.display='none';
-      document.getElementById('app').style.display='block';
-      initApp();
-      return;
-    }
-  }catch(e){}
+  if(pwds.restricted_pwd&&pwd===pwds.restricted_pwd){
+    userRole='restricted';
+    localStorage.setItem('fin26_role','restricted');
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='block';
+    initApp();
+    return;
+  }
   document.getElementById('login-err').textContent='Неверный пароль';
   document.getElementById('pwd-inp').value='';
 }
@@ -1324,13 +1329,14 @@ function doLogout(){
   document.getElementById('pwd-inp').value='';
   document.getElementById('login-err').textContent='';
 }
-function changePwd(){
+async function changePwd(){
   const p1=document.getElementById('new-pwd').value,p2=document.getElementById('new-pwd2').value;
   if(!p1){toast('Введите пароль');return;}
   if(p1!==p2){toast('Пароли не совпадают');return;}
   localStorage.setItem(PWD_KEY,p1);
+  await saveAppSetting('owner_pwd',p1);
   document.getElementById('new-pwd').value='';document.getElementById('new-pwd2').value='';
-  toast('✓ Пароль сохранён');
+  toast('✓ Пароль сохранён — теперь спросится на любом устройстве');
 }
 
 function toggleMobMenu(){
@@ -4342,14 +4348,14 @@ window.onload=async ()=>{
     userRole=savedRole;
     enterApp();
   } else {
-    // Устройство видим первый раз. Если ограниченный доступ не настроен вообще —
+    // Устройство видим первый раз. Если ни один пароль вообще не задан —
     // ничего не меняется, заходим как владелец (как это было раньше, до появления ролей).
-    let restrictedOn=false;
+    let securityOn=false;
     try{
-      const rows=await q("SELECT value FROM app_settings WHERE key='restricted_pwd'");
-      restrictedOn=!!(rows[0]&&rows[0].value);
+      const pwds=await getServerPwds();
+      securityOn=!!(pwds.owner_pwd||pwds.restricted_pwd);
     }catch(e){}
-    if(restrictedOn){
+    if(securityOn){
       document.getElementById('login-screen').style.display='flex';
       document.getElementById('app').style.display='none';
     } else {
