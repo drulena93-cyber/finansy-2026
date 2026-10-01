@@ -4,8 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Финансы</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Carlito:wght@400;700&display=optional">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Carlito:wght@400;700&display=swap');
 :root{
   --bg:#f3f7f8;--surface:#ffffff;--surface2:#eef4f5;--border:#dfe8ea;--border2:#c1d2d6;
   --text:#0f1720;--text2:#45535c;--text3:#849098;
@@ -494,6 +496,20 @@ table.nit td.empty-cell{color:var(--text3);}
       <div class="panel-b" id="dash-cats-inc"></div>
     </div>
   </div>
+
+  <!-- CATEGORIES × MONTHS — расходы и доходы по категориям за весь год, в одном окне -->
+  <div class="panel" style="margin-top:16px">
+    <div class="panel-h">↓ Расходы по категориям и месяцам</div>
+    <div class="panel-b" style="overflow-x:auto;padding:0">
+      <table class="svt" id="dash-cat-month-table-exp" style="min-width:900px"><thead><tr id="dash-cat-month-head-exp"></tr></thead><tbody id="dash-cat-month-body-exp"></tbody></table>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:16px">
+    <div class="panel-h">↑ Доходы по категориям и месяцам</div>
+    <div class="panel-b" style="overflow-x:auto;padding:0">
+      <table class="svt" id="dash-cat-month-table-inc" style="min-width:900px"><thead><tr id="dash-cat-month-head-inc"></tr></thead><tbody id="dash-cat-month-body-inc"></tbody></table>
+    </div>
+  </div>
 </div>
 
 <!-- JOURNAL -->
@@ -827,6 +843,18 @@ table.nit td.empty-cell{color:var(--text3);}
           </div>
         </div>
       </div>
+      <div class="panel" style="margin-bottom:16px" id="restricted-access-panel">
+        <div class="panel-h">Доступ для другого человека</div>
+        <div class="panel-b">
+          <div style="font-size:13px;color:var(--text3);margin-bottom:12px">Другой человек сможет войти по своему паролю и будет видеть только отмеченные ниже счета — Журнал, Сверку и Кредитные карты по ним, без Аналитики, Брокеров и Настроек. Он сможет сам добавлять операции по этим счетам.</div>
+          <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px">
+            <div class="fg"><label>Пароль для другого человека</label><input type="password" class="inp w150" id="restricted-pwd-inp" placeholder="Задайте пароль"></div>
+            <button class="btn btn-p btn-sm" onclick="saveRestrictedPwd()">Сохранить пароль</button>
+          </div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px">Доступные ему счета:</div>
+          <div id="restricted-banks-list"></div>
+        </div>
+      </div>
       <div class="panel">
         <div class="panel-h">Данные</div>
         <div class="panel-b">
@@ -879,6 +907,8 @@ const CURRENCY_NAME={RUB:'Рубли',USD:'Доллары',THB:'Баты',CNY:'�
 
 let banks=[],deposits=[],categories=[];
 let appSettings={};
+// Роль текущего устройства: 'owner' — полный доступ, 'restricted' — ограниченный (см. вход и Настройки)
+let userRole=localStorage.getItem('fin26_role')||'';
 let curMonth=MONTHS[new Date().getMonth()];
 let jrnSort='date_desc';
 // "Журнал брокеров" — тот же журнал, но с сужением до счетов нужного типа
@@ -886,6 +916,41 @@ let journalScope='bank'; // 'bank' | 'broker'
 function scopedBanks(){
   return journalScope==='broker'?banks.filter(b=>b.type==='broker'):banks.filter(b=>b.type!=='broker');
 }
+
+// ─── ПАМЯТЬ ФИЛЬТРОВ: месяц/банк/категория/поиск/сортировка не должны слетать при обновлении страницы ───
+function saveJrnFilters(ft,search){
+  try{
+    localStorage.setItem('jrn_filters',JSON.stringify({jrnBank,jrnCat,journalScope,jrnSort,jfType:ft,jfSearch:search}));
+  }catch(e){}
+}
+function saveSverkaFilters(){
+  try{localStorage.setItem('sverka_filters',JSON.stringify({curr:sverkaCurrFilter,type:sverkaTypeFilter}));}catch(e){}
+}
+function restoreFilters(){
+  try{
+    const savedMonth=localStorage.getItem('cur_month');
+    if(savedMonth&&MONTHS.includes(savedMonth))curMonth=savedMonth;
+  }catch(e){}
+  try{
+    const f=JSON.parse(localStorage.getItem('jrn_filters')||'{}');
+    if(f.jrnBank!==undefined)jrnBank=f.jrnBank;
+    if(f.jrnCat!==undefined)jrnCat=f.jrnCat;
+    if(f.journalScope)journalScope=f.journalScope;
+    if(f.jrnSort)jrnSort=f.jrnSort;
+    const typeSel=document.getElementById('jf-type');
+    if(typeSel&&f.jfType!==undefined)typeSel.value=f.jfType;
+    const searchInp=document.getElementById('jf-search');
+    if(searchInp&&f.jfSearch!==undefined)searchInp.value=f.jfSearch;
+    const sortSel=document.getElementById('jf-sort');
+    if(sortSel&&f.jrnSort)sortSel.value=f.jrnSort;
+  }catch(e){}
+  try{
+    const sv=JSON.parse(localStorage.getItem('sverka_filters')||'{}');
+    if(sv.curr!==undefined)sverkaCurrFilter=sv.curr;
+    if(sv.type!==undefined)sverkaTypeFilter=sv.type;
+  }catch(e){}
+}
+
 // ─── ЖУРНАЛ: КОЛОНКИ (порядок/переименование — управляются данными) ────
 const JRN_COL_IDS=['date','bank','category','description','begin','income','expense','incomeI','expenseI','trIn','trOut','reserve','end','delta'];
 function jrnDefaultLabel(id){
@@ -999,6 +1064,7 @@ function applyJournalScopeLabels(){
   renderNav();
 }
 function setJournalScope(scope){
+  if(userRole==='restricted')scope='bank';
   journalScope=scope;
   jrnBank='';jrnCat='';
   document.getElementById('clear-filter-btn')?.remove();
@@ -1029,6 +1095,14 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.cla
 
 // ─── ЖУРНАЛ ИЗМЕНЕНИЙ (заполняется вручную при каждой правке) ─────
 const CHANGELOG=[
+  {id:33,date:'01.10.2026',title:'Память фильтров, починка столбцов, таблица категорий по месяцам, доступ для другого человека',items:[
+    'Журнал и Сверка теперь помнят месяц, банк, категорию, поиск и сортировку после обновления страницы — не сбрасываются на текущий месяц',
+    'Починка «плывущих» столбцов: ширины теперь всегда пересчитываются от чистой разметки, а не от уже сжатой — не должны больше скакать',
+    'Починка шапки Сверки: заголовки колонок больше не сжимаются до одной буквы на узких экранах',
+    'Шрифты подключены надёжнее (без мигания при загрузке), из-за которого раньше дополнительно скакали ширины столбцов',
+    'Аналитика → новые таблицы «Расходы по категориям и месяцам» и «Доходы по категориям и месяцам»: все категории и все 12 месяцев сразу в одном окне',
+    'Настройки → «Доступ для другого человека»: отдельный пароль и список разрешённых счетов — другой человек видит и ведёт Журнал/Сверку/Кредитки только по этим счетам, без Аналитики, Брокеров и Настроек'
+  ]},
   {id:32,date:'30.08.2026',title:'Резерв — теперь через тип операции, а не конверты',items:[
     'Новый тип операции «🪙 В резерв» / «🪙 Из резерва» — деньги остаются на том же счету, но откладываются отдельно от «свободных»',
     'Столбец «Резерв» в Журнале операций — показывает сумму каждой резервной операции, итог за месяц — в строке «Итого»',
@@ -1214,19 +1288,42 @@ function updateChangelogBadge(){
   else{badge.style.display='none';}
 }
 
-function doLogin(){
+async function doLogin(){
   const pwd=document.getElementById('pwd-inp').value;
   const stored=localStorage.getItem(PWD_KEY)||DEFAULT_PWD;
   if(!stored||pwd===stored){
+    userRole='owner';
+    localStorage.setItem('fin26_role','owner');
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='block';
     initApp();
-  } else {
-    document.getElementById('login-err').textContent='Неверный пароль';
-    document.getElementById('pwd-inp').value='';
+    return;
   }
+  // Проверяем пароль ограниченного доступа — он хранится в базе (app_settings),
+  // чтобы срабатывал на любом устройстве, а не только там, где его завели
+  try{
+    const rows=await q("SELECT value FROM app_settings WHERE key='restricted_pwd'");
+    const restrictedPwd=rows[0]&&rows[0].value;
+    if(restrictedPwd&&pwd===restrictedPwd){
+      userRole='restricted';
+      localStorage.setItem('fin26_role','restricted');
+      document.getElementById('login-screen').style.display='none';
+      document.getElementById('app').style.display='block';
+      initApp();
+      return;
+    }
+  }catch(e){}
+  document.getElementById('login-err').textContent='Неверный пароль';
+  document.getElementById('pwd-inp').value='';
 }
-function doLogout(){document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('pwd-inp').value='';document.getElementById('login-err').textContent='';}
+function doLogout(){
+  localStorage.removeItem('fin26_role');
+  userRole='';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app').style.display='none';
+  document.getElementById('pwd-inp').value='';
+  document.getElementById('login-err').textContent='';
+}
 function changePwd(){
   const p1=document.getElementById('new-pwd').value,p2=document.getElementById('new-pwd2').value;
   if(!p1){toast('Введите пароль');return;}
@@ -1267,18 +1364,23 @@ function applyColumnWidths(tableEl){
   const savedWidths=JSON.parse(localStorage.getItem('colwidths_'+tableId)||'{}');
   const colKey=(th,i)=>th.dataset.col||('idx'+i);
 
-  // Применяем сохранённую ширину столбцов — при каждом вызове, даже если ручки уже навешаны
-  if(Object.keys(savedWidths).length){
-    let sum=0;
-    ths.forEach((th,i)=>{
-      const key=colKey(th,i);
-      const w=savedWidths[key];
-      if(w){th.style.width=w+'px';sum+=w;}
-      else sum+=th.offsetWidth;
-    });
-    tableEl.style.tableLayout='fixed';
-    tableEl.style.width=sum+'px';
-  }
+  // Фиксируем ширину столбцов всегда, даже без сохранённых значений — иначе таблица
+  // остаётся на table-layout:auto и пересчитывает ширины на каждой перерисовке
+  // (смена месяца, других сумм, донагрузка шрифта), от чего столбцы "плывут".
+  // Перед замером снимаем fixed-раскладку с прошлой отрисовки — иначе браузер отдаст
+  // уже "подогнанные" под старую сумму ширины, а не реальную ширину текущего содержимого.
+  tableEl.style.tableLayout='auto';
+  tableEl.style.width='';
+  ths.forEach(th=>{th.style.width='';});
+  let sum=0;
+  ths.forEach((th,i)=>{
+    const key=colKey(th,i);
+    const w=savedWidths[key]||th.offsetWidth;
+    th.style.width=w+'px';
+    sum+=w;
+  });
+  tableEl.style.tableLayout='fixed';
+  tableEl.style.width=sum+'px';
 
   if(tableEl.dataset.resizable)return;
   tableEl.dataset.resizable='1';
@@ -1347,6 +1449,7 @@ async function renderJournal(){
   const search=(document.getElementById('jf-search')?.value||'').toLowerCase().trim();
   const fs=document.getElementById('jf-sort')||{value:jrnSort};
   jrnSort=fs.value||jrnSort;
+  saveJrnFilters(ft,search);
 
   // Единая загрузка операций месяца (раньше грузились дважды подряд) + остатки, если выбран конкретный банк
   const [monthRecsRaw,monthBals]=await Promise.all([
@@ -1697,7 +1800,7 @@ function renderSverkaHeader(rowId,tableId){
   headRow.innerHTML=order.filter(id=>!hidden.includes(id)).map(id=>{
     const cls=SVERKA_COL_CLASS[id]||'';
     const label=labels[id]||SVERKA_COL_DEFAULT_LABELS[id];
-    let extraStyle='white-space:normal;word-break:break-word;line-height:1.25;padding-right:16px;';
+    let extraStyle='white-space:nowrap;line-height:1.25;padding-right:16px;';
     if(id==='incSlip'||id==='expSlip')extraStyle+='background:#fff8e1;color:#b45309;';
     if(id==='bank')extraStyle+='text-align:left;';
     if(id==='end')extraStyle+='background:var(--teal-bg);color:var(--teal);font-weight:800;';
@@ -1818,11 +1921,13 @@ function renderSverkaTotalRowHTML(label,t){
 let sverkaCurrFilter='';
 function setSverkaCurrFilter(c){
   sverkaCurrFilter=c;
+  saveSverkaFilters();
   renderSverka();
 }
 let sverkaTypeFilter='';
 function setSverkaTypeFilter(type){
   sverkaTypeFilter=type;
+  saveSverkaFilters();
   renderSverka();
 }
 async function renderSverka(){
@@ -2259,6 +2364,46 @@ async function renderDash(){
   }
   renderCatList(catExpM,'var(--red)','dash-cats-exp');
   renderCatList(catIncM,'var(--green)','dash-cats-inc');
+
+  // Таблицы "категория × месяц" за весь год — расходы и доходы отдельно
+  const recsYear=allRecsForTotal.filter(r=>filteredBankIdsCat.has(r.bank_id));
+  renderCatMonthTable(recsYear,'expense','var(--red)','dash-cat-month-head-exp','dash-cat-month-body-exp');
+  renderCatMonthTable(recsYear,'income','var(--green)','dash-cat-month-head-inc','dash-cat-month-body-inc');
+}
+
+function renderCatMonthTable(recs,type,color,headId,bodyId){
+  const headEl=document.getElementById(headId),bodyEl=document.getElementById(bodyId);
+  if(!headEl||!bodyEl)return;
+  // data[категория][месяц] = сумма
+  const data={};
+  const totalsByMonth={};
+  MONTHS.forEach(m=>totalsByMonth[m]=0);
+  recs.forEach(r=>{
+    if(r.type!==type)return;
+    const cat=r.category||'Без категории';
+    const amt=parseFloat(r.amount)||0;
+    if(!data[cat])data[cat]={};
+    data[cat][r.month]=(data[cat][r.month]||0)+amt;
+    totalsByMonth[r.month]=(totalsByMonth[r.month]||0)+amt;
+  });
+  const cats=Object.keys(data).map(c=>({name:c,total:Object.values(data[c]).reduce((s,v)=>s+v,0)})).sort((a,b)=>b.total-a.total);
+  if(!cats.length){
+    headEl.innerHTML='';
+    bodyEl.innerHTML='<tr><td style="padding:16px;color:var(--text3)">Нет данных</td></tr>';
+    return;
+  }
+  headEl.innerHTML='<th style="text-align:left">Категория</th>'+MONTHS.map(m=>`<th>${m.slice(0,3)}</th>`).join('')+'<th style="background:var(--surface2)">Итого</th>';
+  bodyEl.innerHTML=cats.map(({name:cat,total})=>{
+    const isNoCat=cat==='Без категории';
+    const clickArg=isNoCat?'__nocat__':cat;
+    const cells=MONTHS.map(m=>{
+      const v=data[cat][m];
+      return `<td${v?` style="cursor:pointer;color:${color}" onclick="goToCatMonth('${clickArg}','${m}')"`:''}>${v?fmt(v):'—'}</td>`;
+    }).join('');
+    return `<tr><td style="text-align:left;font-weight:600;cursor:pointer" onclick="goToCat('${clickArg}')">${catEmoji(cat)} ${cat}</td>${cells}<td style="font-weight:700;background:var(--surface2)">${fmt(total)}</td></tr>`;
+  }).join('')+
+    `<tr style="font-weight:800"><td style="text-align:left">Итого</td>${MONTHS.map(m=>`<td>${totalsByMonth[m]?fmt(totalsByMonth[m]):'—'}</td>`).join('')}<td style="background:var(--surface2)">${fmt(Object.values(totalsByMonth).reduce((s,v)=>s+v,0))}</td></tr>`;
+  makeColumnsResizable(document.getElementById(headId.includes('exp')?'dash-cat-month-table-exp':'dash-cat-month-table-inc'));
 }
 
 function catEmoji(name){
@@ -2405,6 +2550,7 @@ function goToCatMonth(cat,month){
   journalScope='bank';
   jrnBank='';
   curMonth=month;
+  localStorage.setItem('cur_month',month);
   cameFromAnalytics=true;
   document.querySelectorAll('.mtab').forEach(t=>t.classList.toggle('active',t.textContent===month.slice(0,3)));
   if(cat==='__nocat__'){jrnCat='__nocat__';}else{jrnCat=cat;}
@@ -2755,17 +2901,34 @@ function setOfflineState(offline,ts){
 }
 
 // ─── DATA LOADERS ─────────────────────────────────────────────────
+// Ограниченный доступ (роль restricted): видит только счета, выбранные владельцем в Настройках.
+function getRestrictedBankIds(){
+  try{return JSON.parse(appSettings['restricted_banks']||'[]').map(String);}catch(e){return[];}
+}
+function applyRoleBankFilter(list){
+  if(userRole!=='restricted')return list;
+  const allowed=getRestrictedBankIds();
+  return list.filter(b=>allowed.includes(String(b.id)));
+}
 async function loadBanks(){
-  try{banks=await q('SELECT * FROM banks ORDER BY sort_order');cacheSet('banks',banks);setOfflineState(false);}
-  catch(e){const c=cacheGet('banks');if(c){banks=c.data;setOfflineState(true,c.ts);}else console.error(e);}
+  try{const rows=await q('SELECT * FROM banks ORDER BY sort_order');cacheSet('banks',rows);setOfflineState(false);banks=applyRoleBankFilter(rows);}
+  catch(e){const c=cacheGet('banks');if(c){banks=applyRoleBankFilter(c.data);setOfflineState(true,c.ts);}else console.error(e);}
+}
+// Ограниченный доступ (роль restricted): показываем операции только по разрешённым счетам.
+// banks на этот момент уже отфильтрован через applyRoleBankFilter(), поэтому достаточно
+// сверяться с ним — в кэш при этом всегда кладём полные, неотфильтрованные данные.
+function filterRecsByRole(recs){
+  if(userRole!=='restricted')return recs;
+  const ids=new Set(banks.map(b=>b.id));
+  return recs.filter(r=>ids.has(r.bank_id));
 }
 async function loadRecordsMonth(month){
-  try{const rows=await q('SELECT * FROM records WHERE month=$1 ORDER BY op_date,id',[month]);cacheSet('records_'+month,rows);setOfflineState(false);return rows;}
-  catch(e){const c=cacheGet('records_'+month);if(c){setOfflineState(true,c.ts);return c.data;}return[];}
+  try{const rows=await q('SELECT * FROM records WHERE month=$1 ORDER BY op_date,id',[month]);cacheSet('records_'+month,rows);setOfflineState(false);return filterRecsByRole(rows);}
+  catch(e){const c=cacheGet('records_'+month);if(c){setOfflineState(true,c.ts);return filterRecsByRole(c.data);}return[];}
 }
 async function loadAllRecords(){
-  try{const rows=await q('SELECT * FROM records ORDER BY month,op_date,id');cacheSet('allrecords',rows);setOfflineState(false);return rows;}
-  catch(e){const c=cacheGet('allrecords');if(c){setOfflineState(true,c.ts);return c.data;}return[];}
+  try{const rows=await q('SELECT * FROM records ORDER BY month,op_date,id');cacheSet('allrecords',rows);setOfflineState(false);return filterRecsByRole(rows);}
+  catch(e){const c=cacheGet('allrecords');if(c){setOfflineState(true,c.ts);return filterRecsByRole(c.data);}return[];}
 }
 async function loadBalances(month){
   try{
@@ -2908,7 +3071,9 @@ function fillBankSelects(){
 }
 
 // ─── NAVIGATION ───────────────────────────────────────────────────
+const RESTRICTED_BLOCKED_VIEWS=['dashboard','settings','brokersummary'];
 async function go(name){
+  if(userRole==='restricted'&&RESTRICTED_BLOCKED_VIEWS.includes(name))name='journal';
   if(name!=='journal')cameFromAnalytics=false;
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.mob-nb').forEach(b=>b.classList.remove('active'));
@@ -2933,6 +3098,7 @@ function initTabs(){
 }
 function selMonth(m){
   curMonth=m;
+  localStorage.setItem('cur_month',m);
   document.querySelectorAll('.mtab').forEach(t=>t.classList.toggle('active',t.textContent===m.slice(0,3)));
   renderMonthlyGoalWidget();
   // Re-check date field if journal is open
@@ -3227,7 +3393,8 @@ async function saveAppSetting(key,value){
 async function initApp(){
   initTabs();
   applySidebarCollapse();
-  await Promise.all([loadBanks(),loadCategories(),loadAppSettings()]);
+  await loadAppSettings();
+  await Promise.all([loadBanks(),loadCategories()]);
   applyCustomColors();
   renderNav();
   renderMonthlyGoalWidget();
@@ -3235,6 +3402,7 @@ async function initApp(){
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
   renderFSubtypes('income');
   setFSubtype('income','income');
+  restoreFilters();
   const lastView=localStorage.getItem('last_view')||'journal';
   go(lastView);
 }
@@ -3254,6 +3422,8 @@ async function renderSettings(){
   if(colorAccent)colorAccent.value=getCustomColor('accent')||'#075985';
   const colorBg=document.getElementById('setting-color-bg');
   if(colorBg)colorBg.value=getCustomColor('bg')||'#f3f7f8';
+
+  renderRestrictedAccessSettings();
 
   const depBanks=banks.filter(b=>b.type==='deposit'||b.type==='savings');
   document.getElementById('dep-settings-list').innerHTML=depBanks.length
@@ -3797,6 +3967,37 @@ function renderTopGroupOrderSettings(){
     <span style="font-size:14px;font-weight:500">${g.label}</span>
   </div>`).join('');
 }
+// ─── Доступ для другого человека (ограниченная роль, Вариант А — просто, без серверной защиты) ───
+function renderRestrictedAccessSettings(){
+  const panel=document.getElementById('restricted-access-panel');
+  if(!panel)return;
+  if(userRole!=='owner'){panel.style.display='none';return;}
+  panel.style.display='';
+  const allowed=getRestrictedBankIds();
+  const list=document.getElementById('restricted-banks-list');
+  if(list){
+    list.innerHTML=banks.length
+      ?banks.map(b=>`<label style="display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer">
+          <input type="checkbox" ${allowed.includes(String(b.id))?'checked':''} onchange="toggleRestrictedBank('${b.id}',this.checked)">
+          <span class="bdot-sm" style="background:${b.color}"></span>
+          <span style="font-size:14px">${b.name}</span>
+        </label>`).join('')
+      :'<div class="empty" style="padding:4px 0">Сначала добавь счета ниже, в списке «Счета и карты»</div>';
+  }
+}
+async function saveRestrictedPwd(){
+  const p=document.getElementById('restricted-pwd-inp').value;
+  if(!p){toast('Введите пароль');return;}
+  await saveAppSetting('restricted_pwd',p);
+  document.getElementById('restricted-pwd-inp').value='';
+  toast('✓ Пароль сохранён — скажи его тому, кому даёшь доступ');
+}
+async function toggleRestrictedBank(bankId,checked){
+  const allowed=getRestrictedBankIds();
+  const next=checked?[...new Set([...allowed,String(bankId)])]:allowed.filter(id=>id!==String(bankId));
+  await saveAppSetting('restricted_banks',JSON.stringify(next));
+  toast('✓ Сохранено');
+}
 function isBrokersHidden(){
   const dbVal=appSettings['nav_hide_brokers'];
   const raw=dbVal!==undefined?dbVal:localStorage.getItem('nav_hide_brokers');
@@ -3878,7 +4079,12 @@ function renderNav(){
   const wrap=document.getElementById('nav-items');
   if(!wrap)return;
   const curView=currentViewId();
-  const groups=orderedTopGroups().filter(g=>!(g.id==='brokers'&&isBrokersHidden()));
+  const groups=orderedTopGroups().filter(g=>{
+    if(g.id==='brokers'&&isBrokersHidden())return false;
+    // Ограниченный доступ: видна только работа со счетами (журнал/сверка/кредитки) — без аналитики, брокеров и настроек
+    if(userRole==='restricted'&&(g.id==='dashboard'||g.id==='settings'||g.id==='brokers'))return false;
+    return true;
+  });
   let manuallyExpanded=getExpandedGroups();
   const activeGroup=groups.find(g=>!g.standalone&&g.matches(curView));
   if(activeGroup){
@@ -4110,7 +4316,15 @@ function applyTheme(){
   const sun=document.getElementById('theme-icon-sun'),moon=document.getElementById('theme-icon-moon');
   if(sun&&moon){sun.style.display=isDark?'none':'block';moon.style.display=isDark?'block':'none';}
 }
-window.onload=()=>{
+function applyRoleUI(){
+  // Ограниченный доступ: убираем кнопки аналитики/настроек/брокеров из нижнего мобильного меню
+  const hideIds=userRole==='restricted'?['mob-dashboard','mob-settings']:[];
+  ['mob-dashboard','mob-settings'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.style.display=hideIds.includes(id)?'none':'';
+  });
+}
+function enterApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
   applyTheme();
@@ -4118,7 +4332,32 @@ window.onload=()=>{
   if(savedFont)setTableFontSize(savedFont);
   applyColVisibility();
   updateChangelogBadge();
+  applyRoleUI();
   initApp();
+}
+window.onload=async ()=>{
+  const savedRole=localStorage.getItem('fin26_role');
+  if(savedRole){
+    // Роль на этом устройстве уже определена раньше — заходим как обычно, без повторного пароля
+    userRole=savedRole;
+    enterApp();
+  } else {
+    // Устройство видим первый раз. Если ограниченный доступ не настроен вообще —
+    // ничего не меняется, заходим как владелец (как это было раньше, до появления ролей).
+    let restrictedOn=false;
+    try{
+      const rows=await q("SELECT value FROM app_settings WHERE key='restricted_pwd'");
+      restrictedOn=!!(rows[0]&&rows[0].value);
+    }catch(e){}
+    if(restrictedOn){
+      document.getElementById('login-screen').style.display='flex';
+      document.getElementById('app').style.display='none';
+    } else {
+      userRole='owner';
+      localStorage.setItem('fin26_role','owner');
+      enterApp();
+    }
+  }
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('/sw.js').catch(e=>console.warn('SW registration failed',e));
   }
