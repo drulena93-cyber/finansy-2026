@@ -3077,7 +3077,7 @@ function fillBankSelects(){
 }
 
 // ─── NAVIGATION ───────────────────────────────────────────────────
-const RESTRICTED_BLOCKED_VIEWS=['dashboard','settings','brokersummary'];
+const RESTRICTED_BLOCKED_VIEWS=['settings','brokersummary'];
 async function go(name){
   if(userRole==='restricted'&&RESTRICTED_BLOCKED_VIEWS.includes(name))name='journal';
   if(name!=='journal')cameFromAnalytics=false;
@@ -4088,7 +4088,7 @@ function renderNav(){
   const groups=orderedTopGroups().filter(g=>{
     if(g.id==='brokers'&&isBrokersHidden())return false;
     // Ограниченный доступ: видна только работа со счетами (журнал/сверка/кредитки) — без аналитики, брокеров и настроек
-    if(userRole==='restricted'&&(g.id==='dashboard'||g.id==='settings'||g.id==='brokers'))return false;
+    if(userRole==='restricted'&&(g.id==='settings'||g.id==='brokers'))return false;
     return true;
   });
   let manuallyExpanded=getExpandedGroups();
@@ -4323,8 +4323,8 @@ function applyTheme(){
   if(sun&&moon){sun.style.display=isDark?'none':'block';moon.style.display=isDark?'block':'none';}
 }
 function applyRoleUI(){
-  // Ограниченный доступ: убираем кнопки аналитики/настроек/брокеров из нижнего мобильного меню
-  const hideIds=userRole==='restricted'?['mob-dashboard','mob-settings']:[];
+  // Ограниченный доступ: убираем кнопку настроек из нижнего мобильного меню (Аналитика ему нужна и остаётся)
+  const hideIds=userRole==='restricted'?['mob-settings']:[];
   ['mob-dashboard','mob-settings'].forEach(id=>{
     const el=document.getElementById(id);
     if(el)el.style.display=hideIds.includes(id)?'none':'';
