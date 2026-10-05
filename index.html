@@ -1294,7 +1294,7 @@ function updateChangelogBadge(){
 async function getServerPwds(){
   // Без try/catch — вызывающий код сам решает, что делать при ошибке связи с базой,
   // чтобы не путать "нет связи" с "неверный пароль" (из-за этого раньше терялся смысл ошибки)
-  const rows=await q("SELECT key,value FROM app_settings WHERE key IN ('owner_pwd','restricted_pwd')");
+  const rows=await q("SELECT key,value FROM app_settings WHERE key IN ($1,$2)",['owner_pwd','restricted_pwd']);
   const out={};rows.forEach(r=>{out[r.key]=r.value;});
   return out;
 }
