@@ -449,6 +449,7 @@ table.nit td.empty-cell{color:var(--text3);}
         </div>
         <div id="dash-breakdown" style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;justify-content:flex-start"></div>
       </div>
+      <div id="dash-groups" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)"></div>
       <div id="dash-other-currencies" style="display:none">
         <div style="font-size:11px;font-weight:700;color:var(--money-card-text-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;padding-top:8px;border-top:1px solid var(--border)">Другие валюты</div>
         <div id="dash-other-currencies-list" style="display:flex;gap:20px;flex-wrap:wrap"></div>
@@ -500,15 +501,11 @@ table.nit td.empty-cell{color:var(--text3);}
   <!-- CATEGORIES × MONTHS — расходы и доходы по категориям за весь год, в одном окне -->
   <div class="panel" style="margin-top:16px">
     <div class="panel-h">↓ Расходы по категориям и месяцам</div>
-    <div class="panel-b" style="overflow-x:auto;padding:0">
-      <table class="svt" id="dash-cat-month-table-exp" style="min-width:900px"><thead><tr id="dash-cat-month-head-exp"></tr></thead><tbody id="dash-cat-month-body-exp"></tbody></table>
-    </div>
+    <div class="panel-b" style="overflow-x:auto;padding:0" id="dash-cat-month-exp-wrap"></div>
   </div>
   <div class="panel" style="margin-top:16px">
     <div class="panel-h">↑ Доходы по категориям и месяцам</div>
-    <div class="panel-b" style="overflow-x:auto;padding:0">
-      <table class="svt" id="dash-cat-month-table-inc" style="min-width:900px"><thead><tr id="dash-cat-month-head-inc"></tr></thead><tbody id="dash-cat-month-body-inc"></tbody></table>
-    </div>
+    <div class="panel-b" style="overflow-x:auto;padding:0" id="dash-cat-month-inc-wrap"></div>
   </div>
 </div>
 
@@ -681,6 +678,27 @@ table.nit td.empty-cell{color:var(--text3);}
   </div>
 </div>
 
+<!-- RESERVES -->
+<div id="view-reserves" class="view">
+  <div class="ph"><h1>Резервы</h1></div>
+  <div class="mbar" id="mt-reserves"></div>
+  <div class="panel" style="margin-bottom:14px">
+    <div class="panel-h">Мини-сверка · остатки по счетам на конец месяца <span id="res-month-lbl" style="color:var(--text3);font-weight:600"></span></div>
+    <div class="panel-b" id="res-recon" style="padding:0;overflow-x:auto"></div>
+  </div>
+  <div class="panel" style="margin-bottom:14px">
+    <div class="panel-h">🪙 Резерв по всем счетам</div>
+    <div class="panel-b" id="res-total"></div>
+  </div>
+  <div class="panel" style="margin-bottom:14px">
+    <div class="panel-h" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px"><span>🎯 Цели и папки резервов</span>
+      <span style="display:flex;gap:6px;align-items:center"><input class="inp" id="res-new-folder" placeholder="Новая папка: Отпуск, Свадьба…" style="width:230px"><button class="btn btn-p btn-sm" onclick="addReserveFolder()">+ Добавить</button></span>
+    </div>
+    <div class="panel-b" id="res-goals" style="padding:0;overflow-x:auto"></div>
+    <div style="padding:10px 18px;font-size:13px;color:var(--text3)">Как пополнить: Журнал → «+ Добавить» → тип «🪙 В резерв», счёт, сумма и категория = нужная папка. Вернуть деньги — «🪙 Из резерва» с той же категорией.</div>
+  </div>
+</div>
+
 <!-- BROKER SUMMARY -->
 <div id="view-brokersummary" class="view">
   <div class="ph"><h1>Сводка по брокерам</h1></div>
@@ -841,6 +859,13 @@ table.nit td.empty-cell{color:var(--text3);}
             <div class="fg"><label>Повторить</label><input type="password" class="inp w150" id="new-pwd2" placeholder="Повторите пароль"></div>
             <button class="btn btn-p btn-sm" onclick="changePwd()">Сохранить</button>
           </div>
+        </div>
+      </div>
+      <div class="panel" style="margin-bottom:16px" id="shared-banks-panel">
+        <div class="panel-h">Общие счета</div>
+        <div class="panel-b">
+          <div style="font-size:13px;color:var(--text3);margin-bottom:12px">Отметь счета, которые являются общими. Все остальные считаются твоими. В Сверке месяца, Аналитике и на странице «Резервы» будут отдельные итоги: общие, мои и всего.</div>
+          <div id="shared-banks-list"></div>
         </div>
       </div>
       <div class="panel" style="margin-bottom:16px" id="restricted-access-panel">
@@ -1095,6 +1120,13 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.cla
 
 // ─── ЖУРНАЛ ИЗМЕНЕНИЙ (заполняется вручную при каждой правке) ─────
 const CHANGELOG=[
+  {id:34,date:'08.10.2026',title:'Резервы, общие счета и валюты в аналитике',items:[
+    'Новая страница «Резервы»: мини-сверка остатков по счетам, резерв в сумме, цели с бюджетом и папки резервов (Отпуск, Свадьба…)',
+    'Настройки → «Общие счета»: отметь общие счета — в Сверке месяца и Аналитике появятся отдельные итоги «Общие / Мои / Всего»',
+    'Таблицы «категория × месяц» — переключатель валют вместо отдельной таблицы на каждую',
+    'Доходы и расходы по категориям за месяц — колонки по валютам и строка «Итоги»',
+    'Починен переход из Аналитики в Журнал по клику на сумму'
+  ]},
   {id:33,date:'01.10.2026',title:'Память фильтров, починка столбцов, таблица категорий по месяцам, доступ для другого человека',items:[
     'Журнал и Сверка теперь помнят месяц, банк, категорию, поиск и сортировку после обновления страницы — не сбрасываются на текущий месяц',
     'Починка «плывущих» столбцов: ширины теперь всегда пересчитываются от чистой разметки, а не от уже сжатой — не должны больше скакать',
@@ -2008,6 +2040,8 @@ async function renderSverka(){
 
   // Totals for footer row — считаем ОТДЕЛЬНО по каждой валюте, валюты нельзя складывать вместе
   const totalsByCurr={};
+  const totalsByGroup={};
+  const sharedIdsSv=getSharedBankIds();
   active.forEach(b=>{
     const c=b.currency||'RUB';
     if(!totalsByCurr[c])totalsByCurr[c]={totSumInc:0,totSumExp:0,totStart:0,totEnd:0,totDelta:0,totIncOut:0,totExpOut:0,totTrIn:0,totTrOut:0,totIncI:0,totExpI:0,totReserve:0};
@@ -2024,6 +2058,20 @@ async function renderSverka(){
     t.totTrIn+=a.tr_in;t.totTrOut+=a.tr_out;
     t.totIncI+=a.income_i;t.totExpI+=a.expense_i;
     t.totReserve+=reserveByBank[b.id]||0;
+    // Отдельные итоги: общие счета / мои счета (по настройке «Общие счета»)
+    if(sharedIdsSv.length){
+      const grp=sharedIdsSv.includes(String(b.id))?'shared':'mine';
+      const gk=c+'|'+grp;
+      if(!totalsByGroup[gk])totalsByGroup[gk]={totSumInc:0,totSumExp:0,totStart:0,totEnd:0,totDelta:0,totIncOut:0,totExpOut:0,totTrIn:0,totTrOut:0,totIncI:0,totExpI:0,totReserve:0};
+      const g=totalsByGroup[gk];
+      g.totSumInc+=sumInc;g.totSumExp+=sumExp;
+      g.totStart+=bal.start||0;g.totEnd+=autoEnd;
+      g.totDelta+=autoEnd-(bal.start||0);
+      g.totIncOut+=a.income;g.totExpOut+=a.expense;
+      g.totTrIn+=a.tr_in;g.totTrOut+=a.tr_out;
+      g.totIncI+=a.income_i;g.totExpI+=a.expense_i;
+      g.totReserve+=reserveByBank[b.id]||0;
+    }
   });
 
   const noOpsHidden=localStorage.getItem('no_ops_hidden')==='1';
@@ -2057,6 +2105,11 @@ async function renderSverka(){
     const t=totalsByCurr[curr];
     if(t){
       const label=multiCurr?`Итого · ${CURRENCY[curr]||curr} ${CURRENCY_NAME[curr]||curr}`:'Итого';
+      if(sharedIdsSv.length){
+        const sym=CURRENCY[curr]||curr;
+        if(totalsByGroup[curr+'|shared'])bodyHtml+=renderSverkaTotalRowHTML('👥 Общие · '+sym,totalsByGroup[curr+'|shared']);
+        if(totalsByGroup[curr+'|mine'])bodyHtml+=renderSverkaTotalRowHTML('👤 Мои · '+sym,totalsByGroup[curr+'|mine']);
+      }
       bodyHtml+=renderSverkaTotalRowHTML(label,t);
     }
   });
@@ -2134,6 +2187,125 @@ async function loadReserveByBank(uptoMonth){
     else if(r.type==='reserve_in')out[r.bank_id]=(out[r.bank_id]||0)-(parseFloat(r.amount)||0);
   });
   return out;
+}
+
+// ─── СТРАНИЦА «РЕЗЕРВЫ» ──────────────────────────────────────────
+// Цели хранятся в app_settings.reserve_goals: {"Отпуск":{"budget":300000,"cur":"RUB"}, ...}
+// Папка резерва = категория с типом «Резерв» (операции «В резерв» / «Из резерва» с этой категорией)
+function getReserveGoals(){
+  try{return JSON.parse(appSettings['reserve_goals']||'{}')||{};}catch(e){return{};}
+}
+async function setReserveGoal(name,patch){
+  const goals=getReserveGoals();
+  goals[name]=Object.assign({budget:0,cur:'RUB'},goals[name]||{},patch);
+  await saveAppSetting('reserve_goals',JSON.stringify(goals));
+  renderReserves();
+}
+function resEnc(n){return encodeURIComponent(n);}
+function onResGoalBudget(encName,val){
+  const n=parseFloat(String(val).replace(/\s/g,'').replace(',','.'))||0;
+  setReserveGoal(decodeURIComponent(encName),{budget:n});
+}
+function onResGoalCur(encName,cur){setReserveGoal(decodeURIComponent(encName),{cur});}
+async function addReserveFolder(){
+  const inp=document.getElementById('res-new-folder');
+  const name=(inp.value||'').trim();
+  if(!name){toast('Введите название папки');return;}
+  try{
+    await q('INSERT INTO categories(name,sort_order,type) VALUES($1,$2,$3)',[name,categories.length+1,'reserve']);
+    await loadCategories();inp.value='';toast('✓ Папка добавлена');renderReserves();
+  }catch(e){toast('Такая категория уже есть или ошибка');}
+}
+async function renderReserves(){
+  const lbl=document.getElementById('res-month-lbl');
+  if(lbl)lbl.textContent='· '+curMonth;
+  const [allRecs,janBals]=await Promise.all([loadAllRecords(),loadBalances(MONTHS[0])]);
+  const upto=MONTHS.indexOf(curMonth);
+  const sharedIds=getSharedBankIds();
+  const hasShared=sharedIds.length>0;
+  // остаток на конец выбранного месяца и резерв по каждому счёту (кредитные и брокерские не считаем)
+  const rows=banks.filter(b=>b.type!=='credit'&&b.type!=='broker').map(b=>{
+    let end=(janBals[b.id]||{start:0}).start||0,res=0;
+    allRecs.forEach(r=>{
+      if(r.bank_id!==b.id||MONTHS.indexOf(r.month)>upto)return;
+      const a=parseFloat(r.amount)||0;
+      if(r.type==='income'||r.type==='income_i'||r.type==='tr_in')end+=a;
+      else if(r.type==='expense'||r.type==='expense_i'||r.type==='tr_out')end-=a;
+      else if(r.type==='reserve_out')res+=a;
+      else if(r.type==='reserve_in')res-=a;
+    });
+    return{b,cur:b.currency||'RUB',end,res,shared:sharedIds.includes(String(b.id))};
+  }).filter(x=>x.end||x.res||allRecs.some(r=>r.bank_id===x.b.id));
+  const curs=sortedCurrencies([...new Set(rows.map(x=>x.cur))]);
+  const th='padding:6px 12px;text-align:right;font-size:12px;color:var(--text3);text-transform:uppercase';
+  const sumRow=(label,list,bold)=>{
+    const e=list.reduce((s,x)=>s+x.end,0),r=list.reduce((s,x)=>s+x.res,0);
+    return `<tr style="background:var(--surface2);font-weight:${bold?800:700}"><td style="padding:6px 12px">${label}</td><td style="text-align:right;padding:6px 12px">${fmtF(e)}</td><td style="text-align:right;padding:6px 12px;color:var(--purple)">${r?fmtF(r):'—'}</td><td style="text-align:right;padding:6px 12px;color:var(--green)">${fmtF(e-r)}</td></tr>`;
+  };
+  const bankRow=x=>`<tr><td style="padding:6px 12px"><span class="bdot-sm" style="background:${x.b.color}"></span> ${x.b.name}</td><td style="text-align:right;padding:6px 12px">${fmtF(x.end)}</td><td style="text-align:right;padding:6px 12px;color:var(--purple)">${x.res?fmtF(x.res):'—'}</td><td style="text-align:right;padding:6px 12px">${fmtF(x.end-x.res)}</td></tr>`;
+  document.getElementById('res-recon').innerHTML=curs.length?`<table style="width:100%;border-collapse:collapse;font-size:14px">
+    <thead><tr><th style="${th};text-align:left">Счёт</th><th style="${th}">Остаток</th><th style="${th}">🪙 Резерв</th><th style="${th}">Свободно</th></tr></thead>
+    <tbody>${curs.map(cur=>{
+      const sym=CURRENCY[cur]||cur;
+      const list=rows.filter(x=>x.cur===cur);
+      const head=`<tr><td colspan="4" style="padding:4px 12px;background:var(--accent-l);font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase">${sym} ${CURRENCY_NAME[cur]||cur}</td></tr>`;
+      if(!hasShared)return head+list.map(bankRow).join('')+sumRow('Итого · '+sym,list,true);
+      const sh=list.filter(x=>x.shared),mi=list.filter(x=>!x.shared);
+      return head
+        +(sh.length?`<tr><td colspan="4" style="padding:4px 12px;font-weight:700">👥 Общие счета</td></tr>${sh.map(bankRow).join('')}${sumRow('Итого общие · '+sym,sh)}`:'')
+        +(mi.length?`<tr><td colspan="4" style="padding:4px 12px;font-weight:700">👤 Мои счета</td></tr>${mi.map(bankRow).join('')}${sumRow('Итого мои · '+sym,mi)}`:'')
+        +sumRow('Всего · '+sym,list,true);
+    }).join('')}</tbody></table>`:'<div class="empty">Нет данных</div>';
+
+  // Резерв в сумме по валютам
+  const totalByCur={};
+  rows.forEach(x=>{const t=totalByCur[x.cur]=totalByCur[x.cur]||{all:0,shared:0,mine:0};t.all+=x.res;if(x.shared)t.shared+=x.res;else t.mine+=x.res;});
+  const tcs=sortedCurrencies(Object.keys(totalByCur));
+  document.getElementById('res-total').innerHTML=tcs.length?tcs.map(cur=>{
+    const t=totalByCur[cur];
+    return `<div style="display:inline-block;margin:0 28px 6px 0;vertical-align:top"><div style="font-size:12px;color:var(--text3);font-weight:700;text-transform:uppercase">${CURRENCY[cur]||cur} ${CURRENCY_NAME[cur]||cur}</div>
+      <div style="font-family:Manrope,sans-serif;font-size:30px;font-weight:800;color:var(--purple)">${fmtF(t.all)}</div>
+      ${hasShared?`<div style="font-size:13px;color:var(--text2)">👥 общие: <b>${fmtF(t.shared)}</b> · 👤 мои: <b>${fmtF(t.mine)}</b></div>`:''}</div>`;
+  }).join(''):'<div class="empty">Резервов пока нет</div>';
+
+  // Папки (цели): категории типа reserve + любые категории, по которым уже есть резервные операции
+  const folderCur={}; // folderCur[папка][валюта] = сумма
+  allRecs.forEach(r=>{
+    if(r.type!=='reserve_out'&&r.type!=='reserve_in')return;
+    if(MONTHS.indexOf(r.month)>upto)return;
+    const f=r.category||'Резерв';
+    const c=recCurrency(r);
+    const a=(parseFloat(r.amount)||0)*(r.type==='reserve_out'?1:-1);
+    ((folderCur[f]=folderCur[f]||{})[c]=(folderCur[f][c]||0)+a);
+  });
+  const names=[...new Set([...categories.filter(c=>c.type==='reserve').map(c=>c.name),...Object.keys(folderCur)])];
+  const goals=getReserveGoals();
+  const goalCurs=sortedCurrencies([...new Set([...names.map(n=>(goals[n]||{}).cur||'RUB'),...Object.values(folderCur).flatMap(o=>Object.keys(o))])]);
+  const totSaved={},totGoal={};
+  const inpStyle='width:110px;text-align:right';
+  const body=names.map(n=>{
+    const g=goals[n]||{budget:0,cur:'RUB'};
+    const amounts=folderCur[n]||{};
+    const saved=amounts[g.cur]||0;
+    Object.entries(amounts).forEach(([c,v])=>totSaved[c]=(totSaved[c]||0)+v);
+    if(g.budget)totGoal[g.cur]=(totGoal[g.cur]||0)+g.budget;
+    const pct=g.budget>0?Math.max(0,Math.min(100,saved/g.budget*100)):0;
+    const left=g.budget>0?g.budget-saved:null;
+    const savedTxt=Object.keys(amounts).length?sortedCurrencies(Object.keys(amounts)).map(c=>fmtCur(amounts[c],c)).join(' · '):'—';
+    const e=resEnc(n);
+    return `<tr><td style="padding:8px 12px;font-weight:600">${n==='Резерв'?'Резерв (без папки)':n}</td>
+      <td style="padding:8px 12px;text-align:right;color:var(--purple);font-weight:700;white-space:nowrap">${savedTxt}</td>
+      <td style="padding:8px 12px;text-align:right;white-space:nowrap"><input class="inp" style="${inpStyle}" value="${g.budget||''}" placeholder="бюджет" onchange="onResGoalBudget('${e}',this.value)"> <select class="inp" style="width:64px" onchange="onResGoalCur('${e}',this.value)">${Object.keys(CURRENCY).map(c=>`<option value="${c}"${c===g.cur?' selected':''}>${CURRENCY[c]}</option>`).join('')}</select></td>
+      <td style="padding:8px 12px;text-align:right;white-space:nowrap;color:${left!==null&&left<=0?'var(--green)':'var(--text2)'}">${left===null?'—':(left<=0?'✓ достигнута':fmtCur(left,g.cur))}</td>
+      <td style="padding:8px 12px;min-width:140px">${g.budget>0?`<div style="height:8px;border-radius:4px;background:var(--surface2);overflow:hidden"><div style="height:100%;width:${pct}%;background:${pct>=100?'var(--green)':'var(--purple)'}"></div></div><div style="font-size:12px;color:var(--text3);margin-top:2px">${Math.round(pct)}%</div>`:''}</td></tr>`;
+  }).join('');
+  const sumCur=cs=>sortedCurrencies(Object.keys(cs)).map(c=>fmtCur(cs[c],c)).join(' · ')||'—';
+  const leftCs={};
+  Object.keys(totGoal).forEach(c=>{leftCs[c]=totGoal[c]-(totSaved[c]||0);});
+  document.getElementById('res-goals').innerHTML=names.length?`<table style="width:100%;border-collapse:collapse;font-size:14px">
+    <thead><tr><th style="${th};text-align:left">Цель / папка</th><th style="${th}">Накоплено</th><th style="${th}">Бюджет цели</th><th style="${th}">Осталось</th><th style="${th};text-align:left">Прогресс</th></tr></thead>
+    <tbody>${body}<tr style="background:var(--surface2);font-weight:800;border-top:2px solid var(--border2)"><td style="padding:8px 12px">Итого</td><td style="padding:8px 12px;text-align:right;color:var(--purple);white-space:nowrap">${sumCur(totSaved)}</td><td style="padding:8px 12px;text-align:right;white-space:nowrap">${sumCur(totGoal)}</td><td style="padding:8px 12px;text-align:right;white-space:nowrap">${sumCur(leftCs)}</td><td></td></tr></tbody></table>`
+    :'<div class="empty" style="padding:16px">Папок пока нет — добавь первую (например, «Отпуск») кнопкой выше</div>';
 }
 
 // ─── DASHBOARD ──────────────────────────────────────────────────
@@ -2241,6 +2413,8 @@ async function renderDash(){
       <span style="font-size:18px;font-weight:800;color:#4ade80;font-family:Manrope,sans-serif">${fmtF(totalFree)}</span>
     </div>`:''}`;
 
+  // Общие / мои счета — остаток (без кредитных) и операции выбранного месяца, отдельно по каждой валюте
+  renderDashGroups(allRecsForTotal,bankEndMap);
   // Другие валюты — показываем отдельным блоком, каждую валюту своей суммой (не смешивая с рублями)
   const otherCurrKeys=Object.keys(totalByCurrency).filter(c=>c!=='RUB');
   const otherCurrSection=document.getElementById('dash-other-currencies');
@@ -2346,76 +2520,145 @@ async function renderDash(){
     return true;
   }).map(b=>b.id));
   const recsCurMonth=allRecsForTotal.filter(r=>r.month===curMonth&&filteredBankIdsCat.has(r.bank_id));
+  // Валюты не складываем: данные раскладываем по валюте счёта — catX[валюта][категория] = сумма
   const catExpM={},catIncM={};
   recsCurMonth.forEach(r=>{
     const cat=r.category||'Без категории';
     const amt=parseFloat(r.amount)||0;
-    if(r.type==='expense')catExpM[cat]=(catExpM[cat]||0)+amt;
-    if(r.type==='income')catIncM[cat]=(catIncM[cat]||0)+amt;
+    const cur=recCurrency(r);
+    if(r.type==='expense'){(catExpM[cur]=catExpM[cur]||{})[cat]=(catExpM[cur][cat]||0)+amt;}
+    if(r.type==='income'){(catIncM[cur]=catIncM[cur]||{})[cat]=(catIncM[cur][cat]||0)+amt;}
   });
   document.getElementById('dash-cat-month-exp').textContent=curMonth;
   document.getElementById('dash-cat-month-inc').textContent=curMonth;
-  const totalExpM=Object.values(catExpM).reduce((s,v)=>s+v,0);
-  const totalIncM=Object.values(catIncM).reduce((s,v)=>s+v,0);
-  document.getElementById('dash-cat-total-exp').textContent=totalExpM?fmt(totalExpM):'';
-  document.getElementById('dash-cat-total-inc').textContent=totalIncM?fmt(totalIncM):'';
-  function renderCatList(data,color,elId,opType){
-    const sorted=Object.entries(data).sort((a,b)=>b[1]-a[1]);
-    const max=sorted[0]?sorted[0][1]:1;
-    document.getElementById(elId).innerHTML=sorted.length
-      ?sorted.map(([c,v])=>{
-        const isNoCat=c==='Без категории';
-        const clickArg=encCat(isNoCat?'__nocat__':c);
-        return `<div class="cat-row" style="cursor:pointer" onclick="goToCatMonth('${clickArg}','${curMonth}','${opType}')">
-          <div class="cat-name">${catEmoji(c)} ${c}</div>
-          <div class="cat-track"><div class="cat-fill" style="width:${Math.round(v/max*100)}%;background:${color}"></div></div>
-          <div class="cat-val" style="color:${color}">${fmt(v)}</div>
+  // Итог в заголовке — отдельно по каждой валюте: «12 000 ₽ · 50 $»
+  const totalsText=byCur=>sortedCurrencies(Object.keys(byCur)).map(c=>{
+    const t=Object.values(byCur[c]).reduce((s,v)=>s+v,0);
+    return t?fmtCur(t,c):'';
+  }).filter(Boolean).join(' · ');
+  document.getElementById('dash-cat-total-exp').textContent=totalsText(catExpM);
+  document.getElementById('dash-cat-total-inc').textContent=totalsText(catIncM);
+  function renderCatList(byCur,color,elId,opType){
+    const curs=sortedCurrencies(Object.keys(byCur));
+    const el=document.getElementById(elId);
+    if(!curs.length){el.innerHTML='<div class="empty">Нет данных за этот месяц</div>';return;}
+    // cats[категория][валюта] = сумма — один список категорий, отдельный столбец на каждую валюту
+    const cats={};
+    curs.forEach(cur=>Object.entries(byCur[cur]).forEach(([c,v])=>{(cats[c]=cats[c]||{})[cur]=v;}));
+    const mainCur=curs[0]; // полоска — по основной валюте (рубли, если они есть)
+    const rowsData=Object.entries(cats).sort((a,b)=>{
+      const av=a[1][mainCur]||0,bv=b[1][mainCur]||0;
+      if(av!==bv)return bv-av;
+      return Object.values(b[1]).reduce((s,x)=>s+x,0)-Object.values(a[1]).reduce((s,x)=>s+x,0);
+    });
+    const max=Math.max(...rowsData.map(([,m])=>m[mainCur]||0),1);
+    const cols=`minmax(90px,160px) minmax(30px,1fr) repeat(${curs.length},minmax(84px,auto))`;
+    const rowStyle=`display:grid;grid-template-columns:${cols};align-items:center;gap:8px;`;
+    const header=`<div style="${rowStyle}padding:2px 0 6px;font-size:11px;font-weight:700;color:var(--text3)"><div></div><div></div>${curs.map(c=>`<div style="text-align:right">${CURRENCY[c]||c} ${c}</div>`).join('')}</div>`;
+    const totals=`<div style="${rowStyle}padding:8px 6px;margin:0 -6px;background:var(--accent-l);border-radius:6px;font-weight:800"><div style="color:var(--accent)">Итоги</div><div></div>${curs.map(c=>{const t=Object.values(byCur[c]).reduce((s,v)=>s+v,0);return `<div style="text-align:right;color:${color}">${fmtCur(t,c)}</div>`;}).join('')}</div>`;
+    const body=rowsData.map(([c,m])=>{
+      const clickArg=encCat(c==='Без категории'?'__nocat__':c);
+      const firstCur=curs.find(x=>m[x])||mainCur;
+      const v0=m[mainCur]||0;
+      return `<div class="cat-row" style="${rowStyle}cursor:pointer;padding:7px 0" onclick="goToCatMonth('${clickArg}','${curMonth}','${opType}','${firstCur}')">
+          <div class="cat-name" style="width:auto">${catEmoji(c)} ${c}</div>
+          <div class="cat-track"><div class="cat-fill" style="width:${Math.round(v0/max*100)}%;background:${color}"></div></div>
+          ${curs.map(cur=>m[cur]?`<div class="cat-val" style="width:auto;color:${color}" onclick="event.stopPropagation();goToCatMonth('${clickArg}','${curMonth}','${opType}','${cur}')">${cur==='RUB'?fmt(m[cur]):fmtCur(m[cur],cur)}</div>`:`<div class="cat-val" style="width:auto;color:var(--text3)">—</div>`).join('')}
         </div>`;
-      }).join('')
-      :'<div class="empty">Нет данных за этот месяц</div>';
+    }).join('');
+    el.style.overflowX='auto';
+    el.innerHTML=header+totals+body;
   }
   renderCatList(catExpM,'var(--red)','dash-cats-exp','expense');
   renderCatList(catIncM,'var(--green)','dash-cats-inc','income');
 
-  // Таблицы "категория × месяц" за весь год — расходы и доходы отдельно
+  // Таблицы "категория × месяц" за весь год — расходы и доходы отдельно, внутри — отдельная таблица на каждую валюту
   const recsYear=allRecsForTotal.filter(r=>filteredBankIdsCat.has(r.bank_id));
-  renderCatMonthTable(recsYear,'expense','var(--red)','dash-cat-month-head-exp','dash-cat-month-body-exp');
-  renderCatMonthTable(recsYear,'income','var(--green)','dash-cat-month-head-inc','dash-cat-month-body-inc');
+  renderCatMonthTables(recsYear,'expense','var(--red)','dash-cat-month-exp-wrap');
+  renderCatMonthTables(recsYear,'income','var(--green)','dash-cat-month-inc-wrap');
 }
 
-function renderCatMonthTable(recs,type,color,headId,bodyId){
-  const headEl=document.getElementById(headId),bodyEl=document.getElementById(bodyId);
-  if(!headEl||!bodyEl)return;
-  // data[категория][месяц] = сумма
-  const data={};
-  const totalsByMonth={};
-  MONTHS.forEach(m=>totalsByMonth[m]=0);
+// Общие / мои счета в Аналитике: остаток на последний месяц и операции выбранного месяца
+function renderDashGroups(allRecs,bankEndMap){
+  const el=document.getElementById('dash-groups');
+  if(!el)return;
+  const sharedIds=getSharedBankIds();
+  if(!sharedIds.length){el.style.display='none';return;}
+  const data={}; // data[валюта][shared|mine] = {bal,inc,exp}
+  const slot=(cur,grp)=>((data[cur]=data[cur]||{})[grp]=data[cur][grp]||{bal:0,inc:0,exp:0});
+  banks.forEach(b=>{
+    if(b.type==='credit')return;
+    slot(b.currency||'RUB',sharedIds.includes(String(b.id))?'shared':'mine').bal+=bankEndMap[b.id]||0;
+  });
+  allRecs.filter(r=>r.month===curMonth).forEach(r=>{
+    const b=bank(r.bank_id);
+    if(!b||b.type==='credit')return;
+    const s=slot(b.currency||'RUB',sharedIds.includes(String(r.bank_id))?'shared':'mine');
+    if(r.type==='income')s.inc+=parseFloat(r.amount)||0;
+    else if(r.type==='expense')s.exp+=parseFloat(r.amount)||0;
+  });
+  const curs=sortedCurrencies(Object.keys(data));
+  const cell=(v,c)=>`<td style="text-align:right;padding:4px 10px;font-weight:700;color:${c}">${fmt(v)}</td>`;
+  const row=(label,cur,g)=>`<tr><td style="padding:4px 10px;font-weight:600">${label}</td>${cell(g.bal,'var(--money-card-text)')}${cell(g.inc,'var(--green)')}${cell(g.exp,'var(--red)')}</tr>`;
+  const zero={bal:0,inc:0,exp:0};
+  const sum=(a,b)=>({bal:a.bal+b.bal,inc:a.inc+b.inc,exp:a.exp+b.exp});
+  el.style.display='block';
+  el.innerHTML=`<div style="font-size:11px;font-weight:700;color:var(--money-card-text-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Общие и мои счета · остаток и операции за ${curMonth} (без кредитных)</div>
+  <div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:14px;color:var(--money-card-text)">
+  <thead><tr style="color:var(--money-card-text-dim);font-size:12px;text-transform:uppercase"><th style="text-align:left;padding:4px 10px"></th><th style="text-align:right;padding:4px 10px">Остаток</th><th style="text-align:right;padding:4px 10px">Приход</th><th style="text-align:right;padding:4px 10px">Расход</th></tr></thead>
+  <tbody>${curs.map(cur=>{
+    const sym=CURRENCY[cur]||cur;
+    const sh=data[cur].shared||zero,mi=data[cur].mine||zero;
+    return row('👥 Общие · '+sym,cur,sh)+row('👤 Мои · '+sym,cur,mi)+`<tr style="border-top:1px solid var(--border)">${row('Всего · '+sym,cur,sum(sh,mi)).slice(4)}`;
+  }).join('')}</tbody></table></div>`;
+}
+// Валюта операции = валюта её счёта
+function recCurrency(r){return bank(r.bank_id).currency||'RUB';}
+function sortedCurrencies(list){return [...list].sort((a,b)=>a==='RUB'?-1:b==='RUB'?1:a.localeCompare(b));}
+function fmtCur(v,c){return fmt(v)+' '+(CURRENCY[c]||c);}
+
+let catMonthCur=null,catMonthRecsCache=null;
+function setCatMonthCur(cur){
+  catMonthCur=cur;
+  if(catMonthRecsCache){
+    renderCatMonthTables(catMonthRecsCache,'expense','var(--red)','dash-cat-month-exp-wrap');
+    renderCatMonthTables(catMonthRecsCache,'income','var(--green)','dash-cat-month-inc-wrap');
+  }
+}
+function renderCatMonthTables(recs,type,color,wrapId){
+  const wrap=document.getElementById(wrapId);
+  if(!wrap)return;
+  catMonthRecsCache=recs;
+  // Валюты, в которых есть операции (расходы или доходы) — переключатель общий для обоих блоков
+  const allCurs=sortedCurrencies([...new Set(recs.filter(r=>r.type==='expense'||r.type==='income').map(recCurrency))]);
+  if(!allCurs.length){wrap.innerHTML='<div style="padding:16px;color:var(--text3)">Нет данных</div>';return;}
+  if(!catMonthCur||!allCurs.includes(catMonthCur))catMonthCur=allCurs[0];
+  const cur=catMonthCur;
+  const sym=CURRENCY[cur]||cur;
+  const switcher=allCurs.length>1?`<div style="display:flex;gap:6px;padding:10px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap">${allCurs.map(c=>`<button type="button" class="${c===cur?'btn btn-sm btn-p':'btn btn-sm btn-g'}" onclick="setCatMonthCur('${c}')">${CURRENCY[c]||c} ${CURRENCY_NAME[c]||c}</button>`).join('')}</div>`:'';
+  // data[категория][месяц] = сумма — только выбранная валюта
+  const data={},tm={};
   recs.forEach(r=>{
-    if(r.type!==type)return;
+    if(r.type!==type||recCurrency(r)!==cur)return;
     const cat=r.category||'Без категории';
     const amt=parseFloat(r.amount)||0;
-    if(!data[cat])data[cat]={};
-    data[cat][r.month]=(data[cat][r.month]||0)+amt;
-    totalsByMonth[r.month]=(totalsByMonth[r.month]||0)+amt;
+    (data[cat]=data[cat]||{})[r.month]=(data[cat][r.month]||0)+amt;
+    tm[r.month]=(tm[r.month]||0)+amt;
   });
   const cats=Object.keys(data).map(c=>({name:c,total:Object.values(data[c]).reduce((s,v)=>s+v,0)})).sort((a,b)=>b.total-a.total);
-  if(!cats.length){
-    headEl.innerHTML='';
-    bodyEl.innerHTML='<tr><td style="padding:16px;color:var(--text3)">Нет данных</td></tr>';
-    return;
-  }
-  headEl.innerHTML='<th style="text-align:left">Категория</th>'+MONTHS.map(m=>`<th>${m.slice(0,3)}</th>`).join('')+'<th style="background:var(--surface2)">Итого</th>';
-  bodyEl.innerHTML=cats.map(({name:cat,total})=>{
-    const isNoCat=cat==='Без категории';
-    const clickArg=encCat(isNoCat?'__nocat__':cat);
+  if(!cats.length){wrap.innerHTML=switcher+'<div style="padding:16px;color:var(--text3)">Нет данных в этой валюте</div>';return;}
+  const head='<th style="text-align:left">Категория</th>'+MONTHS.map(m=>`<th>${m.slice(0,3)}</th>`).join('')+'<th style="background:var(--surface2)">Итого</th>';
+  const rows=cats.map(({name:cat,total})=>{
+    const clickArg=encCat(cat==='Без категории'?'__nocat__':cat);
     const cells=MONTHS.map(m=>{
       const v=data[cat][m];
-      return `<td${v?` style="cursor:pointer;color:${color}" onclick="goToCatMonth('${clickArg}','${m}','${type}')"`:''}>${v?fmt(v):'—'}</td>`;
+      return `<td${v?` style="cursor:pointer;color:${color}" onclick="goToCatMonth('${clickArg}','${m}','${type}','${cur}')"`:''}>${v?fmt(v):'—'}</td>`;
     }).join('');
     return `<tr><td style="text-align:left;font-weight:600">${catEmoji(cat)} ${cat}</td>${cells}<td style="font-weight:700;background:var(--surface2)">${fmt(total)}</td></tr>`;
-  }).join('')+
-    `<tr style="font-weight:800"><td style="text-align:left">Итого</td>${MONTHS.map(m=>`<td>${totalsByMonth[m]?fmt(totalsByMonth[m]):'—'}</td>`).join('')}<td style="background:var(--surface2)">${fmt(Object.values(totalsByMonth).reduce((s,v)=>s+v,0))}</td></tr>`;
-  makeColumnsResizable(document.getElementById(headId.includes('exp')?'dash-cat-month-table-exp':'dash-cat-month-table-inc'));
+  }).join('');
+  const totalRow=`<tr style="font-weight:800"><td style="text-align:left">Итого, ${sym}</td>${MONTHS.map(m=>`<td>${tm[m]?fmt(tm[m]):'—'}</td>`).join('')}<td style="background:var(--surface2)">${fmt(Object.values(tm).reduce((s,v)=>s+v,0))}</td></tr>`;
+  wrap.innerHTML=`${switcher}<table class="svt" id="dash-cmt-${type}" style="min-width:900px"><thead><tr>${head}</tr></thead><tbody>${rows}${totalRow}</tbody></table>`;
+  makeColumnsResizable(document.getElementById(`dash-cmt-${type}`));
 }
 
 function catEmoji(name){
@@ -2577,7 +2820,7 @@ function goToCat(cat,type){
   go('journal');applyJournalScopeLabels();
 }
 let cameFromAnalytics=false;
-function goToCatMonth(cat,month,type){
+function goToCatMonth(cat,month,type,cur){
   cat=decCat(cat);
   journalScope='bank';
   resetJournalFilters();
@@ -2591,6 +2834,7 @@ function goToCatMonth(cat,month,type){
   // Переносим фильтры Аналитики (тип счёта и валюта), чтобы список совпадал с цифрой
   if(dashTypeFilter)document.getElementById('jf-accttype').value=dashTypeFilter;
   if(dashCurrFilterH)jrnCurrFilter=dashCurrFilterH;
+  if(cur)jrnCurrFilter=cur; // сумма в Аналитике — по одной валюте, Журнал открываем в той же
   go('journal');
   applyJournalScopeLabels();
 }
@@ -3108,7 +3352,7 @@ function fillBankSelects(){
 }
 
 // ─── NAVIGATION ───────────────────────────────────────────────────
-const RESTRICTED_BLOCKED_VIEWS=['settings','brokersummary'];
+const RESTRICTED_BLOCKED_VIEWS=['settings','brokersummary','reserves'];
 async function go(name){
   if(userRole==='restricted'&&RESTRICTED_BLOCKED_VIEWS.includes(name))name='journal';
   if(name!=='journal')cameFromAnalytics=false;
@@ -3123,12 +3367,13 @@ async function go(name){
   if(name==='sverka')renderSverka();
   if(name==='settings')renderSettings();
   if(name==='brokersummary')renderBrokerSummary();
+  if(name==='reserves')renderReserves();
   if(name==='creditcards')renderCreditCards();
   renderNav();
 }
 
 function initTabs(){
-  ['mt-dash','mt-journal','mt-sverka','mt-brokersummary'].forEach(id=>{
+  ['mt-dash','mt-journal','mt-sverka','mt-brokersummary','mt-reserves'].forEach(id=>{
     const c=document.getElementById(id);if(!c)return;
     c.innerHTML=MONTHS.map(m=>`<button class="mtab${m===curMonth?' active':''}" onclick="selMonth('${m}')">${m.slice(0,3)}</button>`).join('');
   });
@@ -3147,6 +3392,7 @@ function selMonth(m){
   if(id==='journal')renderJournal();
   if(id==='sverka')renderSverka();
   if(id==='brokersummary')renderBrokerSummary();
+  if(id==='reserves')renderReserves();
 }
 
 // ─── СВОДКА ПО БРОКЕРАМ (MVP: остатки + движения за месяц) ─────────
@@ -3460,7 +3706,7 @@ async function renderSettings(){
   const colorBg=document.getElementById('setting-color-bg');
   if(colorBg)colorBg.value=getCustomColor('bg')||'#f3f7f8';
 
-  renderRestrictedAccessSettings();
+  renderRestrictedAccessSettings();renderSharedBanksSettings();
 
   const depBanks=banks.filter(b=>b.type==='deposit'||b.type==='savings');
   document.getElementById('dep-settings-list').innerHTML=depBanks.length
@@ -3939,6 +4185,9 @@ const NAV_GROUPS=[
   {id:'dashboard',label:'Аналитика',standalone:true,action:"go('dashboard')",
     icon:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
     matches:v=>v==='dashboard'},
+  {id:'reserves',label:'Резервы',standalone:true,action:"go('reserves')",
+    icon:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10"/><path d="M9.5 9.5c0-1 1-1.7 2.5-1.7s2.5.7 2.5 1.7-1 1.6-2.5 1.9-2.5.9-2.5 1.9 1 1.7 2.5 1.7 2.5-.7 2.5-1.7"/></svg>',
+    matches:v=>v==='reserves'},
   {id:'banks',label:'Банки',standalone:false,
     icon:'<svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M9 21V13h6v8"/></svg>',
     matches:v=>v==='journal'&&journalScope==='bank'||v==='sverka'||v==='creditcards',
@@ -3964,7 +4213,7 @@ function getTopGroupOrder(){
   const defaultOrder=NAV_GROUPS.map(g=>g.id);
   try{
     const saved=JSON.parse(raw||'null');
-    if(saved&&Array.isArray(saved)&&saved.length===defaultOrder.length&&defaultOrder.every(id=>saved.includes(id)))return saved;
+    if(saved&&Array.isArray(saved)){const known=saved.filter(id=>defaultOrder.includes(id));const missing=defaultOrder.filter(id=>!known.includes(id));if(known.length)return [...known,...missing];}
   }catch(e){}
   return defaultOrder;
 }
@@ -4003,6 +4252,31 @@ function renderTopGroupOrderSettings(){
     <span style="width:16px;height:16px;color:var(--text3);flex-shrink:0;display:flex">${g.icon}</span>
     <span style="font-size:14px;font-weight:500">${g.label}</span>
   </div>`).join('');
+}
+// ─── Общие счета: хранится в app_settings.shared_banks (JSON-массив id) ───
+function getSharedBankIds(){
+  try{return JSON.parse(appSettings['shared_banks']||'[]').map(String);}catch(e){return[];}
+}
+function isSharedBank(bankId){return getSharedBankIds().includes(String(bankId));}
+function renderSharedBanksSettings(){
+  const list=document.getElementById('shared-banks-list');
+  const panel=document.getElementById('shared-banks-panel');
+  if(!list)return;
+  if(panel)panel.style.display=userRole==='owner'?'':'none';
+  const shared=getSharedBankIds();
+  list.innerHTML=banks.length
+    ?banks.map(b=>`<label style="display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer">
+        <input type="checkbox" ${shared.includes(String(b.id))?'checked':''} onchange="toggleSharedBank('${b.id}',this.checked)">
+        <span class="bdot-sm" style="background:${b.color}"></span>
+        <span style="font-size:14px">${b.name}</span>
+      </label>`).join('')
+    :'<div class="empty" style="padding:4px 0">Сначала добавь счета в списке «Счета и карты»</div>';
+}
+async function toggleSharedBank(bankId,checked){
+  const cur=getSharedBankIds();
+  const next=checked?[...new Set([...cur,String(bankId)])]:cur.filter(id=>id!==String(bankId));
+  await saveAppSetting('shared_banks',JSON.stringify(next));
+  toast('✓ Сохранено');
 }
 // ─── Доступ для другого человека (ограниченная роль, Вариант А — просто, без серверной защиты) ───
 function renderRestrictedAccessSettings(){
@@ -4119,7 +4393,7 @@ function renderNav(){
   const groups=orderedTopGroups().filter(g=>{
     if(g.id==='brokers'&&isBrokersHidden())return false;
     // Ограниченный доступ: видна только работа со счетами (журнал/сверка/кредитки) — без аналитики, брокеров и настроек
-    if(userRole==='restricted'&&(g.id==='settings'||g.id==='brokers'))return false;
+    if(userRole==='restricted'&&(g.id==='settings'||g.id==='brokers'||g.id==='reserves'))return false;
     return true;
   });
   let manuallyExpanded=getExpandedGroups();
