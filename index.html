@@ -2359,14 +2359,14 @@ async function renderDash(){
   const totalIncM=Object.values(catIncM).reduce((s,v)=>s+v,0);
   document.getElementById('dash-cat-total-exp').textContent=totalExpM?fmt(totalExpM):'';
   document.getElementById('dash-cat-total-inc').textContent=totalIncM?fmt(totalIncM):'';
-  function renderCatList(data,color,elId){
+  function renderCatList(data,color,elId,opType){
     const sorted=Object.entries(data).sort((a,b)=>b[1]-a[1]);
     const max=sorted[0]?sorted[0][1]:1;
     document.getElementById(elId).innerHTML=sorted.length
       ?sorted.map(([c,v])=>{
         const isNoCat=c==='Без категории';
-        const clickArg=isNoCat?'__nocat__':c;
-        return `<div class="cat-row" style="cursor:pointer" onclick="goToCatMonth('${clickArg}','${curMonth}')">
+        const clickArg=encCat(isNoCat?'__nocat__':c);
+        return `<div class="cat-row" style="cursor:pointer" onclick="goToCatMonth('${clickArg}','${curMonth}','${opType}')">
           <div class="cat-name">${catEmoji(c)} ${c}</div>
           <div class="cat-track"><div class="cat-fill" style="width:${Math.round(v/max*100)}%;background:${color}"></div></div>
           <div class="cat-val" style="color:${color}">${fmt(v)}</div>
@@ -2374,8 +2374,8 @@ async function renderDash(){
       }).join('')
       :'<div class="empty">Нет данных за этот месяц</div>';
   }
-  renderCatList(catExpM,'var(--red)','dash-cats-exp');
-  renderCatList(catIncM,'var(--green)','dash-cats-inc');
+  renderCatList(catExpM,'var(--red)','dash-cats-exp','expense');
+  renderCatList(catIncM,'var(--green)','dash-cats-inc','income');
 
   // Таблицы "категория × месяц" за весь год — расходы и доходы отдельно
   const recsYear=allRecsForTotal.filter(r=>filteredBankIdsCat.has(r.bank_id));
@@ -2407,12 +2407,12 @@ function renderCatMonthTable(recs,type,color,headId,bodyId){
   headEl.innerHTML='<th style="text-align:left">Категория</th>'+MONTHS.map(m=>`<th>${m.slice(0,3)}</th>`).join('')+'<th style="background:var(--surface2)">Итого</th>';
   bodyEl.innerHTML=cats.map(({name:cat,total})=>{
     const isNoCat=cat==='Без категории';
-    const clickArg=isNoCat?'__nocat__':cat;
+    const clickArg=encCat(isNoCat?'__nocat__':cat);
     const cells=MONTHS.map(m=>{
       const v=data[cat][m];
-      return `<td${v?` style="cursor:pointer;color:${color}" onclick="goToCatMonth('${clickArg}','${m}')"`:''}>${v?fmt(v):'—'}</td>`;
+      return `<td${v?` style="cursor:pointer;color:${color}" onclick="goToCatMonth('${clickArg}','${m}','${type}')"`:''}>${v?fmt(v):'—'}</td>`;
     }).join('');
-    return `<tr><td style="text-align:left;font-weight:600;cursor:pointer" onclick="goToCat('${clickArg}')">${catEmoji(cat)} ${cat}</td>${cells}<td style="font-weight:700;background:var(--surface2)">${fmt(total)}</td></tr>`;
+    return `<tr><td style="text-align:left;font-weight:600">${catEmoji(cat)} ${cat}</td>${cells}<td style="font-weight:700;background:var(--surface2)">${fmt(total)}</td></tr>`;
   }).join('')+
     `<tr style="font-weight:800"><td style="text-align:left">Итого</td>${MONTHS.map(m=>`<td>${totalsByMonth[m]?fmt(totalsByMonth[m]):'—'}</td>`).join('')}<td style="background:var(--surface2)">${fmt(Object.values(totalsByMonth).reduce((s,v)=>s+v,0))}</td></tr>`;
   makeColumnsResizable(document.getElementById(headId.includes('exp')?'dash-cat-month-table-exp':'dash-cat-month-table-inc'));
@@ -2552,20 +2552,45 @@ function setJrnBank(id){
 }
 function goToBank(bankId){
   journalScope='bank';
-  jrnBank=bankId;jrnCat='';
+  resetJournalFilters();
+  jrnBank=bankId;
   go('journal');
   applyJournalScopeLabels();
 }
-function goToCat(cat){journalScope='bank';jrnCat=cat;jrnBank='';go('journal');applyJournalScopeLabels();}
-let cameFromAnalytics=false;
-function goToCatMonth(cat,month){
+// Сбрасываем ВСЕ фильтры Журнала (в т.ч. сохранённые после обновления страницы) —
+// иначе при переходе из Аналитики они «просачиваются» и список операций не совпадает с цифрой, на которую нажали
+function resetJournalFilters(){
+  jrnBank='';jrnCat='';jrnSort='date_desc';jrnCurrFilter='';
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+  set('jf-type','');set('jf-search','');set('jf-accttype','');set('jf-sort','date_desc');
+  document.getElementById('clear-filter-btn')?.remove();
+}
+// Названия категорий передаём в onclick в закодированном виде — апострофы/кавычки в названии больше не ломают клик
+function encCat(c){return encodeURIComponent(c).replace(/'/g,'%27');}
+function decCat(c){try{return decodeURIComponent(c);}catch(e){return c;}}
+function goToCat(cat,type){
+  cat=decCat(cat);
   journalScope='bank';
-  jrnBank='';
+  resetJournalFilters();
+  jrnCat=cat;
+  if(type)document.getElementById('jf-type').value=type;
+  go('journal');applyJournalScopeLabels();
+}
+let cameFromAnalytics=false;
+function goToCatMonth(cat,month,type){
+  cat=decCat(cat);
+  journalScope='bank';
+  resetJournalFilters();
   curMonth=month;
   localStorage.setItem('cur_month',month);
   cameFromAnalytics=true;
   document.querySelectorAll('.mtab').forEach(t=>t.classList.toggle('active',t.textContent===month.slice(0,3)));
-  if(cat==='__nocat__'){jrnCat='__nocat__';}else{jrnCat=cat;}
+  jrnCat=cat; // '__nocat__' тоже обрабатывается в renderJournal
+  // Тип операции: цифра в Аналитике считает только 'expense' / 'income' — показываем в Журнале ровно их
+  if(type)document.getElementById('jf-type').value=type;
+  // Переносим фильтры Аналитики (тип счёта и валюта), чтобы список совпадал с цифрой
+  if(dashTypeFilter)document.getElementById('jf-accttype').value=dashTypeFilter;
+  if(dashCurrFilterH)jrnCurrFilter=dashCurrFilterH;
   go('journal');
   applyJournalScopeLabels();
 }
