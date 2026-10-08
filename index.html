@@ -268,6 +268,27 @@ select.inp{cursor:pointer;}
 .btn-d{background:var(--red-bg);color:var(--red);border:1px solid var(--red-b);}
 .btn-d:hover{background:#fee2e2;}
 .btn-sm{height:32px;padding:0 14px;font-size:14px;}
+.res-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px 22px;margin-bottom:14px;box-shadow:var(--shadow)}
+.res-hero-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.res-hero-lbl{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em}
+.res-big{font-family:Manrope,sans-serif;font-size:42px;font-weight:800;color:var(--purple);letter-spacing:-1px;margin:6px 0 12px}
+.res-stats{display:flex;gap:10px;flex-wrap:wrap}
+.res-stat{flex:1 1 150px;background:var(--surface2);border-radius:10px;padding:10px 14px}
+.res-stat .l{font-size:12px;color:var(--text3);font-weight:600}
+.res-stat .v{font-size:19px;font-weight:800;font-family:Manrope,sans-serif;margin-top:2px}
+.res-sec{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:20px 2px 10px}
+.res-sec h2{font-size:16px;font-weight:800;margin:0}
+.res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.res-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;box-shadow:var(--shadow)}
+.res-card .nm{font-weight:700;font-size:15px}
+.res-card .amt{font-family:Manrope,sans-serif;font-size:24px;font-weight:800;color:var(--purple);margin:6px 0 8px}
+.res-bar{height:8px;border-radius:4px;background:var(--surface2);overflow:hidden}
+.res-bar>div{height:100%;border-radius:4px;background:var(--purple)}
+.res-bar.done>div{background:var(--green)}
+.res-card .goal-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;font-size:13px;color:var(--text3)}
+.res-card .goal-inp{width:110px;text-align:right;height:30px;font-size:14px}
+.res-card .sub{font-size:12px;color:var(--text3);margin-top:6px}
+
 
 /* SUMMARY */
 table.st{width:100%;border-collapse:collapse;font-size:15px;}
@@ -682,21 +703,15 @@ table.nit td.empty-cell{color:var(--text3);}
 <div id="view-reserves" class="view">
   <div class="ph"><h1>Резервы</h1></div>
   <div class="mbar" id="mt-reserves"></div>
-  <div class="panel" style="margin-bottom:14px">
-    <div class="panel-h">Мини-сверка · остатки по счетам на конец месяца <span id="res-month-lbl" style="color:var(--text3);font-weight:600"></span></div>
-    <div class="panel-b" id="res-recon" style="padding:0;overflow-x:auto"></div>
+  <div id="res-hero"></div>
+  <div class="res-sec">
+    <h2>🎯 Цели и папки резервов</h2>
+    <span style="display:flex;gap:6px;align-items:center"><input class="inp" id="res-new-folder" placeholder="Новая папка: Отпуск, Свадьба…" style="width:230px"><button class="btn btn-p btn-sm" onclick="addReserveFolder()">+ Добавить</button></span>
   </div>
-  <div class="panel" style="margin-bottom:14px">
-    <div class="panel-h">🪙 Резерв по всем счетам</div>
-    <div class="panel-b" id="res-total"></div>
-  </div>
-  <div class="panel" style="margin-bottom:14px">
-    <div class="panel-h" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px"><span>🎯 Цели и папки резервов</span>
-      <span style="display:flex;gap:6px;align-items:center"><input class="inp" id="res-new-folder" placeholder="Новая папка: Отпуск, Свадьба…" style="width:230px"><button class="btn btn-p btn-sm" onclick="addReserveFolder()">+ Добавить</button></span>
-    </div>
-    <div class="panel-b" id="res-goals" style="padding:0;overflow-x:auto"></div>
-    <div style="padding:10px 18px;font-size:13px;color:var(--text3)">Как пополнить: Журнал → «+ Добавить» → тип «🪙 В резерв», счёт, сумма и категория = нужная папка. Вернуть деньги — «🪙 Из резерва» с той же категорией.</div>
-  </div>
+  <div id="res-goals"></div>
+  <div style="font-size:13px;color:var(--text3);margin:10px 2px 0">Как пополнить: Журнал → «+ Добавить» → тип «🪙 В резерв», счёт, сумма и категория = нужная папка. Вернуть деньги — «🪙 Из резерва» с той же категорией.</div>
+  <div class="res-sec"><h2>Мини-сверка · остатки на конец месяца <span id="res-month-lbl" style="color:var(--text3);font-weight:600"></span></h2></div>
+  <div class="panel" style="margin-bottom:14px"><div class="panel-b" id="res-recon" style="padding:0;overflow-x:auto"></div></div>
 </div>
 
 <!-- BROKER SUMMARY -->
@@ -2190,23 +2205,32 @@ async function loadReserveByBank(uptoMonth){
 }
 
 // ─── СТРАНИЦА «РЕЗЕРВЫ» ──────────────────────────────────────────
-// Цели хранятся в app_settings.reserve_goals: {"Отпуск":{"budget":300000,"cur":"RUB"}, ...}
+// Цели хранятся в app_settings.reserve_goals: {"Отпуск":{"RUB":300000,"USD":500}, ...}
 // Папка резерва = категория с типом «Резерв» (операции «В резерв» / «Из резерва» с этой категорией)
+let resCur=null;
 function getReserveGoals(){
-  try{return JSON.parse(appSettings['reserve_goals']||'{}')||{};}catch(e){return{};}
+  let g={};
+  try{g=JSON.parse(appSettings['reserve_goals']||'{}')||{};}catch(e){}
+  // совместимость со старым форматом {budget,cur}
+  Object.keys(g).forEach(n=>{if(g[n]&&g[n].budget!==undefined){const o={};if(g[n].budget)o[g[n].cur||'RUB']=g[n].budget;g[n]=o;}});
+  return g;
 }
-async function setReserveGoal(name,patch){
+async function setReserveGoal(name,cur,budget){
   const goals=getReserveGoals();
-  goals[name]=Object.assign({budget:0,cur:'RUB'},goals[name]||{},patch);
+  goals[name]=goals[name]||{};
+  if(budget>0)goals[name][cur]=budget;else delete goals[name][cur];
   await saveAppSetting('reserve_goals',JSON.stringify(goals));
   renderReserves();
 }
-function resEnc(n){return encodeURIComponent(n);}
-function onResGoalBudget(encName,val){
-  const n=parseFloat(String(val).replace(/\s/g,'').replace(',','.'))||0;
-  setReserveGoal(decodeURIComponent(encName),{budget:n});
+function setResCur(c){
+  resCur=c;
+  try{localStorage.setItem('res_cur',c);}catch(e){}
+  renderReserves();
 }
-function onResGoalCur(encName,cur){setReserveGoal(decodeURIComponent(encName),{cur});}
+function onResGoal(encName,val){
+  const n=parseFloat(String(val).replace(/\s/g,'').replace(',','.'))||0;
+  setReserveGoal(decodeURIComponent(encName),resCur||'RUB',n);
+}
 async function addReserveFolder(){
   const inp=document.getElementById('res-new-folder');
   const name=(inp.value||'').trim();
@@ -2224,7 +2248,7 @@ async function renderReserves(){
   const sharedIds=getSharedBankIds();
   const hasShared=sharedIds.length>0;
   // остаток на конец выбранного месяца и резерв по каждому счёту (кредитные и брокерские не считаем)
-  const rows=banks.filter(b=>b.type!=='credit'&&b.type!=='broker').map(b=>{
+  const rowsAll=banks.filter(b=>b.type!=='credit'&&b.type!=='broker').map(b=>{
     let end=(janBals[b.id]||{start:0}).start||0,res=0;
     allRecs.forEach(r=>{
       if(r.bank_id!==b.id||MONTHS.indexOf(r.month)>upto)return;
@@ -2236,76 +2260,74 @@ async function renderReserves(){
     });
     return{b,cur:b.currency||'RUB',end,res,shared:sharedIds.includes(String(b.id))};
   }).filter(x=>x.end||x.res||allRecs.some(r=>r.bank_id===x.b.id));
-  const curs=sortedCurrencies([...new Set(rows.map(x=>x.cur))]);
+  const allCurs=sortedCurrencies([...new Set(rowsAll.map(x=>x.cur))]);
+  if(!resCur){try{resCur=localStorage.getItem('res_cur')||'RUB';}catch(e){resCur='RUB';}}
+  if(!allCurs.includes(resCur))resCur=allCurs.includes('RUB')?'RUB':(allCurs[0]||'RUB');
+  const cur=resCur,sym=CURRENCY[cur]||cur;
+  const rows=rowsAll.filter(x=>x.cur===cur);
+
+  // ── 1. Резерв по всем счетам (вверху) + переключатель валют
+  const sum=(list,k)=>list.reduce((s,x)=>s+x[k],0);
+  const totRes=sum(rows,'res'),totEnd=sum(rows,'end');
+  const shRes=sum(rows.filter(x=>x.shared),'res'),miRes=totRes-shRes;
+  // папки и цели
+  const folderAmt={};
+  allRecs.forEach(r=>{
+    if(r.type!=='reserve_out'&&r.type!=='reserve_in')return;
+    if(MONTHS.indexOf(r.month)>upto||recCurrency(r)!==cur)return;
+    const f=r.category||'Резерв';
+    folderAmt[f]=(folderAmt[f]||0)+(parseFloat(r.amount)||0)*(r.type==='reserve_out'?1:-1);
+  });
+  const goals=getReserveGoals();
+  const names=[...new Set([...categories.filter(c=>c.type==='reserve'&&c.name!=='Резерв').map(c=>c.name),...Object.keys(folderAmt).filter(n=>n!=='Резерв')])];
+  if(folderAmt['Резерв'])names.push('Резерв');
+  let goalsSum=0,goalsSaved=0;
+  names.forEach(n=>{const g=(goals[n]||{})[cur]||0;if(g){goalsSum+=g;goalsSaved+=Math.min(folderAmt[n]||0,g);}});
+  const switcher=allCurs.length>1?`<div style="display:flex;gap:6px;flex-wrap:wrap">${allCurs.map(c=>`<button type="button" class="btn btn-sm ${c===cur?'btn-p':'btn-g'}" onclick="setResCur('${c}')">${CURRENCY[c]||c} ${CURRENCY_NAME[c]||c}</button>`).join('')}</div>`:'';
+  document.getElementById('res-hero').innerHTML=`<div class="res-hero">
+    <div class="res-hero-top"><div class="res-hero-lbl">🪙 Резерв по всем счетам</div>${switcher}</div>
+    <div class="res-big">${fmtF(totRes)} ${sym}</div>
+    <div class="res-stats">
+      ${hasShared?`<div class="res-stat"><div class="l">👥 Общие счета</div><div class="v">${fmtF(shRes)} ${sym}</div></div><div class="res-stat"><div class="l">👤 Мои счета</div><div class="v">${fmtF(miRes)} ${sym}</div></div>`:''}
+      <div class="res-stat"><div class="l">Всего денег на счетах</div><div class="v">${fmtF(totEnd)} ${sym}</div></div>
+      <div class="res-stat"><div class="l">✓ Свободно</div><div class="v" style="color:var(--green)">${fmtF(totEnd-totRes)} ${sym}</div></div>
+      ${goalsSum?`<div class="res-stat"><div class="l">🎯 Цели: накоплено из ${fmtF(goalsSum)} ${sym}</div><div class="v">${Math.round(goalsSaved/goalsSum*100)}% · осталось ${fmtF(Math.max(goalsSum-goalsSaved,0))} ${sym}</div></div>`:''}
+    </div></div>`;
+
+  // ── 2. Цели и папки — карточки
+  document.getElementById('res-goals').innerHTML=names.length?`<div class="res-grid">${names.map(n=>{
+    const saved=folderAmt[n]||0;
+    const goal=(goals[n]||{})[cur]||0;
+    const pct=goal>0?Math.max(0,Math.min(100,saved/goal*100)):0;
+    const left=goal-saved;
+    const e=encodeURIComponent(n);
+    return `<div class="res-card">
+      <div class="nm">${n==='Резерв'?'📁 Без папки':'📁 '+n}</div>
+      <div class="amt">${fmtF(saved)} ${sym}</div>
+      ${goal>0?`<div class="res-bar${pct>=100?' done':''}"><div style="width:${pct}%"></div></div>`:''}
+      <div class="goal-row"><span>Цель, ${sym}</span><input class="inp goal-inp" value="${goal||''}" placeholder="не задана" onchange="onResGoal('${e}',this.value)"></div>
+      ${goal>0?`<div class="sub">${left<=0?'✓ Цель достигнута':`${Math.round(pct)}% · осталось ${fmtF(left)} ${sym}`}</div>`:''}
+    </div>`;}).join('')}</div>`
+    :'<div class="panel"><div class="empty" style="padding:16px">Папок пока нет — добавь первую (например, «Отпуск») кнопкой выше</div></div>';
+
+  // ── 3. Мини-сверка — только выбранная валюта
   const th='padding:6px 12px;text-align:right;font-size:12px;color:var(--text3);text-transform:uppercase';
   const sumRow=(label,list,bold)=>{
-    const e=list.reduce((s,x)=>s+x.end,0),r=list.reduce((s,x)=>s+x.res,0);
+    const e=sum(list,'end'),r=sum(list,'res');
     return `<tr style="background:var(--surface2);font-weight:${bold?800:700}"><td style="padding:6px 12px">${label}</td><td style="text-align:right;padding:6px 12px">${fmtF(e)}</td><td style="text-align:right;padding:6px 12px;color:var(--purple)">${r?fmtF(r):'—'}</td><td style="text-align:right;padding:6px 12px;color:var(--green)">${fmtF(e-r)}</td></tr>`;
   };
   const bankRow=x=>`<tr><td style="padding:6px 12px"><span class="bdot-sm" style="background:${x.b.color}"></span> ${x.b.name}</td><td style="text-align:right;padding:6px 12px">${fmtF(x.end)}</td><td style="text-align:right;padding:6px 12px;color:var(--purple)">${x.res?fmtF(x.res):'—'}</td><td style="text-align:right;padding:6px 12px">${fmtF(x.end-x.res)}</td></tr>`;
-  document.getElementById('res-recon').innerHTML=curs.length?`<table style="width:100%;border-collapse:collapse;font-size:14px">
+  let body='';
+  if(!hasShared)body=rows.map(bankRow).join('')+sumRow('Итого · '+sym,rows,true);
+  else{
+    const sh=rows.filter(x=>x.shared),mi=rows.filter(x=>!x.shared);
+    body=(sh.length?`<tr><td colspan="4" style="padding:6px 12px;font-weight:700">👥 Общие счета</td></tr>${sh.map(bankRow).join('')}${sumRow('Итого общие · '+sym,sh)}`:'')
+      +(mi.length?`<tr><td colspan="4" style="padding:6px 12px;font-weight:700">👤 Мои счета</td></tr>${mi.map(bankRow).join('')}${sumRow('Итого мои · '+sym,mi)}`:'')
+      +sumRow('Всего · '+sym,rows,true);
+  }
+  document.getElementById('res-recon').innerHTML=rows.length?`<table style="width:100%;border-collapse:collapse;font-size:14px">
     <thead><tr><th style="${th};text-align:left">Счёт</th><th style="${th}">Остаток</th><th style="${th}">🪙 Резерв</th><th style="${th}">Свободно</th></tr></thead>
-    <tbody>${curs.map(cur=>{
-      const sym=CURRENCY[cur]||cur;
-      const list=rows.filter(x=>x.cur===cur);
-      const head=`<tr><td colspan="4" style="padding:4px 12px;background:var(--accent-l);font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase">${sym} ${CURRENCY_NAME[cur]||cur}</td></tr>`;
-      if(!hasShared)return head+list.map(bankRow).join('')+sumRow('Итого · '+sym,list,true);
-      const sh=list.filter(x=>x.shared),mi=list.filter(x=>!x.shared);
-      return head
-        +(sh.length?`<tr><td colspan="4" style="padding:4px 12px;font-weight:700">👥 Общие счета</td></tr>${sh.map(bankRow).join('')}${sumRow('Итого общие · '+sym,sh)}`:'')
-        +(mi.length?`<tr><td colspan="4" style="padding:4px 12px;font-weight:700">👤 Мои счета</td></tr>${mi.map(bankRow).join('')}${sumRow('Итого мои · '+sym,mi)}`:'')
-        +sumRow('Всего · '+sym,list,true);
-    }).join('')}</tbody></table>`:'<div class="empty">Нет данных</div>';
-
-  // Резерв в сумме по валютам
-  const totalByCur={};
-  rows.forEach(x=>{const t=totalByCur[x.cur]=totalByCur[x.cur]||{all:0,shared:0,mine:0};t.all+=x.res;if(x.shared)t.shared+=x.res;else t.mine+=x.res;});
-  const tcs=sortedCurrencies(Object.keys(totalByCur));
-  document.getElementById('res-total').innerHTML=tcs.length?tcs.map(cur=>{
-    const t=totalByCur[cur];
-    return `<div style="display:inline-block;margin:0 28px 6px 0;vertical-align:top"><div style="font-size:12px;color:var(--text3);font-weight:700;text-transform:uppercase">${CURRENCY[cur]||cur} ${CURRENCY_NAME[cur]||cur}</div>
-      <div style="font-family:Manrope,sans-serif;font-size:30px;font-weight:800;color:var(--purple)">${fmtF(t.all)}</div>
-      ${hasShared?`<div style="font-size:13px;color:var(--text2)">👥 общие: <b>${fmtF(t.shared)}</b> · 👤 мои: <b>${fmtF(t.mine)}</b></div>`:''}</div>`;
-  }).join(''):'<div class="empty">Резервов пока нет</div>';
-
-  // Папки (цели): категории типа reserve + любые категории, по которым уже есть резервные операции
-  const folderCur={}; // folderCur[папка][валюта] = сумма
-  allRecs.forEach(r=>{
-    if(r.type!=='reserve_out'&&r.type!=='reserve_in')return;
-    if(MONTHS.indexOf(r.month)>upto)return;
-    const f=r.category||'Резерв';
-    const c=recCurrency(r);
-    const a=(parseFloat(r.amount)||0)*(r.type==='reserve_out'?1:-1);
-    ((folderCur[f]=folderCur[f]||{})[c]=(folderCur[f][c]||0)+a);
-  });
-  const names=[...new Set([...categories.filter(c=>c.type==='reserve').map(c=>c.name),...Object.keys(folderCur)])];
-  const goals=getReserveGoals();
-  const goalCurs=sortedCurrencies([...new Set([...names.map(n=>(goals[n]||{}).cur||'RUB'),...Object.values(folderCur).flatMap(o=>Object.keys(o))])]);
-  const totSaved={},totGoal={};
-  const inpStyle='width:110px;text-align:right';
-  const body=names.map(n=>{
-    const g=goals[n]||{budget:0,cur:'RUB'};
-    const amounts=folderCur[n]||{};
-    const saved=amounts[g.cur]||0;
-    Object.entries(amounts).forEach(([c,v])=>totSaved[c]=(totSaved[c]||0)+v);
-    if(g.budget)totGoal[g.cur]=(totGoal[g.cur]||0)+g.budget;
-    const pct=g.budget>0?Math.max(0,Math.min(100,saved/g.budget*100)):0;
-    const left=g.budget>0?g.budget-saved:null;
-    const savedTxt=Object.keys(amounts).length?sortedCurrencies(Object.keys(amounts)).map(c=>fmtCur(amounts[c],c)).join(' · '):'—';
-    const e=resEnc(n);
-    return `<tr><td style="padding:8px 12px;font-weight:600">${n==='Резерв'?'Резерв (без папки)':n}</td>
-      <td style="padding:8px 12px;text-align:right;color:var(--purple);font-weight:700;white-space:nowrap">${savedTxt}</td>
-      <td style="padding:8px 12px;text-align:right;white-space:nowrap"><input class="inp" style="${inpStyle}" value="${g.budget||''}" placeholder="бюджет" onchange="onResGoalBudget('${e}',this.value)"> <select class="inp" style="width:64px" onchange="onResGoalCur('${e}',this.value)">${Object.keys(CURRENCY).map(c=>`<option value="${c}"${c===g.cur?' selected':''}>${CURRENCY[c]}</option>`).join('')}</select></td>
-      <td style="padding:8px 12px;text-align:right;white-space:nowrap;color:${left!==null&&left<=0?'var(--green)':'var(--text2)'}">${left===null?'—':(left<=0?'✓ достигнута':fmtCur(left,g.cur))}</td>
-      <td style="padding:8px 12px;min-width:140px">${g.budget>0?`<div style="height:8px;border-radius:4px;background:var(--surface2);overflow:hidden"><div style="height:100%;width:${pct}%;background:${pct>=100?'var(--green)':'var(--purple)'}"></div></div><div style="font-size:12px;color:var(--text3);margin-top:2px">${Math.round(pct)}%</div>`:''}</td></tr>`;
-  }).join('');
-  const sumCur=cs=>sortedCurrencies(Object.keys(cs)).map(c=>fmtCur(cs[c],c)).join(' · ')||'—';
-  const leftCs={};
-  Object.keys(totGoal).forEach(c=>{leftCs[c]=totGoal[c]-(totSaved[c]||0);});
-  document.getElementById('res-goals').innerHTML=names.length?`<table style="width:100%;border-collapse:collapse;font-size:14px">
-    <thead><tr><th style="${th};text-align:left">Цель / папка</th><th style="${th}">Накоплено</th><th style="${th}">Бюджет цели</th><th style="${th}">Осталось</th><th style="${th};text-align:left">Прогресс</th></tr></thead>
-    <tbody>${body}<tr style="background:var(--surface2);font-weight:800;border-top:2px solid var(--border2)"><td style="padding:8px 12px">Итого</td><td style="padding:8px 12px;text-align:right;color:var(--purple);white-space:nowrap">${sumCur(totSaved)}</td><td style="padding:8px 12px;text-align:right;white-space:nowrap">${sumCur(totGoal)}</td><td style="padding:8px 12px;text-align:right;white-space:nowrap">${sumCur(leftCs)}</td><td></td></tr></tbody></table>`
-    :'<div class="empty" style="padding:16px">Папок пока нет — добавь первую (например, «Отпуск») кнопкой выше</div>';
+    <tbody>${body}</tbody></table>`:'<div class="empty" style="padding:16px">Нет данных</div>';
 }
 
 // ─── DASHBOARD ──────────────────────────────────────────────────
@@ -3686,6 +3708,7 @@ async function initApp(){
   renderFSubtypes('income');
   setFSubtype('income','income');
   restoreFilters();
+  initTabs(); // перерисовываем вкладки месяцев уже с восстановленным месяцем
   const lastView=localStorage.getItem('last_view')||'journal';
   go(lastView);
 }
